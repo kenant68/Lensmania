@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LensmaniaClient", "LensmaniaClient\LensmaniaClient.csproj", "{54FEA301-CF0F-4429-A731-907F842B1B49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LensmaniaServer", "LensmaniaServer\LensmaniaServer.csproj", "{428DEAFF-61C9-4BB1-A6F9-EF5D7938171D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LensmaniaLibrary", "LensmaniaLibrary\LensmaniaLibrary.csproj", "{E0166F5A-3921-4116-8E0D-C582BDFA833C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LensmaniaTests", "LensmaniaTests\LensmaniaTests.csproj", "{08B5AFA6-449F-4EAE-B27E-F4302A161FC3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54FEA301-CF0F-4429-A731-907F842B1B49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54FEA301-CF0F-4429-A731-907F842B1B49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54FEA301-CF0F-4429-A731-907F842B1B49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54FEA301-CF0F-4429-A731-907F842B1B49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{428DEAFF-61C9-4BB1-A6F9-EF5D7938171D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{428DEAFF-61C9-4BB1-A6F9-EF5D7938171D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{428DEAFF-61C9-4BB1-A6F9-EF5D7938171D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{428DEAFF-61C9-4BB1-A6F9-EF5D7938171D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0166F5A-3921-4116-8E0D-C582BDFA833C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0166F5A-3921-4116-8E0D-C582BDFA833C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0166F5A-3921-4116-8E0D-C582BDFA833C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0166F5A-3921-4116-8E0D-C582BDFA833C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B5AFA6-449F-4EAE-B27E-F4302A161FC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B5AFA6-449F-4EAE-B27E-F4302A161FC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B5AFA6-449F-4EAE-B27E-F4302A161FC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B5AFA6-449F-4EAE-B27E-F4302A161FC3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

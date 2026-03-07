@@ -1,0 +1,6 @@
+@LensmaniaServer_HostAddress = http://localhost:5078
+
+GET {{LensmaniaServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
