@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LensmaniaLibrary")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79dd89ed2b6d1bc6aca19533b8fce269338a343b")]
 [assembly: System.Reflection.AssemblyProductAttribute("LensmaniaLibrary")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LensmaniaLibrary")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
