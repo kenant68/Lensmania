@@ -17,6 +17,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\LensmaniaLibrary\LensmaniaLibrary.csproj" />
+        <ProjectReference Include="..\LensmaniaServer\LensmaniaServer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
