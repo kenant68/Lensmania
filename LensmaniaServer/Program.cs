@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using LensmaniaServer.Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Set up Entity Framework
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
