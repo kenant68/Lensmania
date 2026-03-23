@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using LensmaniaServer.Database;
+using LensmaniaServer.Features.Posts;
+using LensmaniaLibrary.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,12 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IPostService, PostService>();
 
 // Set up Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:5135")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -23,6 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowClient");
 app.MapControllers();
 
 // Template code to delete
@@ -45,6 +60,22 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast");
 */
+
+// Données de test
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+
+    if (!db.Posts.Any())
+    {
+        db.Posts.AddRange(
+            new Post { Title = "Premier post", PhotoUrl = "https://picsum.photos/400/300", Description = "Test" },
+            new Post { Title = "Deuxième post", PhotoUrl = "https://picsum.photos/400/301", Description = "Test 2" }
+        );
+        db.SaveChanges();
+    }
+}
 
 app.Run();
 
