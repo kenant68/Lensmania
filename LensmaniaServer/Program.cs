@@ -40,46 +40,11 @@ app.UseHttpsRedirection();
 app.UseCors("AllowClient");
 app.MapControllers();
 
-// Template code to delete
-/*var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
-*/
-
-// Données de test
+// Seed database with posts seeder : SeederPost
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-
-    if (!db.Posts.Any())
-    {
-        db.Posts.AddRange(
-            new Post { Title = "Premier post", PhotoUrl = "https://picsum.photos/400/300", Description = "Test" },
-            new Post { Title = "Deuxième post", PhotoUrl = "https://picsum.photos/400/301", Description = "Test 2" }
-        );
-        db.SaveChanges();
-    }
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await SeederPost.Seed(context);
 }
 
 app.Run();
-
-/*record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}*/
