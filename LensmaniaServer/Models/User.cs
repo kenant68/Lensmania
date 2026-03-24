@@ -8,11 +8,7 @@ public class User {
     public bool IsAdmin { get; set; } = false;
     public bool IsPremium { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    
+
     public record RegisterRequest(string Username, string Email, string Password);
     public record LoginRequest(string Email, string Password);
-    
-    
-    public record AuthResponse(string Token, string Username, bool IsAdmin, bool IsPremium);
 }
