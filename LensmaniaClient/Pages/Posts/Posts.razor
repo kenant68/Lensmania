@@ -9,6 +9,10 @@
 {
     <p>Chargement...</p>
 }
+else if (_hasError)
+{
+    <p>Erreur lors du chargement des photos.</p>
+}
 else if (!posts.Any())
 {
     <p>Aucune photo pour l'instant.</p>
@@ -36,11 +40,17 @@ else
     private List<Post>? posts;
     private Masonry _masonry = null!;
     private bool _postsLoaded = false;
+    private bool _hasError = false;
 
     protected override async Task OnInitializedAsync()
     {
-        posts = await Http.GetFromJsonAsync<List<Post>>("api/posts");
-        _postsLoaded = true;
+        try {
+            posts = await Http.GetFromJsonAsync<List<Post>>("api/posts");
+            _postsLoaded = true;
+        } catch (HttpRequestException) {
+            posts = new List<Post>();
+            _hasError = true;
+        }
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
