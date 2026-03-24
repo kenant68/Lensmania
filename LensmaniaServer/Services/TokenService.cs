@@ -8,12 +8,20 @@ namespace LensmaniaServer.Services;
 
 public class TokenService {
     private readonly IConfiguration _cfg;
-    public TokenService(IConfiguration cfg) { _cfg = cfg; }
+    private readonly SymmetricSecurityKey _signingKey;
+
+    public TokenService(IConfiguration cfg) {
+        _cfg = cfg;
+        var keyString = cfg["Jwt:Key"];
+        if (string.IsNullOrWhiteSpace(keyString)) {
+            throw new InvalidOperationException(
+                "Configuration value 'Jwt:Key' is missing or empty. Set a non-empty signing key in configuration.");
+        }
+        _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
+    }
 
     public string GenerateToken(User user) {
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_cfg["Jwt:Key"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var creds = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
         var claims = new[] {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
