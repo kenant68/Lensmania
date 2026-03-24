@@ -39,7 +39,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        posts = await Http.GetFromJsonAsync<List<Post>>("http://localhost:5078/api/posts");
+        posts = await Http.GetFromJsonAsync<List<Post>>("api/posts");
         _postsLoaded = true;
     }
     

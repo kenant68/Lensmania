@@ -28,6 +28,6 @@ public class SeederPost
         context.Posts.AddRange(posts);
         await context.SaveChangesAsync();
         
-        Console.WriteLine("Base de données intialisée avec le seeder");
+        Console.WriteLine("Base de données initialisée avec le seeder");
     }
 }
