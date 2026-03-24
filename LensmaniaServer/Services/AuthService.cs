@@ -1,5 +1,6 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LensmaniaServer.Services;
 
@@ -11,7 +12,7 @@ public class AuthService {
     }
 
     public async Task<AuthResponse?> Register(RegisterRequest req) {
-        if (_db.Users.Any(u => u.Email == req.Email)) return null;
+        if (await _db.Users.AnyAsync(u => u.Email == req.Email)) return null;
         var user = new User {
             Username = req.Username,
             Email = req.Email,
