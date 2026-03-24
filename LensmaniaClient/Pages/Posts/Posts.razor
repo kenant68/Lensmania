@@ -1,0 +1,56 @@
+﻿@page "/posts"
+@inject HttpClient Http
+@using LensmaniaLibrary.Models
+@using Soenneker.Blazor.Masonry
+
+<h1>Les photos</h1>
+
+@if (posts == null)
+{
+    <p>Chargement...</p>
+}
+else if (!posts.Any())
+{
+    <p>Aucune photo pour l'instant.</p>
+}
+else
+{
+    <Masonry AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
+        @foreach (var post in posts)
+        {
+            <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top" />
+                    @* <div class="card-body"> *@
+                    @*     <h5>@post.Title</h5> *@
+                    @*     <p>@post.Description</p> *@
+                    @*     <small>@post.CreatedAt.ToShortDateString()</small> *@
+                    @* </div> *@
+                </div>
+            </MasonryItem>
+        }
+    </Masonry>
+}
+
+@code {
+    private List<Post>? posts;
+    private Masonry _masonry = null!;
+    private bool _postsLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await Http.GetFromJsonAsync<List<Post>>("http://localhost:5078/api/posts");
+        _postsLoaded = true;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_postsLoaded)
+        {
+            _postsLoaded = false;
+            await Task.Delay(500);
+            await _masonry.Init();
+            //Console.WriteLine("Masonry initialisé");
+        }
+    }
+}
