@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using LensmaniaLibrary.Models;
 
 namespace LensmaniaServer.Database;
 
@@ -8,4 +9,6 @@ public class AppDbContext : DbContext
         : base(options)
     {
     }
+    
+    public DbSet<Post> Posts { get; set; }
 }
