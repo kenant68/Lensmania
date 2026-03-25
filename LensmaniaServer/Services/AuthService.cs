@@ -1,6 +1,7 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LensmaniaServer.Services;
 
@@ -12,14 +13,24 @@ public class AuthService {
     }
 
     public async Task<AuthResponse?> Register(RegisterRequest req) {
-        if (await _db.Users.AnyAsync(u => u.Email == req.Email)) return null;
+        if (await _db.Users.AnyAsync(u => u.Email == req.Email || u.Username == req.Username)) return null;
         var user = new User {
             Username = req.Username,
             Email = req.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password)
         };
         _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            var pg = ex.InnerException as PostgresException ?? ex.GetBaseException() as PostgresException;
+            if (pg != null && pg.SqlState == "23505")
+                throw new ApiConflictException("Email ou nom d'utilisateur déjà utilisé.");
+            throw;
+        }
         return new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium);
     }
 
