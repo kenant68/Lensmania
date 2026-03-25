@@ -12,10 +12,17 @@ public class AuthController : ControllerBase {
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest req) {
-        var result = await _auth.Register(req);
-        return result is null
-            ? BadRequest("Email déjà utilisé.")
-            : Ok(result);
+        try
+        {
+            var result = await _auth.Register(req);
+            return result is null
+                ? Conflict("Email ou nom d'utilisateur déjà utilisé.")
+                : Ok(result);
+        }
+        catch (ApiConflictException ex)
+        {
+            return Conflict(ex.Message);
+        }
     }
 
     [HttpPost("login")]
