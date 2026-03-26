@@ -16,18 +16,26 @@ public class AuthController : ControllerBase {
         {
             var result = await _auth.Register(req);
             return result is null
-                ? Conflict("Email ou nom d'utilisateur déjà utilisé.")
+                ? Conflict(new ApiErrorResponse(
+                    AuthErrorCodes.DuplicateIdentity,
+                    "Email or username is already in use."))
                 : Ok(result);
         }
         catch (ApiConflictException ex)
         {
-            return Conflict(ex.Message);
+            return Conflict(new ApiErrorResponse(
+                AuthErrorCodes.DuplicateIdentity,
+                ex.Message));
         }
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest req) {
         var result = await _auth.Login(req);
-        return result is null ? Unauthorized() : Ok(result);
+        return result is null
+            ? Unauthorized(new ApiErrorResponse(
+                AuthErrorCodes.InvalidCredentials,
+                "Invalid email or password."))
+            : Ok(result);
     }
 }
