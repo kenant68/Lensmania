@@ -34,7 +34,16 @@ Error response (`409 Conflict`):
 ```json
 {
   "code": "AUTH_DUPLICATE_IDENTITY",
-  "message": "Email or username is already in use."
+  "message": "Cet e-mail ou ce nom d'utilisateur est deja utilise."
+}
+```
+
+Alternative conflict message (`409 Conflict`):
+
+```json
+{
+  "code": "AUTH_DUPLICATE_IDENTITY",
+  "message": "<message metier de conflit, renvoye par le service>"
 }
 ```
 
@@ -43,7 +52,7 @@ Validation error response (`400 Bad Request`):
 ```json
 {
   "code": "AUTH_VALIDATION_FAILED",
-  "message": "Validation failed for authentication request.",
+  "message": "Certaines donnees du formulaire sont invalides.",
   "errors": {
     "FieldName": [
       "validation message"
@@ -79,7 +88,7 @@ Error response (`401 Unauthorized`):
 ```json
 {
   "code": "AUTH_INVALID_CREDENTIALS",
-  "message": "Invalid email or password."
+  "message": "E-mail ou mot de passe incorrect."
 }
 ```
 
@@ -88,7 +97,7 @@ Validation error response (`400 Bad Request`):
 ```json
 {
   "code": "AUTH_VALIDATION_FAILED",
-  "message": "Validation failed for authentication request.",
+  "message": "Certaines donnees du formulaire sont invalides.",
   "errors": {
     "FieldName": [
       "validation message"
