@@ -7,10 +7,12 @@ namespace LensmaniaClient.Services.Auth;
 public sealed class AuthApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly CustomAuthenticationStateProvider _authenticationStateProvider;
 
-    public AuthApiClient(HttpClient httpClient)
+    public AuthApiClient(HttpClient httpClient, CustomAuthenticationStateProvider authenticationStateProvider)
     {
         _httpClient = httpClient;
+        _authenticationStateProvider = authenticationStateProvider;
     }
 
     public Task<AuthApiResult<AuthResponseDto>> RegisterAsync(RegisterRequestDto request) =>
@@ -36,6 +38,7 @@ public sealed class AuthApiClient
                             "Authentication response body is empty."));
                 }
 
+                await _authenticationStateProvider.SetTokenAsync(payload.Token);
                 return AuthApiResult<AuthResponseDto>.Success(payload);
             }
 
