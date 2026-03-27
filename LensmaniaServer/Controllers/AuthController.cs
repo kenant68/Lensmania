@@ -18,7 +18,7 @@ public class AuthController : ControllerBase {
             return result is null
                 ? Conflict(new ApiErrorResponse(
                     AuthErrorCodes.DuplicateIdentity,
-                    "Email or username is already in use."))
+                    "Cet e-mail ou ce nom d'utilisateur est deja utilise."))
                 : Ok(result);
         }
         catch (ApiConflictException ex)
@@ -35,7 +35,7 @@ public class AuthController : ControllerBase {
         return result is null
             ? Unauthorized(new ApiErrorResponse(
                 AuthErrorCodes.InvalidCredentials,
-                "Invalid email or password."))
+                "E-mail ou mot de passe incorrect."))
             : Ok(result);
     }
 }

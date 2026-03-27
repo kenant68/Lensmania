@@ -25,7 +25,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         return new BadRequestObjectResult(new
         {
             code = AuthErrorCodes.ValidationFailed,
-            message = "Validation failed for authentication request.",
+            message = "Certaines donnees du formulaire sont invalides.",
             errors
         });
     };
