@@ -1,3 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace LensmaniaServer.Models;
 
-public record ApiErrorResponse(string Code, string Message);
+
+public record ApiErrorResponse(
+    [property: JsonPropertyName("code")] string Code,
+    [property: JsonPropertyName("message")] string Message);
