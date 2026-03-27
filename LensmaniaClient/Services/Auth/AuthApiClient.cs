@@ -72,6 +72,12 @@ public sealed class AuthApiClient
             return AuthApiResult<AuthResponseDto>.Failure(
                 new AuthApiError(AuthApiErrorType.UnexpectedServerError, "Reponse serveur non prise en charge."));
         }
+        
+        catch (System.Text.Json.JsonException)
+        {
+            return AuthApiResult<AuthResponseDto>.Failure(
+                new AuthApiError(AuthApiErrorType.UnexpectedServerError, "Format de reponse serveur invalide."));
+        }
     }
 
     private static string ExtractUserMessage(ApiErrorDto? apiError)
