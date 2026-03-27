@@ -3,13 +3,33 @@ using LensmaniaServer.Database;
 using LensmaniaServer.Services;
 using LensmaniaServer.Features.Posts;
 using LensmaniaLibrary.Models;
+using LensmaniaServer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(entry => entry.Value?.Errors.Count > 0)
+            .ToDictionary(
+                entry => entry.Key,
+                entry => entry.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+
+        return new BadRequestObjectResult(new
+        {
+            code = AuthErrorCodes.ValidationFailed,
+            message = "Certaines donnees du formulaire sont invalides.",
+            errors
+        });
+    };
+});
 builder.Services.AddScoped<IPostService, PostService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
@@ -21,7 +41,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateIssuer = true,
-            ValidateAudience = true
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
         };
     });
 builder.Services.AddAuthorization();
