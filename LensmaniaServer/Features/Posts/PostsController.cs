@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using LensmaniaLibrary.Models;
+using LensmaniaLibrary.DTOs.Posts;
 
 namespace LensmaniaServer.Features.Posts;
 
@@ -15,9 +15,11 @@ public class PostsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Post>>> GetAll()
+    public async Task<ActionResult<PaginatedPosts>> GetAll(
+        [FromQuery] int? cursor = null,
+        [FromQuery] int limit = 10)
     {
-        var posts = await _postService.GetAllAsync();
-        return Ok(posts);
+        var result = await _postService.GetAllAsync(cursor, limit);
+        return Ok(result);
     }
 }
