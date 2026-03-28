@@ -1,34 +1,33 @@
 ﻿@page "/posts"
-@inject HttpClient Http
-@using LensmaniaLibrary.Models
 @using Soenneker.Blazor.Masonry
 
-<h1>Les photos</h1>
+<h1>Lensmania</h1>
 
-@if (posts == null)
-{
-    <p>Chargement...</p>
-}
-else if (_hasError)
+@if (_hasError)
 {
     <p>Erreur lors du chargement des photos.</p>
 }
-else if (!posts.Any())
+else if (!_posts.Any() && _isLoading)
+{
+    <p>Chargement...</p>
+}
+else if (!_posts.Any())
 {
     <p>Aucune photo pour l'instant.</p>
 }
 else
 {
-    <Masonry AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
-        @foreach (var post in posts)
+
+    <Masonry @key="_cursor" AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
+        @foreach (var post in _posts)
         {
             <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card">
-                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top" />
+                <div class="post-card">
+                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top" @onload="OnImageLoaded" />
                     @* <div class="card-body"> *@
-                    @*     <h5>@post.Title</h5> *@
+                    @*     <h3>@post.Title</h3> *@
                     @*     <p>@post.Description</p> *@
-                    @*     <small>@post.CreatedAt.ToShortDateString()</small> *@
+                    @*     <p>@post.CreatedAt.ToShortDateString()</p> *@
                     @* </div> *@
                 </div>
             </MasonryItem>
@@ -36,31 +35,17 @@ else
     </Masonry>
 }
 
-@code {
-    private List<Post>? posts;
-    private Masonry _masonry = null!;
-    private bool _postsLoaded = false;
-    private bool _hasError = false;
+@if (_isLoading)
+{
+    <p>Chargement...</p>
+}
 
-    protected override async Task OnInitializedAsync()
-    {
-        try {
-            posts = await Http.GetFromJsonAsync<List<Post>>("api/posts");
-            _postsLoaded = true;
-        } catch (HttpRequestException) {
-            posts = new List<Post>();
-            _hasError = true;
-        }
-    }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_postsLoaded)
-        {
-            _postsLoaded = false;
-            await Task.Delay(500);
-            await _masonry.Init();
-            //Console.WriteLine("Masonry initialisé");
-        }
-    }
+@if (!_hasMore && _posts.Any())
+{
+    <p>Plus aucune photo à afficher.</p>
+}
+
+@if (_hasMore)
+{
+    <div @ref="_sentinel" style="height: 1px;"></div>
 }
