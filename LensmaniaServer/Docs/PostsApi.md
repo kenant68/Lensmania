@@ -25,13 +25,13 @@ Returns a paginated list of posts, sorted from latest `createdAt` to oldest, usi
 
 ### First page (without cursor)
 
-```
+```http
 GET /api/posts?limit=10
 ```
 
 ### Next page (with cursor)
 
-```
+```http
 GET /api/posts?limit=10&cursor=32
 ```
 
@@ -48,7 +48,7 @@ GET /api/posts?limit=10&cursor=32
       "title": "Mon post",
       "photoUrl": "https://example.com/photo.jpg",
       "description": "Une photo test",
-      "createdAt": "2026-29-03T12:30:00Z"
+      "createdAt": "2026-03-29T12:30:00Z"
     }
   ],
   "hasMore": true,
@@ -79,7 +79,7 @@ This endpoint uses a **cursor-based pagination** rather than an offset paginatio
 
 The client uses the `nextCursor` field from the previous response to load the next batch. This prevents duplicate posts or skipped posts if new posts are added between requests.
 
-```
+```http
 Request 1 : GET /api/posts?limit=10
 → gets posts 100..91, nextCursor = 91
 

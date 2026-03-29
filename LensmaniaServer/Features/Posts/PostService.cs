@@ -14,8 +14,7 @@ public class PostService : IPostService
     public async Task<PaginatedPosts> GetAllAsync(int? cursor, int limit)
     {
         var query = _db.Posts
-            .OrderByDescending(p => p.CreatedAt)
-            .ThenByDescending(p => p.Id)
+            .OrderByDescending(p => p.Id)
             .AsQueryable();
 
         if (cursor.HasValue)
@@ -42,7 +41,7 @@ public class PostService : IPostService
         {
             Posts = itemDtos,
             HasMore = hasMore,
-            NextCursor = hasMore ? items.Last().Id : null
+            NextCursor = hasMore && items.Any() ? items.Last().Id : null
         };
     }
 

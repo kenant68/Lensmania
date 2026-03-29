@@ -31,12 +31,17 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         if (firstRender)
         {
             await LoadMorePosts();
+            // Waits for the re-render triggered by LoadMorePosts() to be finished
+            await Task.Yield();
 
             _dotNetRef = DotNetObjectReference.Create(this);
             _jsModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./js/infiniteScroll.js");
 
-            await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
+            if (_sentinel.Id != null && _hasMore)
+            {
+	            await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
+            }
         }
     }
 
@@ -84,8 +89,20 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 		}
     }
 
-	// Is called every time an image is loaded, to ensure that masonry layout is applied when all images are ready
+	// Called by @onload — photo path OK
 	private async Task OnImageLoaded()
+	{
+		await OnImageSettled();
+	}
+	
+	// Called by @onerror — broken photo path
+	private async Task OnImageFailed()
+	{
+		await OnImageSettled();
+	}
+	
+	// Is called every time an image is loaded or failed, to ensure that masonry layout is applied when all images are ready
+	private async Task OnImageSettled()
 	{
     	if (_isMasonryInitialized) return;
 		
