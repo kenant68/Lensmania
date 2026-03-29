@@ -49,7 +49,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnSentinelVisible()
     {
-        if (_isLoading || !_hasMore || _imagesToLoad > 0) return;
+        if (_isLoading || !_hasMore || _imagesToLoad > 0 || _hasError) return;
         await LoadMorePosts();
         StateHasChanged();
     }
