@@ -1,0 +1,88 @@
+@page "/inscription"
+@using LensmaniaClient.Models.Auth
+@using LensmaniaClient.Services.Auth
+@inject AuthApiClient AuthApiClient
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h1 class="auth-title">Inscription</h1>
+        <p class="text-muted mb-4">Créez un compte pour rejoindre Lensmania.</p>
+
+        <div class="mb-3">
+            <label class="form-label" for="reg-username">Nom d'utilisateur</label>
+            <input id="reg-username" class="form-control" autocomplete="username" @bind="username" @bind:event="oninput" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="reg-email">E-mail</label>
+            <input id="reg-email" class="form-control" type="email" autocomplete="email" @bind="email" @bind:event="oninput" />
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="reg-password">Mot de passe</label>
+            <input id="reg-password" class="form-control" type="password" autocomplete="new-password" @bind="password" @bind:event="oninput" />
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="button" @onclick="SubmitAsync" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Inscription…</span>
+            }
+            else
+            {
+                <span>S'inscrire</span>
+            }
+        </button>
+
+        <p class="mt-4 mb-0 text-center">
+            Déjà un compte ?
+            <a href="connexion">Se connecter</a>
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="alert @(isError ? "alert-danger" : "alert-success") mt-4 mb-0" role="alert">
+                @message
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string username = string.Empty;
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private bool isLoading;
+    private string? message;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("/");
+    }
+
+    private async Task SubmitAsync()
+    {
+        isLoading = true;
+        message = null;
+        StateHasChanged();
+
+        var result = await AuthApiClient.RegisterAsync(
+            new RegisterRequestDto(username.Trim(), email.Trim(), password));
+
+        if (result.IsSuccess && result.Data is not null)
+        {
+            isError = false;
+            message = $"Compte créé. Bienvenue, {result.Data.Username}.";
+            await Task.Delay(150);
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        isError = true;
+        message = result.Error?.Message ?? "L'inscription a échoué.";
+        isLoading = false;
+    }
+}
