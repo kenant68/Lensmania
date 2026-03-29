@@ -19,7 +19,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	private int _imagesLoaded = 0;
 	private int _imagesToLoad = 0;
 	private bool _isMasonryInitialized = false;
-
+	private string _errorMessage = string.Empty;
 	private Masonry? _masonry;
     private ElementReference _sentinel;
     private IJSObjectReference? _jsModule;
@@ -30,13 +30,13 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     {
         if (firstRender)
         {
-            await LoadMorePosts();
-            // Waits for the re-render triggered by LoadMorePosts() to be finished
-            await Task.Yield();
-
             _dotNetRef = DotNetObjectReference.Create(this);
             _jsModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./js/infiniteScroll.js");
+
+            await LoadMorePosts();
+            // Waits for the re-render triggered by LoadMorePosts() to be finished
+            await Task.Yield();
 
             if (_sentinel.Id != null && _hasMore)
             {
@@ -60,6 +60,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 		try {
 			_isLoading = true;
         	_hasError = false;
+			StateHasChanged();
 
 			var url = $"api/posts?limit=10";
 			if (_cursor.HasValue)
@@ -77,10 +78,16 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 				_isMasonryInitialized = false;
         	}
 		} 
+		catch (HttpRequestException)
+    	{
+        	_hasError = true;
+        	_errorMessage = "Une erreur est survenue lors du chargement des posts. Vérifier la connexion.";
+    	}
 		catch (Exception e)
     	{
         	_hasError = true;
-    		Console.Error.WriteLine($"Erreur de chargement des posts : {e.Message}");
+			_errorMessage = "Erreur inattendue lors du chargement des posts.";
+    		Console.Error.WriteLine($"Erreur : {e.Message}");
     	}      
 		finally
 		{
@@ -125,9 +132,17 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     // Cleans up JS interop and .NET references when component is removed
     public async ValueTask DisposeAsync()
     {
-        if (_jsModule != null)
-            await _jsModule.InvokeVoidAsync("unobserve");
-
-        _dotNetRef?.Dispose();
+		try 
+		{
+        	if (_jsModule != null)
+			{
+            	await _jsModule.InvokeVoidAsync("unobserve");
+				await _jsModule.DisposeAsync();
+			}
+		}
+        finally
+    	{
+        	_dotNetRef?.Dispose();
+    	}
     }
 }

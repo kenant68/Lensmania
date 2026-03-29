@@ -5,7 +5,7 @@
 
 @if (_hasError && !_posts.Any())
 {
-    <p>Erreur lors du chargement des photos.</p>
+<p class="error">@_errorMessage</p>
 }
 else if (!_posts.Any() && _isLoading)
 {
@@ -17,12 +17,13 @@ else if (!_posts.Any())
 }
 else
 {
-    <Masonry @key="_cursor" AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
+<Masonry AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
         @foreach (var post in _posts)
         {
             <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="post-card">
-                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top" @onload="OnImageLoaded"
+                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top"
+                         @onload="OnImageLoaded"
                          @onerror="OnImageFailed"/>
                     @* <div class="card-body"> *@
                     @*     <h3>@post.Title</h3> *@
@@ -42,12 +43,12 @@ else
 
 @if (_hasError && _posts.Any())
 {
-<p>Impossible de charger plus de photos.</p>
+<p class="error">@_errorMessage</p>
 }
 
 @if (!_hasMore && _posts.Any())
 {
-    <p>Plus aucune photo à afficher.</p>
+<p>Vous avez vu tous les posts</p>
 }
 
 @if (_hasMore)
