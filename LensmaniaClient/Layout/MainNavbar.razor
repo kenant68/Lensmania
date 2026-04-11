@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg navbar-lens px-4">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="">
+            <img src="images/LensmaniaLogo.png" alt="Lensmania logo" class="logo-img me-2"/>
+            Lensmania
+        </a>
+
+        <button class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse @NavMenuCssClass">
+            <!-- Menu -->
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="posts" Match="NavLinkMatch.All">Photos</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="challenges">Challenges</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="profil">Profil</NavLink>
+                </li>
+            </ul>
+            <!-- Actions -->
+            <div class="d-flex gap-3">
+                <NavLink class="btn btn-secondary" href="login">Connexion</NavLink>
+                <NavLink class="btn btn-primary" href="register">Inscription</NavLink>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+private bool collapseNavMenu = true;
+private string? NavMenuCssClass => collapseNavMenu ? "collapse" : "show";
+
+private void ToggleNavMenu()
+{
+collapseNavMenu = !collapseNavMenu;
+}
+}
