@@ -3,7 +3,7 @@ using LensmaniaLibrary.Models;
 using LensmaniaServer.Database;
 using LensmaniaLibrary.DTOs.Posts;
 
-namespace LensmaniaServer.Features.Posts;
+namespace LensmaniaServer.Services;
 
 public class PostService : IPostService
 {
@@ -29,8 +29,9 @@ public class PostService : IPostService
         var hasMore = posts.Count > limit;
         var items = hasMore ? posts.Take(limit).ToList() : posts;
         
-        var itemDtos = items.Select(p => new PostResponse
+        var itemDtos = items.Select(p => new PostDto
         {
+            Id = p.Id,
             Title = p.Title,
             PhotoUrl = p.PhotoUrl,
             Description = p.Description,
@@ -45,16 +46,17 @@ public class PostService : IPostService
         };
     }
 
-    public async Task<PostResponse?> GetByIdAsync(int id)
+    public async Task<PostDto?> GetByIdAsync(int id)
     {
         var post = await _db.Posts.FindAsync(id);
 
     	if (post == null)
         	return null;
 
-    	return new PostResponse
+    	return new PostDto
     	{
-        	Title = post.Title,
+        	Id = post.Id,
+            Title = post.Title,
         	PhotoUrl = post.PhotoUrl,
 			Description = post.Description,
         	CreatedAt = post.CreatedAt
