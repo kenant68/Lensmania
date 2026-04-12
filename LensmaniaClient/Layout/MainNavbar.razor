@@ -66,6 +66,6 @@
     private async Task LogoutAsync()
     {
         await AuthStateProvider.ClearTokenAsync();
-        Navigation.NavigateTo("/", replace: true);
+        Navigation.NavigateTo(string.Empty, replace: true);
     }
 }
