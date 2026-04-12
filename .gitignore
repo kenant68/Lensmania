@@ -477,5 +477,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+#appsettings
 appsettings.json
 appsettings.Development.json
+
+# Ignore uploaded photos in /uploads/photos/ (keep the structure)
+LensmaniaServer/wwwroot/uploads/photos/*
+!LensmaniaServer/wwwroot/uploads/photos/.gitkeep
