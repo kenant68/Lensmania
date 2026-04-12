@@ -1,9 +1,9 @@
-﻿using LensmaniaLibrary.Models;
+﻿using LensmaniaLibrary.DTOs.Posts;
 
 namespace LensmaniaServer.Features.Posts;
 
 public interface IPostService
 {
-    Task<List<Post>> GetAllAsync();
-    Task<Post?> GetByIdAsync(int id);
+    Task<PaginatedPosts> GetAllAsync(int? cursor, int limit);
+    Task<PostResponse?> GetByIdAsync(int id);
 }
