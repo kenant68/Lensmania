@@ -1,0 +1,107 @@
+@using LensmaniaClient.Services.Posts
+@using LensmaniaLibrary.DTOs.Posts
+
+@if (IsOpen)
+{
+    <div class="modal @(IsOpen ? "d-block" : "d-none")" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2 class="modal-title">Créer un post</h2>
+                </div>
+
+                <div class="modal-body">
+                    <input class="form-control mb-2" @bind="title" placeholder="Titre"/>
+                    <textarea class="form-control mb-2" @bind="description" placeholder="Description"></textarea>
+                    <InputFile class="form-control mb-2" OnChange="HandleFileSelected"/>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <p class="text-danger">@errorMessage</p>
+                    }
+                    @if (selectedFile != null)
+                    {
+                        <p class="text-muted">@selectedFile.Name</p>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" @onclick="CreatePost">Créer</button>
+                    <button class="btn btn-secondary" @onclick="CloseModal">Annuler</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<PostDto> OnPostCreated { get; set; }
+
+    [Inject] public PostService PostService { get; set; } = default!;
+
+    private string? title;
+    private string? description;
+    private IBrowserFile? selectedFile;
+    private string? errorMessage;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        errorMessage = null;
+
+        // Front validation
+        var allowedTypes = new[] { "image/jpg", "image/jpeg", "image/png" };
+        if (!allowedTypes.Contains(file.ContentType))
+        {
+            errorMessage = "Format non autorisé (jpg, jpeg, png uniquement)";
+            return;
+        }
+
+        if (file.Size > 5 * 1024 * 1024)
+        {
+            errorMessage = "La photo ne doit pas dépasser 5 Mo";
+            return;
+        }
+
+        selectedFile = file;
+    }
+
+    private async Task CreatePost()
+    {
+        if (selectedFile == null)
+        {
+            errorMessage = "Veuillez sélectionner une photo";
+            return;
+        }
+
+        var photoUrl = await PostService.UploadImageAsync(selectedFile);
+
+        var createdPost = await PostService.CreatePostAsync(new CreatePostRequest
+            {
+                Title = title,
+                Description = description,
+                PhotoUrl = photoUrl
+            }
+        );
+
+        await OnPostCreated.InvokeAsync(createdPost);
+        FormReset();
+    }
+    
+    private async Task CloseModal()
+    {
+        FormReset();      
+        await OnClose.InvokeAsync();
+    }
+    
+    private void FormReset()
+    {
+        title = null;
+        description = null;
+        selectedFile = null;
+        errorMessage = null;
+    }
+}

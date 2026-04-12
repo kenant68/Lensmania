@@ -11,7 +11,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
-    private List<PostResponse> _posts = [];
+    private List<PostDto> _posts = [];
     private int? _cursor = null;
     private bool _hasMore = true;
     private bool _isLoading = false;
@@ -145,4 +145,22 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         	_dotNetRef?.Dispose();
     	}
     }
+
+	private void ResetPosts()
+	{
+    	_posts.Clear();
+    	_cursor = null;
+    	_hasMore = true;
+	}
+
+	/*protected async Task HandlePostCreated()
+	{
+    	ResetPosts();
+    	await LoadMorePosts();
+	}*/
+    
+    async Task HandlePostCreated(PostDto post)
+	{
+    	_posts.Insert(0, post);
+	}
 }

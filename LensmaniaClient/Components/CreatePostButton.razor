@@ -1,0 +1,33 @@
+@using LensmaniaClient.Components
+@using LensmaniaLibrary.DTOs.Posts
+
+<button @onclick="OpenModal">
+    Créer un post
+</button>
+
+<CreatePostModal
+    IsOpen="@isModalOpen"
+    OnClose="CloseModal"
+    OnPostCreated="HandlePostCreated"
+/>
+
+@code {
+    private bool isModalOpen = false;
+
+    void OpenModal()
+    {
+        isModalOpen = true;
+        StateHasChanged();
+    }
+
+    void CloseModal() => isModalOpen = false;
+
+    [Parameter]
+    public EventCallback<PostDto> OnPostCreated { get; set; }
+
+    private async Task HandlePostCreated(PostDto postDto)
+    {
+        isModalOpen = false;
+        await OnPostCreated.InvokeAsync(postDto);
+    }
+}

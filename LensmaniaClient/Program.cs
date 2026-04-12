@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Soenneker.Blazor.Masonry.Registrars;
 using LensmaniaClient;
 using LensmaniaClient.Services.Auth;
+using LensmaniaClient.Services.Posts;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -24,6 +25,7 @@ builder.Services.AddHttpClient("LensmaniaApi", client =>
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("LensmaniaApi"));
 builder.Services.AddMasonryInteropAsScoped();
 builder.Services.AddScoped<AuthApiClient>();
+builder.Services.AddScoped<PostService>();
 
 var host = builder.Build();
 await host.Services.GetRequiredService<CustomAuthenticationStateProvider>().InitializeAsync();

@@ -1,11 +1,14 @@
 ﻿@page "/posts"
 @using Soenneker.Blazor.Masonry
+@using LensmaniaClient.Components
 
 <h1>Lensmania</h1>
 
+<CreatePostButton OnPostCreated="HandlePostCreated"/>
+
 @if (_hasError && !_posts.Any())
 {
-<p class="error">@_errorMessage</p>
+	<p class="error">@_errorMessage</p>
 }
 else if (!_posts.Any() && _isLoading)
 {
@@ -43,12 +46,12 @@ else
 
 @if (_hasError && _posts.Any())
 {
-<p class="error">@_errorMessage</p>
+	<p class="error">@_errorMessage</p>
 }
 
 @if (!_hasMore && _posts.Any())
 {
-<p>Vous avez vu tous les posts</p>
+	<p>Vous avez vu tous les posts</p>
 }
 
 @if (_hasMore)
