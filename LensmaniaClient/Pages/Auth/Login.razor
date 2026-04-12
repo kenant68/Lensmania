@@ -1,4 +1,4 @@
-@page "/connexion"
+@page "/login"
 @using LensmaniaClient.Models.Auth
 @using LensmaniaClient.Services.Auth
 @inject AuthApiClient AuthApiClient
@@ -33,7 +33,7 @@
 
         <p class="mt-4 mb-0 text-center">
             Pas encore de compte ?
-            <a href="inscription">Créer un compte</a>
+            <a href="@AuthRoutes.Register">Créer un compte</a>
         </p>
 
         @if (!string.IsNullOrWhiteSpace(message))

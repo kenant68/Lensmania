@@ -38,8 +38,8 @@
                         <button type="button" class="btn btn-outline-light" @onclick="LogoutAsync">Déconnexion</button>
                     </Authorized>
                     <NotAuthorized>
-                        <NavLink class="btn btn-secondary" href="connexion">Connexion</NavLink>
-                        <NavLink class="btn btn-primary" href="inscription">Inscription</NavLink>
+                        <NavLink class="btn btn-secondary" href="@AuthRoutes.Login">Connexion</NavLink>
+                        <NavLink class="btn btn-primary" href="@AuthRoutes.Register">Inscription</NavLink>
                     </NotAuthorized>
                 </AuthorizeView>
             </div>
