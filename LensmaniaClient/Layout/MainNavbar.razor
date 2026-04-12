@@ -1,0 +1,71 @@
+@using System.Security.Claims
+@using LensmaniaClient.Services.Auth
+@inject CustomAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<nav class="navbar navbar-expand-lg navbar-lens px-4">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="">
+            <img src="images/LensmaniaLogo.png" alt="Lensmania logo" class="logo-img me-2"/>
+            Lensmania
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                aria-label="@(isMenuOpen ? "Masquer le menu" : "Afficher le menu")"
+                aria-expanded="@isMenuOpen"
+                aria-controls="mainNavbarMenu"
+                @onclick="ToggleMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="mainNavbarMenu" class="navbar-collapse collapse @(isMenuOpen ? "show" : "")">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="posts" Match="NavLinkMatch.All">Photos</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="challenges">Challenges</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="profil">Profil</NavLink>
+                </li>
+            </ul>
+            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3 align-items-lg-center">
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="text-white-50 small text-lg-end">@GetDisplayName(context)</span>
+                        <button type="button" class="btn btn-outline-light" @onclick="LogoutAsync">Déconnexion</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="btn btn-secondary" href="connexion">Connexion</NavLink>
+                        <NavLink class="btn btn-primary" href="inscription">Inscription</NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private bool isMenuOpen = false;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private static string? GetDisplayName(AuthenticationState state)
+    {
+        var user = state.User;
+        return user.FindFirst("name")?.Value
+               ?? user.FindFirst(ClaimTypes.Name)?.Value
+               ?? user.Identity?.Name;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthStateProvider.ClearTokenAsync();
+        Navigation.NavigateTo("/", replace: true);
+    }
+}

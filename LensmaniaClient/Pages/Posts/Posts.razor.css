@@ -1,4 +1,4 @@
-.card {
+.post-card {
     border: none;
     border-radius: 16px;
     overflow: hidden;
@@ -8,4 +8,9 @@
     width: 100%;
     height: auto;
     display: block;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
 }

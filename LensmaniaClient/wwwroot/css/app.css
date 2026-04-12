@@ -1,23 +1,65 @@
+/* Variables */
+:root {
+    --color-dark-purple: #563EA1;
+    --color-yellow: #FAF9BF;
+    --color-light-purple: #BDB3DD;
+    --color-lighter-purple: #E6E3F2;
+    --color-pink: #F4A6B9;
+
+    --font-main: 'Monserrat', Arial, sans-serif;
+}
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--font-main);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
 }
 
 h1:focus {
     outline: none;
 }
 
+/* NavBar */
+.nav-link {
+    color: var(--color-yellow);
+    margin: 0 10px;
+}
+
+.nav-link:hover {
+    color: var(--color-light-purple);
+}
+
+.nav-link.active {
+    background-color: var(--color-lighter-purple);
+    color: var(--color-dark-purple) !important;
+    border-radius: 10px;
+}
+
+/* Links & buttons */
 a, .btn-link {
-    color: #0071c1;
+    color: var(--color-dark-purple);
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    color: var(--color-yellow);
+    background-color: var(--color-dark-purple);
+    border-color: var(--color-yellow);
+}
+
+.btn-secondary {
+    color: var(--color-dark-purple);
+    background-color: var(--color-yellow);
+    border-color: var(--color-yellow);
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem var(--color-yellow), 0 0 0 0.25rem var(--color-dark-purple);
 }
 
 .content {
@@ -85,7 +127,7 @@ a, .btn-link {
     }
 
         .loading-progress circle:last-child {
-            stroke: #1b6ec2;
+            stroke: var(--color-dark-purple);
             stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
             transition: stroke-dasharray 0.05s ease-in-out;
         }
