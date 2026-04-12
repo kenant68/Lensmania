@@ -62,4 +62,30 @@ public class PostService : IPostService
         	CreatedAt = post.CreatedAt
     	};
     }
+    
+    public async Task<PostDto> CreatePostAsync(CreatePostRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.PhotoUrl))
+            throw new ArgumentException("PhotoUrl is required");
+        
+        var post = new Post
+        {
+            Title = request.Title,
+            PhotoUrl = request.PhotoUrl,
+            Description = request.Description,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.Posts.Add(post);
+        await _db.SaveChangesAsync();
+
+        return new PostDto
+        {
+            Id = post.Id,
+            Title = post.Title,
+            PhotoUrl = post.PhotoUrl,
+            Description = post.Description,
+            CreatedAt = post.CreatedAt
+        };
+    }
 }

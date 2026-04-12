@@ -6,4 +6,5 @@ public interface IPostService
 {
     Task<PaginatedPosts> GetAllAsync(int? cursor, int limit);
     Task<PostDto?> GetByIdAsync(int id);
+    Task<PostDto> CreatePostAsync(CreatePostRequest request);
 }

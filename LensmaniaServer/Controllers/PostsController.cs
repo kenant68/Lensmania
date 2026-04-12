@@ -38,4 +38,11 @@ public class PostsController : ControllerBase
         var result = await _postService.GetByIdAsync(id);
         return Ok(result);
     }
+    
+    [HttpPost]
+    public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostRequest request)
+    {
+        var post = await _postService.CreatePostAsync(request);
+        return Ok(post);
+    }
 }
