@@ -6,11 +6,16 @@
             Lensmania
         </a>
 
-        <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <button class="navbar-toggler"
+                type="button"
+                aria-label="@(isMenuOpen ? "Masquer le menu" : "Afficher le menu")"
+                aria-expanded="@isMenuOpen"
+                aria-controls="mainNavbarMenu"
+                @onclick="ToggleMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse @NavMenuCssClass">
+        <div id="mainNavbarMenu" class="navbar-collapse collapse @(isMenuOpen ? "show" : "")">
             <!-- Menu -->
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
@@ -33,11 +38,10 @@
 </nav>
 
 @code {
-private bool collapseNavMenu = true;
-private string? NavMenuCssClass => collapseNavMenu ? "collapse" : "show";
+private bool isMenuOpen = false;
 
-private void ToggleNavMenu()
+private void ToggleMenu()
 {
-collapseNavMenu = !collapseNavMenu;
+isMenuOpen = !isMenuOpen;
 }
 }
