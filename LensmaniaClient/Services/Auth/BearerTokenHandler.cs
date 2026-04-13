@@ -33,7 +33,7 @@ public sealed class BearerTokenHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.Unauthorized && !IsAuthEndpoint(request.RequestUri))
         {
             await _authenticationStateProvider.ClearTokenAsync();
-            _navigationManager.NavigateTo("/login");
+            _navigationManager.NavigateTo(AuthRoutes.Login);
         }
 
         return response;

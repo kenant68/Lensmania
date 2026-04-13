@@ -1,0 +1,72 @@
+@using System.Security.Claims
+@using LensmaniaClient.Services.Auth
+@inject CustomAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">LensmaniaClient</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Accueil
+            </NavLink>
+        </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3 pt-2 small text-white-50">
+                    Connecté : <strong class="text-white">@GetDisplayName(context)</strong>
+                </div>
+                <div class="nav-item px-3">
+                    <button type="button" class="nav-link btn btn-link text-start w-100 border-0 p-0" @onclick="LogoutAsync">
+                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Déconnexion
+                    </button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@AuthRoutes.Login">
+                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Connexion
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@AuthRoutes.Register">
+                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Inscription
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private static string? GetDisplayName(AuthenticationState state)
+    {
+        var user = state.User;
+        return user.FindFirst("name")?.Value
+               ?? user.FindFirst(ClaimTypes.Name)?.Value
+               ?? user.Identity?.Name;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthStateProvider.ClearTokenAsync();
+        Navigation.NavigateTo(string.Empty, replace: true);
+    }
+}
