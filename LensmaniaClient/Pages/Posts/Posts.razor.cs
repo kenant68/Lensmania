@@ -11,6 +11,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
+    private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
     private List<PostDto> _posts = [];
     private int? _cursor = null;
     private bool _hasMore = true;
@@ -152,15 +153,13 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	_cursor = null;
     	_hasMore = true;
 	}
-
-	/*protected async Task HandlePostCreated()
-	{
-    	ResetPosts();
-    	await LoadMorePosts();
-	}*/
     
     async Task HandlePostCreated(PostDto post)
 	{
     	_posts.Insert(0, post);
+	    _imagesToLoad = 1;
+    	_imagesLoaded = 0;
+    	_isMasonryInitialized = false;
+    	StateHasChanged();
 	}
 }

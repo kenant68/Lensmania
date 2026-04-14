@@ -25,7 +25,7 @@ else
         {
             <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="post-card">
-                    <img src="@post.PhotoUrl" alt="@post.Title" class="card-img-top"
+                    <img src="@($"{ApiBaseUrl}{post.PhotoUrl}")" alt="@post.Title" class="card-img-top"
                          @onload="OnImageLoaded"
                          @onerror="OnImageFailed"/>
                     @* <div class="card-body"> *@
