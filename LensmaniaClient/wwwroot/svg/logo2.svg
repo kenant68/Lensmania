@@ -1,0 +1,23 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+
+  <rect x="90" y="130" width="220" height="140" rx="25" fill="#7B8FA1"/>
+  <rect x="100" y="120" width="220" height="140" rx="25" fill="#F4C2C2"/>
+  <rect x="100" y="190" width="220" height="80" rx="10" fill="#E8F6F3"/>
+
+  <circle cx="230" cy="170" r="45" fill="#5C6B73"/>
+  <circle cx="230" cy="170" r="32" fill="#2F3E46"/>
+  <circle cx="230" cy="170" r="18" fill="#FADADD"/>
+
+  <path d="M230 165
+           C225 155,210 160,230 180
+           C250 160,235 155,230 165Z"
+        fill="#FFFFFF"/>
+
+  <circle cx="145" cy="170" r="14" fill="#CFF5E7"/>
+  <rect x="280" y="145" width="30" height="30" rx="6" fill="#2F3E46"/>
+
+  <rect x="170" y="250" width="60" height="90" fill="#E0BBE4" transform="rotate(-8 200 290)"/>
+  <rect x="210" y="250" width="60" height="90" fill="#B5EAD7" transform="rotate(8 240 290)"/>
+  <rect x="190" y="255" width="60" height="90" fill="#FFFFFF"/>
+
+</svg>
