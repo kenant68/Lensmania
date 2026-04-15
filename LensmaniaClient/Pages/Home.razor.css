@@ -1,0 +1,139 @@
+/* ── Hero + Features — shared gradient background ── */
+.hero-features {
+    background: linear-gradient(160deg,
+        var(--color-yellow) 0%,
+        var(--color-pink)   45%,
+        var(--color-light-purple) 100%);
+    padding: 60px 80px 72px;
+}
+
+/* ── Hero ── */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.hero-text {
+    max-width: 480px;
+}
+
+.brand-heading {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: var(--color-dark-purple);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.brand-icon {
+    width: 64px;
+    height: 64px;
+}
+
+.hero-title {
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: #2b2b2b;
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.hero-text p {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.7;
+    text-align: left;
+    margin-bottom: 4px;
+}
+
+.hero-illustration {
+    flex-shrink: 0;
+    width: 280px;
+    height: 280px;
+}
+
+.hero-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ── Features ── */
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.feature-icon {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.feature-item h3 {
+    font-size: 17px;
+    font-weight: 700;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: #2b2b2b;
+    text-align: center;
+}
+
+.feature-item p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.65;
+    text-align: center;
+    max-width: 220px;
+}
+
+/* ── CTA ── */
+.cta-section {
+    background-color: var(--color-dark-purple);
+    padding: 50px 40px;
+    text-align: center;
+}
+
+.cta-section h2 {
+    color: var(--color-yellow);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 28px;
+}
+
+.btn-cta {
+    display: inline-block;
+    padding: 13px 32px;
+    background-color: var(--color-yellow);
+    color: var(--color-dark-purple);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-cta:hover {
+    opacity: 0.88;
+    color: var(--color-dark-purple);
+}
