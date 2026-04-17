@@ -1,7 +1,6 @@
 using System.Text;
 using LensmaniaServer.Database;
 using LensmaniaServer.Services;
-using LensmaniaLibrary.Models;
 using LensmaniaServer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;

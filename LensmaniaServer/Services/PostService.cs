@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using LensmaniaLibrary.Models;
-using LensmaniaServer.Database;
+using LensmaniaServer.Models;
 using LensmaniaLibrary.DTOs.Posts;
+using LensmaniaServer.Database;
 
 namespace LensmaniaServer.Services;
 
@@ -21,49 +21,44 @@ public class PostService : IPostService
         {
             query = query.Where(p => p.Id < cursor.Value);
         }
-
+        
         var posts = await query
-			.Take(limit + 1)
-			.ToListAsync();
+            .Select(p => new PostListItemResponse(
+                p.Id,
+                p.Title ?? $"Photo de {p.User.Username}",
+                p.PhotoUrl,
+                p.User.Username
+            ))
+            .Take(limit + 1)
+            .ToListAsync();
 
         var hasMore = posts.Count > limit;
         var items = hasMore ? posts.Take(limit).ToList() : posts;
-        
-        var itemDtos = items.Select(p => new PostDto
-        {
-            Id = p.Id,
-            Title = p.Title,
-            PhotoUrl = p.PhotoUrl,
-            Description = p.Description,
-            CreatedAt = p.CreatedAt
-        }).ToList();
 
         return new PaginatedPosts
         {
-            Posts = itemDtos,
+            Posts = items,
             HasMore = hasMore,
-            NextCursor = hasMore && items.Any() ? items.Last().Id : null
+            NextCursor = hasMore ? items.Last().Id : null
         };
     }
 
-    public async Task<PostDto?> GetByIdAsync(int id)
+    public async Task<PostResponse?> GetByIdAsync(int id)
     {
-        var post = await _db.Posts.FindAsync(id);
-
-    	if (post == null)
-        	return null;
-
-    	return new PostDto
-    	{
-        	Id = post.Id,
-            Title = post.Title,
-        	PhotoUrl = post.PhotoUrl,
-			Description = post.Description,
-        	CreatedAt = post.CreatedAt
-    	};
+        return await _db.Posts
+            .Where(p => p.Id == id)
+            .Select(p => new PostResponse(
+                p.Id,
+                p.Title,
+                p.PhotoUrl,
+                p.Description,
+                p.CreatedAt,
+                p.User.Username
+            ))
+            .FirstOrDefaultAsync();
     }
     
-    public async Task<PostDto> CreatePostAsync(CreatePostRequest request)
+    public async Task<PostListItemResponse> CreatePostAsync(CreatePostRequest request, int  userId)
     {
         if (string.IsNullOrWhiteSpace(request.PhotoUrl))
             throw new ArgumentException("PhotoUrl is required");
@@ -73,19 +68,22 @@ public class PostService : IPostService
             Title = request.Title,
             PhotoUrl = request.PhotoUrl,
             Description = request.Description,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UserId = userId
         };
 
         _db.Posts.Add(post);
         await _db.SaveChangesAsync();
+        
+        await _db.Entry(post)
+            .Reference(p => p.User)
+            .LoadAsync();
 
-        return new PostDto
-        {
-            Id = post.Id,
-            Title = post.Title,
-            PhotoUrl = post.PhotoUrl,
-            Description = post.Description,
-            CreatedAt = post.CreatedAt
-        };
+        return new PostListItemResponse(
+            post.Id,
+            post.Title ?? $"Photo de {post.User.Username}",
+            post.PhotoUrl,
+            post.User.Username
+        );
     }
 }

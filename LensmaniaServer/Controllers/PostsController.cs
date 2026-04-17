@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using LensmaniaLibrary.DTOs.Posts;
 using LensmaniaServer.Services;
 
@@ -33,16 +34,18 @@ public class PostsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<PostDto>> GetById(int id)
+    public async Task<ActionResult<PostResponse>> GetById(int id)
     {       
         var result = await _postService.GetByIdAsync(id);
         return Ok(result);
     }
     
     [HttpPost]
-    public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostRequest request)
+    public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
     {
-        var post = await _postService.CreatePostAsync(request);
+		var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        
+		var post = await _postService.CreatePostAsync(request, userId);
         return Ok(post);
     }
 }
