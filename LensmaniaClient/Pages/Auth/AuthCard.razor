@@ -1,0 +1,14 @@
+<div class="auth-page auth-page--cover">
+    <div class="auth-card">
+        <header class="auth-card-header">
+            <p class="auth-welcome">Bienvenue sur</p>
+            <p class="auth-brand">Lensmania</p>
+            <p class="auth-tagline">Capturez votre monde !</p>
+        </header>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}
