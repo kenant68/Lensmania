@@ -7,6 +7,7 @@ namespace LensmaniaServer.Controllers;
 
 [ApiController]
 [Route("api/uploads")]
+[Authorize]
 public class UploadController : ControllerBase
 {
     private readonly IFileStorageService _fileStorageService;

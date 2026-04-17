@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using LensmaniaLibrary.DTOs.Posts;
 using LensmaniaServer.Services;
@@ -40,6 +41,7 @@ public class PostsController : ControllerBase
         return Ok(result);
     }
     
+	[Authorize]
     [HttpPost]
     public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
     {
