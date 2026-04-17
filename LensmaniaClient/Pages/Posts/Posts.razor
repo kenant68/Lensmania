@@ -4,23 +4,26 @@
 
 <h1>Lensmania</h1>
 
-<CreatePostButton OnPostCreated="HandlePostCreated"/>
+<AuthorizeView>
+    <Authorized>
+        <CreatePostButton OnPostCreated="HandlePostCreated" />
+    </Authorized>
+    <NotAuthorized>
+        <p class="text-center mb-4">Connectez-vous pour publier !</p>
+    </NotAuthorized>
+</AuthorizeView>
 
-@if (_hasError && !_posts.Any())
-{
+@if (_hasError && !_posts.Any()) {
 	<p class="error">@_errorMessage</p>
 }
-else if (!_posts.Any() && _isLoading)
-{
+else if (!_posts.Any() && _isLoading) {
     <p>Chargement...</p>
 }
-else if (!_posts.Any())
-{
+else if (!_posts.Any()) {
     <p>Aucune photo pour l'instant.</p>
 }
-else
-{
-<Masonry AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
+else {
+	<Masonry AutoRender="false" SizerClass="col-sm-1" @ref="_masonry" class="row">
         @foreach (var post in _posts)
         {
             <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
@@ -40,22 +43,18 @@ else
     </Masonry>
 }
 
-@if (_isLoading)
-{
+@if (_isLoading) {
     <p>Chargement...</p>
 }
 
-@if (_hasError && _posts.Any())
-{
+@if (_hasError && _posts.Any()) {
 	<p class="error">@_errorMessage</p>
 }
 
-@if (!_hasMore && _posts.Any())
-{
+@if (!_hasMore && _posts.Any()) {
 	<p>Vous avez vu tous les posts</p>
 }
 
-@if (_hasMore)
-{
+@if (_hasMore) {
     <div @ref="_sentinel" style="height: 1px;"></div>
 }

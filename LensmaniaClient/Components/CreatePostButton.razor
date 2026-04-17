@@ -1,9 +1,14 @@
 @using LensmaniaClient.Components
 @using LensmaniaLibrary.DTOs.Posts
 
-<button @onclick="OpenModal">
-    Créer un post
-</button>
+<div class="d-flex justify-content-center mb-3">
+	<button class="btn btn-primary px-4"
+			type="button"
+			@onclick="OpenModal"
+>
+	    Créer un post
+	</button>
+</div>
 
 <CreatePostModal
     IsOpen="@isModalOpen"
