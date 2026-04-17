@@ -62,6 +62,11 @@ public class PostService : IPostService
     {
         if (string.IsNullOrWhiteSpace(request.PhotoUrl))
             throw new ArgumentException("PhotoUrl is required");
+
+		// PhotoUrl check : only accept paths from our upload endpoint
+		if (!request.PhotoUrl.StartsWith("/uploads/photos/", StringComparison.Ordinal)
+			|| request.PhotoUrl.Contains("..", StringComparison.Ordinal))
+			throw new ArgumentException("PhotoUrl must reference an uploaded photo");
         
         var post = new Post
         {

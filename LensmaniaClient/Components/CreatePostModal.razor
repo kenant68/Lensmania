@@ -76,19 +76,37 @@
             errorMessage = "Veuillez sélectionner une photo";
             return;
         }
+        try
+        {
+			var photoUrl = await PostService.UploadImageAsync(selectedFile);
 
-        var photoUrl = await PostService.UploadImageAsync(selectedFile);
+            if (string.IsNullOrEmpty(photoUrl))
+            {
+                errorMessage = "Échec de l'envoi de la photo.";
+                return;
+            }
 
-        var createdPost = await PostService.CreatePostAsync(new CreatePostRequest
+            var createdPost = await PostService.CreatePostAsync(new CreatePostRequest
             {
                 Title = title,
                 Description = description,
                 PhotoUrl = photoUrl
-            }
-        );
+            });
 
-        await OnPostCreated.InvokeAsync(createdPost);
-        FormReset();
+            if (createdPost is null)
+            {
+                errorMessage = "Impossible de créer le post.";
+                return;
+            }
+
+            await OnPostCreated.InvokeAsync(createdPost);
+            FormReset();
+        }
+        catch (Exception e)
+        {
+            errorMessage = "Une erreur est survenue.";
+            Console.Error.WriteLine(e);
+        }
     }
     
     private async Task CloseModal()

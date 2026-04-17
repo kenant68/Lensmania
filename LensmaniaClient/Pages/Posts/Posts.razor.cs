@@ -154,12 +154,15 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	_hasMore = true;
 	}
     
-    private async Task HandlePostCreated(PostListItemResponse post)
+    private async Task HandlePostCreated(PostListItemResponse? post)
 	{
-    	_posts.Insert(0, post);
+		if (post is null) return;
+ 	
+		_posts.Insert(0, post);
 	    _imagesToLoad = 1;
     	_imagesLoaded = 0;
     	_isMasonryInitialized = false;
-    	StateHasChanged();
-	}
+    	
+		StateHasChanged();
+    }
 }

@@ -12,9 +12,13 @@ public class FileStorageService : IFileStorageService
     public async Task<string> UploadPhotoAsync(IFormFile file)
     {
         // Validation
+        if (file is null || file.Length == 0) 
+            throw new ArgumentException("Aucun fichier selectionné ou fichier vide");
+        
         // Check allowed extensions
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        
         if (!allowedExtensions.Contains(ext))
             throw new ArgumentException("Format non autorisé");
 
@@ -25,6 +29,7 @@ public class FileStorageService : IFileStorageService
         // Check real content (magic bytes) -> prevent malicious renaming
         using var reader = new BinaryReader(file.OpenReadStream());
         var magicBytes = reader.ReadBytes(4);
+        
         if (!IsValidImage(magicBytes))
             throw new ArgumentException("Contenu du fichier invalide");
 

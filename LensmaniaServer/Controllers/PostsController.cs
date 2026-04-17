@@ -38,6 +38,10 @@ public class PostsController : ControllerBase
     public async Task<ActionResult<PostResponse>> GetById(int id)
     {       
         var result = await _postService.GetByIdAsync(id);
+
+		if (result is null)
+			return NotFound();
+
         return Ok(result);
     }
     
