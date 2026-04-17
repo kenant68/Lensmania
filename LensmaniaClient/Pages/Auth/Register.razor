@@ -6,43 +6,45 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthCard>
-    <div class="auth-fields auth-fields--before-submit-only">
-        <div class="auth-field">
-            <label class="visually-hidden" for="reg-username">Nom d'utilisateur</label>
-            <input id="reg-username" class="form-control auth-input" autocomplete="username" placeholder="Nom d'utilisateur" @bind="username" @bind:event="oninput" />
+    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault="true">
+        <div class="auth-fields auth-fields--before-submit-only">
+            <div class="auth-field">
+                <label class="visually-hidden" for="reg-username">Nom d'utilisateur</label>
+                <input id="reg-username" class="form-control auth-input" autocomplete="username" placeholder="Nom d'utilisateur" @bind="username" @bind:event="oninput" />
+            </div>
+            <div class="auth-field">
+                <label class="visually-hidden" for="reg-email">E-mail</label>
+                <input id="reg-email" class="form-control auth-input" type="email" autocomplete="email" placeholder="Email" @bind="email" @bind:event="oninput" />
+            </div>
+            <div class="auth-field">
+                <label class="visually-hidden" for="reg-password">Mot de passe</label>
+                <input id="reg-password" class="form-control auth-input" type="password" autocomplete="new-password" placeholder="Mot de passe" @bind="password" @bind:event="oninput" />
+            </div>
         </div>
-        <div class="auth-field">
-            <label class="visually-hidden" for="reg-email">E-mail</label>
-            <input id="reg-email" class="form-control auth-input" type="email" autocomplete="email" placeholder="Email" @bind="email" @bind:event="oninput" />
-        </div>
-        <div class="auth-field">
-            <label class="visually-hidden" for="reg-password">Mot de passe</label>
-            <input id="reg-password" class="form-control auth-input" type="password" autocomplete="new-password" placeholder="Mot de passe" @bind="password" @bind:event="oninput" />
-        </div>
-    </div>
 
-    <button class="auth-submit" type="button" @onclick="SubmitAsync" disabled="@isLoading">
-        @if (isLoading)
+        <button class="auth-submit" type="submit" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Inscription…</span>
+            }
+            else
+            {
+                <span>Inscription</span>
+            }
+        </button>
+
+        <p class="auth-footer-link">
+            Déjà un compte ?
+            <a href="@AuthRoutes.Login">Se connecter</a>
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
         {
-            <span>Inscription…</span>
+            <div class="auth-alert @(isError ? "auth-alert--error" : "auth-alert--success")" role="alert">
+                @message
+            </div>
         }
-        else
-        {
-            <span>Inscription</span>
-        }
-    </button>
-
-    <p class="auth-footer-link">
-        Déjà un compte ?
-        <a href="@AuthRoutes.Login">Se connecter</a>
-    </p>
-
-    @if (!string.IsNullOrWhiteSpace(message))
-    {
-        <div class="auth-alert @(isError ? "auth-alert--error" : "auth-alert--success")" role="alert">
-            @message
-        </div>
-    }
+    </form>
 </AuthCard>
 
 @code {
