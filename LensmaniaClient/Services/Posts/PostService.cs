@@ -13,14 +13,14 @@ public class PostService
         _http = http;
     }
 
-    public async Task<PostDto?> CreatePostAsync(CreatePostRequest request)
+    public async Task<PostListItemResponse?> CreatePostAsync(CreatePostRequest request)
     {
         var response = await _http.PostAsJsonAsync("api/posts", request);
 
         if (!response.IsSuccessStatusCode)
             return null;
 
-        return await response.Content.ReadFromJsonAsync<PostDto>();
+        return await response.Content.ReadFromJsonAsync<PostListItemResponse>();
     }
     
     public async Task<string> UploadImageAsync(IBrowserFile file)

@@ -23,11 +23,11 @@
     void CloseModal() => isModalOpen = false;
 
     [Parameter]
-    public EventCallback<PostDto> OnPostCreated { get; set; }
+    public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
 
-    private async Task HandlePostCreated(PostDto postDto)
+    private async Task HandlePostCreated(PostListItemResponse post)
     {
         isModalOpen = false;
-        await OnPostCreated.InvokeAsync(postDto);
+        await OnPostCreated.InvokeAsync(post);
     }
 }

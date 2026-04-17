@@ -38,7 +38,7 @@
 @code {
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback<PostDto> OnPostCreated { get; set; }
+    [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
 
     [Inject] public PostService PostService { get; set; } = default!;
 

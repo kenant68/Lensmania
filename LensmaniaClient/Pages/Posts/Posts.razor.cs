@@ -12,7 +12,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
     private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
-    private List<PostDto> _posts = [];
+    private List<PostListItemResponse> _posts = [];
     private int? _cursor = null;
     private bool _hasMore = true;
     private bool _isLoading = false;
@@ -154,7 +154,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	_hasMore = true;
 	}
     
-    async Task HandlePostCreated(PostDto post)
+    private async Task HandlePostCreated(PostListItemResponse post)
 	{
     	_posts.Insert(0, post);
 	    _imagesToLoad = 1;
