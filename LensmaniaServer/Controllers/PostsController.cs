@@ -49,12 +49,20 @@ public class PostsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        try
+		{
+			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
-		if (!int.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+			if (!int.TryParse(userIdClaim, out var userId))
+            	return Unauthorized();
         
-		var post = await _postService.CreatePostAsync(request, userId);
-        return Ok(post);
+			var post = await _postService.CreatePostAsync(request, userId);
+        	return Ok(post);
+		}
+		// Todo: add ValidationException + middleware
+    	catch (ArgumentException ex)
+    	{
+        	return BadRequest(new { message = ex.Message });
+    	}
     }
 }
