@@ -43,7 +43,7 @@ public class FileStorageService : IFileStorageService
         using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        return $"/uploads/photos/{fileName}";
+        return fileName;
     }
     
     private bool IsValidImage(byte[] bytes)

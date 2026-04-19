@@ -49,7 +49,10 @@ public class PostsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
     {
-		var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+		if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
         
 		var post = await _postService.CreatePostAsync(request, userId);
         return Ok(post);
