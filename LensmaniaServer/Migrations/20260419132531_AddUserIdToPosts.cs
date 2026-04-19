@@ -43,8 +43,7 @@ namespace LensmaniaServer.Migrations
                 name: "UserId",
                 table: "Posts",
                 type: "integer",
-                nullable: false,
-                defaultValue: 0);
+                nullable: false);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserId",
