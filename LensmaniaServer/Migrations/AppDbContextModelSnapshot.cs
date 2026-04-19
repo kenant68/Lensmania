@@ -101,7 +101,7 @@ namespace LensmaniaServer.Migrations
                     b.HasOne("LensmaniaServer.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");

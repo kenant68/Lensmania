@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LensmaniaServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260417104958_AddUserIdToPosts")]
+    [Migration("20260419132531_AddUserIdToPosts")]
     partial class AddUserIdToPosts
     {
         /// <inheritdoc />
@@ -104,7 +104,7 @@ namespace LensmaniaServer.Migrations
                     b.HasOne("LensmaniaServer.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");

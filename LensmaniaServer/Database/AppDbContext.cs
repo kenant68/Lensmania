@@ -30,7 +30,7 @@ public class AppDbContext : DbContext {
 			entity.HasOne(p => p.User)
       			.WithMany(u => u.Posts)
       			.HasForeignKey(p => p.UserId)
-      			.OnDelete(DeleteBehavior.Cascade);
+      			.OnDelete(DeleteBehavior.Restrict);
 
 			entity.HasIndex(p => p.UserId);
         });
