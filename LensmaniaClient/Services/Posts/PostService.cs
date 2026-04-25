@@ -13,24 +13,27 @@ public class PostService
         _http = http;
     }
 
-    public async Task<PostDto?> CreatePostAsync(CreatePostRequest request)
+    public async Task<PostListItemResponse?> CreatePostAsync(CreatePostRequest request)
     {
         var response = await _http.PostAsJsonAsync("api/posts", request);
 
         if (!response.IsSuccessStatusCode)
             return null;
 
-        return await response.Content.ReadFromJsonAsync<PostDto>();
+        return await response.Content.ReadFromJsonAsync<PostListItemResponse>();
     }
     
-    public async Task<string> UploadImageAsync(IBrowserFile file)
+    public async Task<string?> UploadImageAsync(IBrowserFile file)
     {
-        var content = new MultipartFormDataContent();
+        using var content = new MultipartFormDataContent();
+        await using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
 
-        var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
         content.Add(new StreamContent(stream), "photo", file.Name);
 
         var response = await _http.PostAsync("api/uploads/photo", content);
+
+		if (!response.IsSuccessStatusCode)
+			return null;
 
         return await response.Content.ReadAsStringAsync();
     }

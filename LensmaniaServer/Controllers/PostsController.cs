@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using LensmaniaLibrary.DTOs.Posts;
 using LensmaniaServer.Services;
 
@@ -33,16 +35,34 @@ public class PostsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<PostDto>> GetById(int id)
+    public async Task<ActionResult<PostResponse>> GetById(int id)
     {       
         var result = await _postService.GetByIdAsync(id);
+
+		if (result is null)
+			return NotFound();
+
         return Ok(result);
     }
     
+	[Authorize]
     [HttpPost]
-    public async Task<ActionResult<PostDto>> CreatePost([FromBody] CreatePostRequest request)
+    public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
     {
-        var post = await _postService.CreatePostAsync(request);
-        return Ok(post);
+        try
+		{
+			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+			if (!int.TryParse(userIdClaim, out var userId))
+            	return Unauthorized();
+        
+			var post = await _postService.CreatePostAsync(request, userId);
+        	return Ok(post);
+		}
+		// Todo: add ValidationException + middleware
+    	catch (ArgumentException ex)
+    	{
+        	return BadRequest(new { message = ex.Message });
+    	}
     }
 }

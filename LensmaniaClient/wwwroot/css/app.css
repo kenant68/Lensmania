@@ -55,7 +55,8 @@ a, .btn-link {
 }
 
 .btn-primary:hover {
-    opacity: 0.9;
+    color: var(--color-dark-purple);
+    background-color: var(--color-lighter-purple);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

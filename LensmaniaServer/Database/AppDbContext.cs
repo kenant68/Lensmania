@@ -1,5 +1,4 @@
 using LensmaniaServer.Models;
-using LensmaniaLibrary.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LensmaniaServer.Database;
@@ -15,7 +14,10 @@ public class AppDbContext : DbContext {
     {
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasIndex(u => u.Email).IsUnique();
+			entity.Property(u => u.Username).IsRequired().HasMaxLength(50);
+			entity.Property(u => u.Email).IsRequired();
+
+			entity.HasIndex(u => u.Email).IsUnique();
             entity.HasIndex(u => u.Username).IsUnique();
         });
         
@@ -24,6 +26,13 @@ public class AppDbContext : DbContext {
             entity.Property(p => p.Title).HasMaxLength(150);
             entity.Property(p => p.PhotoUrl).IsRequired();
             entity.Property(p => p.Description).HasMaxLength(300);
+
+			entity.HasOne(p => p.User)
+      			.WithMany(u => u.Posts)
+      			.HasForeignKey(p => p.UserId)
+      			.OnDelete(DeleteBehavior.Restrict);
+
+			entity.HasIndex(p => p.UserId);
         });
     }
 }

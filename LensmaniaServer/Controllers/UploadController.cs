@@ -7,6 +7,7 @@ namespace LensmaniaServer.Controllers;
 
 [ApiController]
 [Route("api/uploads")]
+[Authorize]
 public class UploadController : ControllerBase
 {
     private readonly IFileStorageService _fileStorageService;
@@ -19,7 +20,16 @@ public class UploadController : ControllerBase
     [HttpPost("photo")]
     public async Task<IActionResult> UploadPhoto([FromForm] IFormFile photo)
     {
-        var photoUrl = await _fileStorageService.UploadPhotoAsync(photo);
-        return Ok(photoUrl);
+        if (photo is null) return BadRequest(new { message = "Aucun fichier fourni." });
+
+        try
+        {
+            var photoUrl = await _fileStorageService.UploadPhotoAsync(photo);
+            return Ok(photoUrl);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(new { message = e.Message });
+        }
     }
 }

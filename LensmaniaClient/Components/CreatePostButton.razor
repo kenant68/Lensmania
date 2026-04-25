@@ -1,9 +1,14 @@
 @using LensmaniaClient.Components
 @using LensmaniaLibrary.DTOs.Posts
 
-<button @onclick="OpenModal">
-    Créer un post
-</button>
+<div class="d-flex justify-content-center mb-3">
+	<button class="btn btn-primary px-4"
+			type="button"
+			@onclick="OpenModal"
+>
+	    Créer un post
+	</button>
+</div>
 
 <CreatePostModal
     IsOpen="@isModalOpen"
@@ -23,11 +28,11 @@
     void CloseModal() => isModalOpen = false;
 
     [Parameter]
-    public EventCallback<PostDto> OnPostCreated { get; set; }
+    public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
 
-    private async Task HandlePostCreated(PostDto postDto)
+    private async Task HandlePostCreated(PostListItemResponse post)
     {
         isModalOpen = false;
-        await OnPostCreated.InvokeAsync(postDto);
+        await OnPostCreated.InvokeAsync(post);
     }
 }
