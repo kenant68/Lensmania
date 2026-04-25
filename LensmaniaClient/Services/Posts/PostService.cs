@@ -1,0 +1,40 @@
+using LensmaniaLibrary.DTOs.Posts;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Json;
+
+namespace LensmaniaClient.Services.Posts;
+
+public class PostService
+{
+    private readonly HttpClient _http;
+
+    public PostService(HttpClient http)
+    {
+        _http = http;
+    }
+
+    public async Task<PostListItemResponse?> CreatePostAsync(CreatePostRequest request)
+    {
+        var response = await _http.PostAsJsonAsync("api/posts", request);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<PostListItemResponse>();
+    }
+    
+    public async Task<string?> UploadImageAsync(IBrowserFile file)
+    {
+        using var content = new MultipartFormDataContent();
+        await using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
+
+        content.Add(new StreamContent(stream), "photo", file.Name);
+
+        var response = await _http.PostAsync("api/uploads/photo", content);
+
+		if (!response.IsSuccessStatusCode)
+			return null;
+
+        return await response.Content.ReadAsStringAsync();
+    }
+}

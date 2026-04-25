@@ -1,8 +1,6 @@
 using System.Text;
 using LensmaniaServer.Database;
 using LensmaniaServer.Services;
-using LensmaniaServer.Features.Posts;
-using LensmaniaLibrary.Models;
 using LensmaniaServer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +28,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         });
     };
 });
+
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -76,6 +76,7 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 app.UseCors("AllowClient");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

@@ -11,7 +11,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
-    private List<PostResponse> _posts = [];
+    private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
+    private List<PostListItemResponse> _posts = [];
     private int? _cursor = null;
     private bool _hasMore = true;
     private bool _isLoading = false;
@@ -144,5 +145,33 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	{
         	_dotNetRef?.Dispose();
     	}
+    }
+
+	private void ResetPosts()
+	{
+    	_posts.Clear();
+    	_cursor = null;
+    	_hasMore = true;
+	}
+    
+    private async Task HandlePostCreated(PostListItemResponse? post)
+	{
+		if (post is null) return;
+
+        _posts.Insert(0, post);
+        if (_isMasonryInitialized)
+        {
+            // Previous batch already laid out : start a fresh single-image cycle.
+            _imagesToLoad = 1;
+            _imagesLoaded = 0;
+            _isMasonryInitialized = false;
+        }
+        else
+        {
+            // A batch is still loading : add to the pending count.
+            _imagesToLoad++;
+        }
+    	
+		StateHasChanged();
     }
 }

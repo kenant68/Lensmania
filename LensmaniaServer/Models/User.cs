@@ -8,4 +8,6 @@ public class User {
     public bool IsAdmin { get; set; } = false;
     public bool IsPremium { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+	public List<Post> Posts { get; } = new();
 }
