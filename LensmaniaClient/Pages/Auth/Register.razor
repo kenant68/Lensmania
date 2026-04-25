@@ -20,6 +20,10 @@
                 <label class="visually-hidden" for="reg-password">Mot de passe</label>
                 <input id="reg-password" class="form-control auth-input" type="password" autocomplete="new-password" placeholder="Mot de passe" @bind="password" @bind:event="oninput" />
             </div>
+            <div class="auth-field">
+                <label class="visually-hidden" for="reg-password-confirmation">Confirmation du mot de passe</label>
+                <input id="reg-password-confirmation" class="form-control auth-input" type="password" autocomplete="new-password" placeholder="Confirmer le mot de passe" @bind="confirmPassword" @bind:event="oninput" />
+            </div>
         </div>
 
         <button class="auth-submit" type="submit" disabled="@isLoading">
@@ -51,6 +55,7 @@
     private string username = string.Empty;
     private string email = string.Empty;
     private string password = string.Empty;
+    private string confirmPassword = string.Empty;
     private bool isLoading;
     private string? message;
     private bool isError;
@@ -64,8 +69,18 @@
 
     private async Task SubmitAsync()
     {
-        isLoading = true;
         message = null;
+        isError = false;
+
+        var validationMessage = ValidateForm();
+        if (validationMessage is not null)
+        {
+            isError = true;
+            message = validationMessage;
+            return;
+        }
+
+        isLoading = true;
         StateHasChanged();
 
         var result = await AuthApiClient.RegisterAsync(
@@ -83,5 +98,46 @@
         isError = true;
         message = result.Error?.Message ?? "L'inscription a échoué.";
         isLoading = false;
+    }
+
+    private string? ValidateForm()
+    {
+        var trimmedUsername = username.Trim();
+        var trimmedEmail = email.Trim();
+
+        if (string.IsNullOrWhiteSpace(trimmedUsername))
+            return "Le nom d'utilisateur est obligatoire.";
+
+        if (trimmedUsername.Length < 3)
+            return "Le nom d'utilisateur doit contenir au moins 3 caracteres.";
+
+        if (trimmedUsername.Length > 32)
+            return "Le nom d'utilisateur ne peut pas depasser 32 caracteres.";
+
+        if (string.IsNullOrWhiteSpace(trimmedEmail))
+            return "L'adresse e-mail est obligatoire.";
+
+        if (trimmedEmail.Length > 254)
+            return "L'adresse e-mail ne peut pas depasser 254 caracteres.";
+
+        if (!(new System.ComponentModel.DataAnnotations.EmailAddressAttribute()).IsValid(trimmedEmail))
+            return "L'adresse e-mail n'est pas valide.";
+
+        if (string.IsNullOrWhiteSpace(password))
+            return "Le mot de passe est obligatoire.";
+
+        if (password.Length < 8)
+            return "Le mot de passe est trop court (minimum 8 caracteres).";
+
+        if (password.Length > 128)
+            return "Le mot de passe ne peut pas depasser 128 caracteres.";
+
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+            return "La confirmation du mot de passe est obligatoire.";
+
+        if (!string.Equals(password, confirmPassword, StringComparison.Ordinal))
+            return "Les mots de passe ne correspondent pas.";
+
+        return null;
     }
 }
