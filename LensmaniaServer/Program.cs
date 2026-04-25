@@ -1,7 +1,6 @@
 using System.Text;
 using LensmaniaServer.Database;
 using LensmaniaServer.Services;
-using LensmaniaLibrary.Models;
 using LensmaniaServer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -77,9 +76,9 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 app.UseCors("AllowClient");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
