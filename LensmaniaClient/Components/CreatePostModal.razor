@@ -53,7 +53,7 @@
         errorMessage = null;
 
         // Front validation
-        var allowedTypes = new[] { "image/jpg", "image/jpeg", "image/png" };
+        var allowedTypes = new[] { "image/jpeg", "image/png" };
         if (!allowedTypes.Contains(file.ContentType))
         {
             errorMessage = "Format non autorisé (jpg, jpeg, png uniquement)";

@@ -66,7 +66,7 @@ public class PostService : IPostService
             .FirstOrDefaultAsync();
     }
     
-    public async Task<PostListItemResponse> CreatePostAsync(CreatePostRequest request, int  userId)
+    public async Task<PostResponse> CreatePostAsync(CreatePostRequest request, int  userId)
     {
         if (string.IsNullOrWhiteSpace(request.PhotoUrl))
             throw new ArgumentException("PhotoUrl is required");
@@ -108,10 +108,12 @@ public class PostService : IPostService
             .Reference(p => p.User)
             .LoadAsync();
 
-        return new PostListItemResponse(
+        return new PostResponse(
             post.Id,
             post.Title ?? DefaultAltImgFor(post.User.Username),
             post.PhotoUrl,
+            post.Description,
+            post.CreatedAt,
             post.User.Username
         );
     }
