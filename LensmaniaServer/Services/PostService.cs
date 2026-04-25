@@ -10,6 +10,8 @@ public class PostService : IPostService
     private readonly AppDbContext _db;
 	private readonly IWebHostEnvironment _env;
     private static readonly string[] AllowedPhotoExtensions = [".jpg", ".jpeg", ".png"];
+	private const string DefaultAltImgPrefix = "Photo de ";
+    private static string DefaultAltImgFor(string username) => DefaultAltImgPrefix + username;
 
     public PostService(AppDbContext db, IWebHostEnvironment  env)
 	{
@@ -31,7 +33,7 @@ public class PostService : IPostService
         var posts = await query
             .Select(p => new PostListItemResponse(
                 p.Id,
-                p.Title ?? $"Photo de {p.User.Username}",
+                p.Title ?? DefaultAltImgFor(p.User.Username),
                 p.PhotoUrl,
                 p.User.Username
             ))
@@ -108,7 +110,7 @@ public class PostService : IPostService
 
         return new PostListItemResponse(
             post.Id,
-            post.Title ?? $"Photo de {post.User.Username}",
+            post.Title ?? DefaultAltImgFor(post.User.Username),
             post.PhotoUrl,
             post.User.Username
         );

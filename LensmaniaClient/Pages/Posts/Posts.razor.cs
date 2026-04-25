@@ -157,11 +157,20 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     private async Task HandlePostCreated(PostListItemResponse? post)
 	{
 		if (post is null) return;
- 	
-		_posts.Insert(0, post);
-	    _imagesToLoad = 1;
-    	_imagesLoaded = 0;
-    	_isMasonryInitialized = false;
+
+        _posts.Insert(0, post);
+        if (_isMasonryInitialized)
+        {
+            // Previous batch already laid out : start a fresh single-image cycle.
+            _imagesToLoad = 1;
+            _imagesLoaded = 0;
+            _isMasonryInitialized = false;
+        }
+        else
+        {
+            // A batch is still loading : add to the pending count.
+            _imagesToLoad++;
+        }
     	
 		StateHasChanged();
     }
