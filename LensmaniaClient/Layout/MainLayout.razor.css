@@ -1,7 +1,10 @@
 .page {
     display: flex;
     flex-direction: column;
+    flex: 1;
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
 }
 
 main {
@@ -14,6 +17,10 @@ main {
 }
 
 .content {
-    max-width: 95vw;
-    margin: 20px auto 0 auto;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content {
+    margin-top: 20px;
 }

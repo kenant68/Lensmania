@@ -10,7 +10,17 @@
 }
 
 html, body {
+    margin: 0;
     font-family: var(--font-main);
+    min-height: 100%;
+}
+
+#app {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -55,8 +65,7 @@ a, .btn-link {
 }
 
 .btn-primary:hover {
-    color: var(--color-dark-purple);
-    background-color: var(--color-lighter-purple);
+    opacity: 0.9;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -155,4 +164,30 @@ code {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+main:has(.auth-page--cover) {
+    padding-top: 0 !important;
+}
+
+.main-content:has(.auth-page--cover) {
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+article.content:has(.auth-page--cover) {
+    max-width: none !important;
+    width: 100%;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    align-self: stretch;
 }

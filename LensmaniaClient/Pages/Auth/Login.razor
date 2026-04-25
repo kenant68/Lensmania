@@ -5,45 +5,46 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="auth-page">
-    <div class="auth-card">
-        <h1 class="auth-title">Connexion</h1>
-        <p class="text-muted mb-4">Accédez à votre compte Lensmania.</p>
-
-        <div class="mb-3">
-            <label class="form-label" for="login-email">E-mail</label>
-            <input id="login-email" class="form-control" type="email" autocomplete="email" @bind="email" @bind:event="oninput" />
+<AuthCard>
+    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault="true">
+        <div class="auth-fields">
+            <div class="auth-field">
+                <label class="visually-hidden" for="login-email">E-mail</label>
+                <input id="login-email" class="form-control auth-input" type="email" autocomplete="email" placeholder="Email" @bind="email" @bind:event="oninput" />
+            </div>
+            <div class="auth-field">
+                <label class="visually-hidden" for="login-password">Mot de passe</label>
+                <input id="login-password" class="form-control auth-input" type="password" autocomplete="current-password" placeholder="Mot de passe" @bind="password" @bind:event="oninput" />
+            </div>
         </div>
-        <div class="mb-4">
-            <label class="form-label" for="login-password">Mot de passe</label>
-            <input id="login-password" class="form-control" type="password" autocomplete="current-password" @bind="password" @bind:event="oninput" />
+
+        <div class="auth-forgot-row">
+            <a class="auth-forgot-link" href="#">Mot de passe oublié</a>
         </div>
 
-        <button class="btn btn-primary w-100 py-2" type="button" @onclick="SubmitAsync" disabled="@isLoading">
+        <button class="auth-submit" type="submit" disabled="@isLoading">
             @if (isLoading)
             {
                 <span>Connexion…</span>
             }
             else
             {
-                <span>Se connecter</span>
-
+                <span>Connexion</span>
             }
         </button>
 
-        <p class="mt-4 mb-0 text-center">
-            Pas encore de compte ?
+        <p class="auth-footer-link">
             <a href="@AuthRoutes.Register">Créer un compte</a>
         </p>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <div class="alert @(isError ? "alert-danger" : "alert-success") mt-4 mb-0" role="alert">
+            <div class="auth-alert @(isError ? "auth-alert--error" : "auth-alert--success")" role="alert">
                 @message
             </div>
         }
-    </div>
-</div>
+    </form>
+</AuthCard>
 
 @code {
     private string email = string.Empty;
