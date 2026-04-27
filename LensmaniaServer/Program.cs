@@ -34,6 +34,7 @@ builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.Configure<PasswordResetOptions>(builder.Configuration.GetSection("PasswordReset"));
 builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
+builder.Services.AddScoped<PasswordResetService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
