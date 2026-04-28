@@ -21,7 +21,8 @@ public class PostsController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<PaginatedPosts>> GetAll(
-        [FromQuery] int? cursor = null,
+	    [FromQuery] int? userId,
+	    [FromQuery] int? cursor = null,
         [FromQuery] int limit = 10)
     {
         if (limit < 1 || limit > 50)
@@ -30,7 +31,7 @@ public class PostsController : ControllerBase
         if (cursor.HasValue && cursor.Value <= 0)
             return BadRequest("`cursor` must be a positive integer.");
         
-        var result = await _postService.GetAllAsync(cursor, limit);
+        var result = await _postService.GetAllAsync(userId, cursor, limit);
         return Ok(result);
     }
 
