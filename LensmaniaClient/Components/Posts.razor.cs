@@ -4,48 +4,72 @@ using System.Net.Http.Json;
 using Soenneker.Blazor.Masonry;
 using LensmaniaLibrary.DTOs.Posts;
 
-namespace LensmaniaClient.Pages.Posts;
+namespace LensmaniaClient.Components;
 
 public partial class Posts : ComponentBase, IAsyncDisposable
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
+    // Parameters
+    [Parameter] public int? UserId { get; set; }
+    [Parameter] public bool DisplayCreateButton { get; set; } = false;
+    [Parameter] public bool IsOwnProfile { get; set; } = false;
+    [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
+    
     private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
     private List<PostListItemResponse> _posts = [];
     private int? _cursor = null;
     private bool _hasMore = true;
     private bool _isLoading = false;
 	private bool _hasError = false;
+	private string _errorMessage = string.Empty;
+	
+	// Masonry / images
+	private Masonry? _masonry;
 	private int _imagesLoaded = 0;
 	private int _imagesToLoad = 0;
 	private bool _isMasonryInitialized = false;
-	private string _errorMessage = string.Empty;
-	private Masonry? _masonry;
+	
+	// Infinite scroll
     private ElementReference _sentinel;
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<Posts>? _dotNetRef;
+    
+    // Modal details
+    private PostListItemResponse? _selectedPostItem = null;
+    private PostResponse? _selectedPostDetailed = null;
+    private bool _isLoadingDetail = false;
 
+    
+    // --- Initialize ---
+    private bool _initialized = false;
+
+    // Manages UserId changes
+    protected override async Task OnParametersSetAsync()
+    {
+	    if (!_initialized) return;
+	    await ReloadAsync();
+    }
+    
 	// Runs after each render. On first render : it loads first posts and sets up the sentinel <div>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            _dotNetRef = DotNetObjectReference.Create(this);
-            _jsModule = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./js/infiniteScroll.js");
+	    if (!firstRender) return;
 
-            await LoadMorePosts();
-            // Waits for the re-render triggered by LoadMorePosts() to be finished
-            await Task.Yield();
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+            "import", "./js/infiniteScroll.js");
 
-            if (_sentinel.Id != null && _hasMore)
-            {
-	            await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
-            }
-        }
+        await LoadMorePosts();
+        // Waits for the re-render triggered by LoadMorePosts() to be finished
+        await Task.Yield();
+
+        if (_sentinel.Id != null && _hasMore)
+            await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
     }
 
+    // --- Infinite scroll ---
     // Calld by JS when sentinel is visible : triggers loading of more posts
     [JSInvokable]
     public async Task OnSentinelVisible()
@@ -55,6 +79,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
+    // --- Loading ---
+    
 	// Loads the next batch of posts and updates component state
     private async Task LoadMorePosts()
     {
@@ -66,6 +92,9 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 			var url = $"api/posts?limit=10";
 			if (_cursor.HasValue)
     			url += $"&cursor={_cursor}";
+			
+			if (UserId.HasValue)
+				url += $"&userId={UserId}";
 
         	var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
 
@@ -74,7 +103,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             	_posts.AddRange(result.Posts);
             	_cursor = result.NextCursor;
             	_hasMore = result.HasMore;
-            	_imagesToLoad = result.Posts.Count;
+            	_imagesToLoad += result.Posts.Count;
             	_imagesLoaded = 0;
 				_isMasonryInitialized = false;
         	}
@@ -82,7 +111,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 		catch (HttpRequestException)
     	{
         	_hasError = true;
-        	_errorMessage = "Une erreur est survenue lors du chargement des posts. Vérifier la connexion.";
+        	_errorMessage = "Erreur de connexion lors du chargement des posts.";
     	}
 		catch (Exception e)
     	{
@@ -96,18 +125,37 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         	StateHasChanged();
 		}
     }
+    
+    private void ResetState()
+    {
+	    _posts.Clear();
+	    _cursor = null;
+	    _hasMore = true;
+	    _imagesToLoad = 0;
+	    _imagesLoaded = 0;
+	    _isMasonryInitialized = false;
+	    _selectedPostItem = null;
+    }
+    
+    // Reload method exposed for parent pages
+    public async Task ReloadAsync()
+    {
+	    ResetState();
+	    await LoadMorePosts();
+	    await Task.Yield();
 
+	    // Observe sentinel after reload
+	    if (_jsModule != null && _sentinel.Id != null && _hasMore)
+		    await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
+    }
+    
+	// --- Masonry ---
+	
 	// Called by @onload — photo path OK
-	private async Task OnImageLoaded()
-	{
-		await OnImageSettled();
-	}
+	private async Task OnImageLoaded() => await OnImageSettled();
 	
 	// Called by @onerror — broken photo path
-	private async Task OnImageFailed()
-	{
-		await OnImageSettled();
-	}
+	private async Task OnImageFailed() => await OnImageSettled();
 	
 	// Is called every time an image is loaded or failed, to ensure that masonry layout is applied when all images are ready
 	private async Task OnImageSettled()
@@ -118,47 +166,27 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 
     	if (_imagesToLoad > 0 && _imagesLoaded >= _imagesToLoad)
     	{
-			_isMasonryInitialized = true;        	
+			_isMasonryInitialized = true;
+			
 			if (_masonry != null)
         	{
             	var scrollY = await _jsModule!.InvokeAsync<double>("getScrollY");
             	await _masonry.Init();
             	await _jsModule!.InvokeVoidAsync("scrollTo", 0, scrollY);
         	}
+			
         	_imagesLoaded = 0;
 			_imagesToLoad = 0;
     	}
 	}
-
-    // Cleans up JS interop and .NET references when component is removed
-    public async ValueTask DisposeAsync()
-    {
-		try 
-		{
-        	if (_jsModule != null)
-			{
-            	await _jsModule.InvokeVoidAsync("unobserve");
-				await _jsModule.DisposeAsync();
-			}
-		}
-        finally
-    	{
-        	_dotNetRef?.Dispose();
-    	}
-    }
-
-	private void ResetPosts()
-	{
-    	_posts.Clear();
-    	_cursor = null;
-    	_hasMore = true;
-	}
     
+	// --- Post creation ---
     private async Task HandlePostCreated(PostListItemResponse? post)
 	{
 		if (post is null) return;
 
         _posts.Insert(0, post);
+        
         if (_isMasonryInitialized)
         {
             // Previous batch already laid out : start a fresh single-image cycle.
@@ -172,6 +200,55 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             _imagesToLoad++;
         }
     	
+        await OnPostCreated.InvokeAsync(post);
 		StateHasChanged();
+    }
+    
+    // Post details
+    private async Task SelectPost(PostListItemResponse item)
+    {
+	    _selectedPostItem = item;
+	    _selectedPostDetailed = null;
+	    _isLoadingDetail = true;
+	    StateHasChanged();
+
+	    try
+	    {
+		    _selectedPostDetailed = await Http.GetFromJsonAsync<PostResponse>(
+			    $"api/posts/{item.Id}");
+	    }
+	    catch (Exception e)
+	    {
+		    Console.Error.WriteLine($"Erreur chargement détail : {e.Message}");
+	    }
+	    finally
+	    {
+		    _isLoadingDetail = false;
+		    StateHasChanged();
+	    }
+    }
+
+    private void CloseDetail()
+    {
+	    _selectedPostDetailed = null;
+	    _selectedPostItem = null;
+    }
+    
+    // --- Dispose ---
+    // Cleans up JS interop and .NET references when component is removed
+    public async ValueTask DisposeAsync()
+    {
+	    try 
+	    {
+		    if (_jsModule != null)
+		    {
+			    await _jsModule.InvokeVoidAsync("unobserve");
+			    await _jsModule.DisposeAsync();
+		    }
+	    }
+	    finally
+	    {
+		    _dotNetRef?.Dispose();
+	    }
     }
 }
