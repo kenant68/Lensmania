@@ -1,6 +1,7 @@
 using LensmaniaLibrary.DTOs.Posts;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
+using System.Net;
 
 namespace LensmaniaClient.Services.Posts;
 
@@ -36,5 +37,18 @@ public class PostService
 			return null;
 
         return await response.Content.ReadAsStringAsync();
+    }
+    
+    public async Task<DeletePostResult> DeletePostAsync(int postId)
+    {
+        var response = await _http.DeleteAsync($"api/posts/{postId}");
+        
+        return response.StatusCode switch
+        {
+            HttpStatusCode.NoContent => DeletePostResult.Success,
+            HttpStatusCode.NotFound => DeletePostResult.NotFound,
+            HttpStatusCode.Forbidden => DeletePostResult.Forbidden,
+            _ => DeletePostResult.Error
+        };
     }
 }
