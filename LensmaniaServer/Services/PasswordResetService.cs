@@ -57,10 +57,45 @@ public class PasswordResetService
         await _emailSender.SendAsync(user.Email, ResetSubject, body);
     }
 
-    public Task<ResetOutcome> ResetAsync(string token, string newPassword)
+    public async Task<ResetOutcome> ResetAsync(string token, string newPassword)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(token)) return ResetOutcome.InvalidOrExpired;
+
+        var hashed = HashToken(token);
+        var resetToken = await _db.PasswordResetTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.TokenHash == hashed);
+
+        if (resetToken is null) return ResetOutcome.InvalidOrExpired;
+        if (resetToken.ConsumedAt is not null) return ResetOutcome.InvalidOrExpired;
+        if (resetToken.ExpiresAt < DateTime.UtcNow) return ResetOutcome.InvalidOrExpired;
+
+        resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        resetToken.ConsumedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        try
+        {
+            await _emailSender.SendAsync(
+                resetToken.User.Email,
+                "Votre mot de passe Lensmania a été modifié",
+                BuildConfirmationBody());
+        }
+        catch
+        {
+            // Confirmation email is best-effort; failure must not roll back the password change.
+        }
+
+        return ResetOutcome.Success;
     }
+    
+    private static string BuildConfirmationBody() =>
+        """
+        <p>Bonjour,</p>
+        <p>Votre mot de passe vient d'être modifié.</p>
+        <p>Si vous n'êtes pas à l'origine de cette modification, contactez immédiatement le support.</p>
+        <p>— L'équipe Lensmania</p>
+        """;
 
     private static string GenerateRawToken()
     {

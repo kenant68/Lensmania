@@ -81,4 +81,87 @@ public class PasswordResetServiceTests
         Assert.That(tokens, Has.Count.EqualTo(2));
         Assert.That(tokens.Count(t => t.ConsumedAt == null), Is.EqualTo(1));
     }
+    
+    
+    private async Task<string> RequestAndCaptureRawTokenAsync(User user)
+{
+    await _service.RequestResetAsync(user.Email);
+    var sent = _emailSender.SentEmails.Last();
+    var marker = "?token=";
+    var startIndex = sent.HtmlBody.IndexOf(marker, StringComparison.Ordinal) + marker.Length;
+    var endIndex = sent.HtmlBody.IndexOf("\"", startIndex, StringComparison.Ordinal);
+    return sent.HtmlBody.Substring(startIndex, endIndex - startIndex);
+}
+
+    [Test]
+    public async Task ResetAsync_ValidToken_UpdatesPasswordAndConsumesToken()
+    {
+        var user = await SeedUserAsync();
+        var rawToken = await RequestAndCaptureRawTokenAsync(user);
+
+        var outcome = await _service.ResetAsync(rawToken, "newpassword123");
+
+        Assert.That(outcome, Is.EqualTo(ResetOutcome.Success));
+
+        var refreshed = await _db.Users.AsNoTracking().FirstAsync(u => u.Id == user.Id);
+        Assert.That(BCrypt.Net.BCrypt.Verify("newpassword123", refreshed.PasswordHash), Is.True);
+
+        var dbToken = await _db.PasswordResetTokens.AsNoTracking().FirstAsync();
+        Assert.That(dbToken.ConsumedAt, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task ResetAsync_ExpiredToken_ReturnsInvalidOrExpired_PasswordUnchanged()
+    {
+        var user = await SeedUserAsync();
+        var rawToken = await RequestAndCaptureRawTokenAsync(user);
+
+        var stored = await _db.PasswordResetTokens.FirstAsync();
+        stored.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
+        await _db.SaveChangesAsync();
+
+        var outcome = await _service.ResetAsync(rawToken, "newpassword123");
+
+        Assert.That(outcome, Is.EqualTo(ResetOutcome.InvalidOrExpired));
+
+        var refreshed = await _db.Users.AsNoTracking().FirstAsync(u => u.Id == user.Id);
+        Assert.That(BCrypt.Net.BCrypt.Verify("oldpassword", refreshed.PasswordHash), Is.True);
+    }
+
+    [Test]
+    public async Task ResetAsync_AlreadyConsumedToken_ReturnsInvalidOrExpired()
+    {
+        var user = await SeedUserAsync();
+        var rawToken = await RequestAndCaptureRawTokenAsync(user);
+
+        var first = await _service.ResetAsync(rawToken, "newpassword123");
+        Assert.That(first, Is.EqualTo(ResetOutcome.Success));
+
+        var second = await _service.ResetAsync(rawToken, "anothernewpassword");
+        Assert.That(second, Is.EqualTo(ResetOutcome.InvalidOrExpired));
+    }
+
+    [Test]
+    public async Task ResetAsync_UnknownToken_ReturnsInvalidOrExpired()
+    {
+        await SeedUserAsync();
+
+        var outcome = await _service.ResetAsync("totally-not-a-real-token", "newpassword123");
+
+        Assert.That(outcome, Is.EqualTo(ResetOutcome.InvalidOrExpired));
+    }
+
+    [Test]
+    public async Task ResetAsync_Success_SendsConfirmationEmail()
+    {
+        var user = await SeedUserAsync();
+        var rawToken = await RequestAndCaptureRawTokenAsync(user);
+
+        var sentBefore = _emailSender.SentEmails.Count;
+        await _service.ResetAsync(rawToken, "newpassword123");
+
+        Assert.That(_emailSender.SentEmails.Count, Is.EqualTo(sentBefore + 1));
+        Assert.That(_emailSender.SentEmails.Last().Subject, Does.Contain("modifié"));
+        Assert.That(_emailSender.SentEmails.Last().To, Is.EqualTo(user.Email));
+    }
 }
