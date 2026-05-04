@@ -9,6 +9,7 @@ public class AppDbContext : DbContext {
     
     public DbSet<User> Users { get; set; }
     public DbSet<Post> Posts { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,20 @@ public class AppDbContext : DbContext {
       			.OnDelete(DeleteBehavior.Restrict);
 
 			entity.HasIndex(p => p.UserId);
+        });
+        
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+	        entity.Property(t => t.TokenHash).IsRequired().HasMaxLength(64);
+	        entity.Property(t => t.RowVersion).IsRowVersion();
+
+	        entity.HasIndex(t => t.TokenHash).IsUnique();
+	        entity.HasIndex(t => new { t.UserId, t.ConsumedAt });
+
+	        entity.HasOne(t => t.User)
+		        .WithMany()
+		        .HasForeignKey(t => t.UserId)
+		        .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
