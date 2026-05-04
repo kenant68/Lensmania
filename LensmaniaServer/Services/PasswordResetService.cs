@@ -19,12 +19,14 @@ public class PasswordResetService
 
     private readonly AppDbContext _db;
     private readonly IEmailSender _emailSender;
+    private readonly ILogger<PasswordResetService> _logger;
     private readonly PasswordResetOptions _options;
 
-    public PasswordResetService(AppDbContext db, IEmailSender emailSender, IOptions<PasswordResetOptions> options)
+    public PasswordResetService(AppDbContext db, IEmailSender emailSender, ILogger<PasswordResetService> logger, IOptions<PasswordResetOptions> options)
     {
         _db = db;
         _emailSender = emailSender;
+        _logger = logger;
         _options = options.Value;
     }
 
@@ -52,9 +54,16 @@ public class PasswordResetService
 
         await _db.SaveChangesAsync();
 
-        var resetUrl = $"{_options.ClientBaseUrl.TrimEnd('/')}/reset-password?token={rawToken}";
-        var body = BuildResetRequestBody(resetUrl);
-        await _emailSender.SendAsync(user.Email, ResetSubject, body);
+        try
+        {
+            var resetUrl = $"{_options.ClientBaseUrl.TrimEnd('/')}/reset-password?token={rawToken}";
+            var body = BuildResetRequestBody(resetUrl);
+            await _emailSender.SendAsync(user.Email, ResetSubject, body);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password-reset email to {Email}.", user.Email);
+        }
     }
 
     public async Task<ResetOutcome> ResetAsync(string token, string newPassword)
