@@ -6,6 +6,7 @@ using LensmaniaTests.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace LensmaniaTests.Auth;
@@ -28,7 +29,7 @@ public class AuthControllerPasswordResetTests
             TokenLifetimeMinutes = 60,
             ClientBaseUrl = "http://localhost:5135"
         });
-        _passwordReset = new PasswordResetService(_db, _emailSender, resetOptions);
+        _passwordReset = new PasswordResetService(_db, _emailSender, NullLogger<PasswordResetService>.Instance, resetOptions);
 
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>

@@ -3,6 +3,7 @@ using LensmaniaServer.Models;
 using LensmaniaServer.Services;
 using LensmaniaTests.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace LensmaniaTests.Auth;
@@ -24,7 +25,7 @@ public class PasswordResetServiceTests
             TokenLifetimeMinutes = 60,
             ClientBaseUrl = "https://localhost:5135"
         });
-        _service = new PasswordResetService(_db,_emailSender,options);
+        _service = new PasswordResetService(_db, _emailSender, NullLogger<PasswordResetService>.Instance, options);
     }
 
     [TearDown]
