@@ -23,7 +23,7 @@ public class GmailSmtpEmailSender : IEmailSender
         message.Subject = subject;
         message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
         
-        using var client = new SmtpClient();
+        using var client = new SmtpClient { Timeout = 15_000 };
         var secureOption = _options.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
         await client.ConnectAsync(_options.SmtpHost, _options.SmtpPort, secureOption);
         await client.AuthenticateAsync(_options.Username, _options.Password);
