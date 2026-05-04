@@ -11,5 +11,5 @@ public class PasswordResetToken
     public DateTime ExpiresAt { get; set; }
     public DateTime? ConsumedAt { get; set; }
     public DateTime CreatedAt { get; set; } =  DateTime.UtcNow;
-    [Timestamp] public byte[] RowVersion { get; set; } = null!;
+    [Timestamp] public byte[]? RowVersion { get; set; }
 }
