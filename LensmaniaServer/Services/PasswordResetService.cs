@@ -57,7 +57,7 @@ public class PasswordResetService
         try
         {
             var resetUrl = $"{_options.ClientBaseUrl.TrimEnd('/')}/reset-password?token={rawToken}";
-            var body = BuildResetRequestBody(resetUrl);
+            var body = BuildResetRequestBody(resetUrl, _options.TokenLifetimeMinutes);
             await _emailSender.SendAsync(user.Email, ResetSubject, body);
         }
         catch (Exception ex)
@@ -129,10 +129,10 @@ public class PasswordResetService
         return Convert.ToHexString(hash);
     }
 
-    private static string BuildResetRequestBody(string resetUrl) =>
+    private static string BuildResetRequestBody(string resetUrl, int lifetimeMinutes) =>
         $"""
         <p>Bonjour,</p>
-        <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous (valable 1 heure) :</p>
+        <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous (valable {lifetimeMinutes} minute{(lifetimeMinutes > 1 ? "s" : "")}) :</p>
         <p><a href="{resetUrl}">Réinitialiser mon mot de passe</a></p>
         <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce message.</p>
         <p>— L'équipe Lensmania</p>
