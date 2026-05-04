@@ -24,7 +24,7 @@ public class GmailSmtpEmailSender : IEmailSender
         message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
         
         using var client = new SmtpClient();
-        var secureOption = _options.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+        var secureOption = _options.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
         await client.ConnectAsync(_options.SmtpHost, _options.SmtpPort, secureOption);
         await client.AuthenticateAsync(_options.Username, _options.Password);
         await client.SendAsync(message);
