@@ -39,6 +39,7 @@ public class AppDbContext : DbContext {
         modelBuilder.Entity<PasswordResetToken>(entity =>
         {
 	        entity.Property(t => t.TokenHash).IsRequired().HasMaxLength(64);
+	        entity.Property(t => t.RowVersion).IsRowVersion();
 
 	        entity.HasIndex(t => t.TokenHash).IsUnique();
 	        entity.HasIndex(t => new { t.UserId, t.ConsumedAt });

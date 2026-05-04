@@ -81,7 +81,15 @@ public class PasswordResetService
 
         resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         resetToken.ConsumedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
+
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return ResetOutcome.InvalidOrExpired;
+        }
 
         try
         {
