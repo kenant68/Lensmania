@@ -229,11 +229,15 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    _selectedPostDetailed = null;
 	    _isLoadingDetail = true;
 	    StateHasChanged();
+	    
+	    var requestedPostId = item.Id;
 
 	    try
 	    {
-		    _selectedPostDetailed = await Http.GetFromJsonAsync<PostResponse>(
-			    $"api/posts/{item.Id}");
+		    var detail = await Http.GetFromJsonAsync<PostResponse>($"api/posts/{requestedPostId}");
+		    
+		    if (_selectedPostItem?.Id == requestedPostId)
+			    _selectedPostDetailed = detail;
 	    }
 	    catch (Exception e)
 	    {
@@ -241,7 +245,9 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    }
 	    finally
 	    {
-		    _isLoadingDetail = false;
+		    if (_selectedPostItem?.Id == requestedPostId)
+			    _isLoadingDetail = false;
+		    
 		    StateHasChanged();
 	    }
     }
