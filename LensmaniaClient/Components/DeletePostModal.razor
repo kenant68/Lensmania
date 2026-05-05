@@ -1,0 +1,91 @@
+@using LensmaniaClient.Services.Posts
+
+@if (IsOpen)
+{
+    <div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header m-auto">
+                    <h2 class="modal-title text-center">Supprimer le post</h2>
+                </div>
+
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce post ? Cette action est irréversible.</p>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <p class="text-danger">@errorMessage</p>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-danger"
+                            @onclick="ConfirmDelete"
+                            disabled="@isLoading">
+                        @(isLoading ? "Suppression..." : "Supprimer")
+                    </button>
+                    <button class="btn btn-secondary"
+                            @onclick="CloseModal"
+                            disabled="@isLoading">
+                        Annuler
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public int PostId { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<int> OnPostDeleted { get; set; }
+
+    [Inject] private PostService PostService { get; set; } = default!;
+
+    private string? errorMessage;
+    private bool isLoading = false;
+
+    private async Task ConfirmDelete()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await PostService.DeletePostAsync(PostId);
+
+            switch (result)
+            {
+                case DeletePostResult.Success:
+                    await OnPostDeleted.InvokeAsync(PostId);
+                    break;
+                case DeletePostResult.NotFound:
+                    errorMessage = "Ce post n'existe plus.";
+                    break;
+                case DeletePostResult.Forbidden:
+                    errorMessage = "Vous n'êtes pas autorisé à supprimer ce post.";
+                    break;
+                default:
+                    errorMessage = "Une erreur est survenue, veuillez réessayer.";
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            errorMessage = "Une erreur est survenue.";
+            Console.Error.WriteLine(e);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private async Task CloseModal()
+    {
+        errorMessage = null;      
+        await OnClose.InvokeAsync();
+    }
+}

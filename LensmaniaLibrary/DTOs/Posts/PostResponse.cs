@@ -6,5 +6,6 @@ public record PostResponse (
     string PhotoUrl,
     string? Description,
     DateTime CreatedAt,
-    string Username
+    string Username,
+    int UserId
 );

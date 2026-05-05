@@ -1,0 +1,43 @@
+@page "/profile/{Username}"
+@using LensmaniaLibrary.DTOs.Posts
+@using System.Security.Claims
+@using LensmaniaClient.Components
+@using LensmaniaClient.Services.Auth
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="profile-page">
+
+    <header class="profile-header">
+        <h1 class="text-start mb-4">
+            @(_isOwnProfile 
+                ? "Mon profil" 
+                : $"Profil de {(_username ?? "...")}")
+        </h1>
+    </header>
+
+    <Posts @ref="_postsComponent"
+           Username="@_username"
+           DisplayCreateButton="@_isOwnProfile"
+           IsOwnProfile="@_isOwnProfile"
+    />
+
+</div>
+
+@code {
+    [Parameter] public required string Username { get; set; }
+
+    private Posts? _postsComponent;
+    private bool _isOwnProfile;
+    private string? _username;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        var usernameClaim = user.FindFirst(ClaimTypes.Name)?.Value;
+        
+        _isOwnProfile = string.Equals(usernameClaim, Username, StringComparison.OrdinalIgnoreCase);
+        _username = _isOwnProfile ? usernameClaim : Username;
+    }
+}

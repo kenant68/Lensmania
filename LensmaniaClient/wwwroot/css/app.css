@@ -5,7 +5,6 @@
     --color-light-purple: #BDB3DD;
     --color-lighter-purple: #E6E3F2;
     --color-pink: #F4A6B9;
-
     --font-main: 'Montserrat', Arial, sans-serif;
 }
 
@@ -66,6 +65,8 @@ a, .btn-link {
 
 .btn-primary:hover {
     opacity: 0.9;
+    color: var(--color-dark-purple);
+    background-color: var(--color-light-purple);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
