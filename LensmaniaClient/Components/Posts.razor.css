@@ -37,7 +37,8 @@
     background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
 }
 
-.post-card:hover .post-overlay {
+.post-card:hover .post-overlay,
+.post-card:focus-within .post-overlay {
     opacity: 1;
 }
 
@@ -63,6 +64,11 @@
 
 .like-btn:active {
     transform: scale(0.92);
+}
+
+.like-btn:focus-visible {
+    outline: 2px solid #ff4d6d;
+    outline-offset: 2px;
 }
 
 .heart-icon {
