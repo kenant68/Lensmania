@@ -32,17 +32,20 @@ public class PostsController : ControllerBase
 
         if (limit < 1 || limit > 50)
             return BadRequest("`limit` must be between 1 and 50.");
-        
+
         if (cursor.HasValue && cursor.Value <= 0)
             return BadRequest("`cursor` must be a positive integer.");
-        
-        var result = await _postService.GetAllAsync(userId, cursor, limit);
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        int? currentUserId = int.TryParse(userIdClaim, out var id) ? id : null;
+
+        var result = await _postService.GetAllAsync(userId, cursor, limit, currentUserId);
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PostResponse>> GetById(int id)
-    {       
+    {
         var result = await _postService.GetByIdAsync(id);
 
 		if (result is null)
@@ -50,7 +53,21 @@ public class PostsController : ControllerBase
 
         return Ok(result);
     }
-    
+
+    [Authorize]
+    [HttpPost("{id:int}/likes")]
+    public async Task<IActionResult> ToggleLike(int id)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var found = await _postService.ToggleLikeAsync(id, userId);
+        if (!found) return NotFound();
+
+        return NoContent();
+    }
+
 	[Authorize]
     [HttpPost]
     public async Task<ActionResult<PostResponse>> CreatePost([FromBody] CreatePostRequest request)
