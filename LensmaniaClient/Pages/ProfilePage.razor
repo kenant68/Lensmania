@@ -41,7 +41,6 @@
         _isOwnProfile = usernameClaim == Username;
         _username = _isOwnProfile ? usernameClaim : Username;
 
-        _postsComponent?.ReloadAsync();
         _pendingMasonry = true;
     }
     

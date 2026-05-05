@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System.Net.Http.Json;
 using Soenneker.Blazor.Masonry;
 using LensmaniaLibrary.DTOs.Posts;
+using LensmaniaClient.Services.Posts;
 
 namespace LensmaniaClient.Components;
 
@@ -10,6 +11,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] public PostService _postService { get; set; } = default!;
+
 
     // Parameters
     [Parameter] public string? Username { get; set; }
@@ -64,10 +67,6 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         _jsModule = await JS.InvokeAsync<IJSObjectReference>(
             "import", "./js/infiniteScroll.js");
 
-        await LoadMorePosts();
-        // Waits for the re-render triggered by LoadMorePosts() to be finished
-        await Task.Yield();
-
         if (_sentinel.Id != null && _hasMore)
             await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
         
@@ -106,14 +105,17 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 			
 			if (!string.IsNullOrWhiteSpace(Username))
 			{
-				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10";
+				//TODO: replace by _postService.GetPostsByUsernameAsync
+				// var result = await _postService.GetPostsByUsernameAsync(Username, _cursor, 10);
 
+				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10";
+			
 				if (_cursor.HasValue)
 					url += $"&cursor={_cursor}";
 			}
 
         	var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
-
+	        
         	if (result != null)
         	{
             	_posts.AddRange(result.Posts);
