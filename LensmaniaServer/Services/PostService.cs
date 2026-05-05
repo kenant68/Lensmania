@@ -19,7 +19,7 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null)
     {
         var query = _db.Posts.AsQueryable();
 
@@ -30,17 +30,17 @@ public class PostService : IPostService
         }
 
         if (cursor.HasValue)
-        {
             query = query.Where(p => p.Id < cursor.Value);
-        }
-        
+
         var posts = await query
             .OrderByDescending(p => p.Id)
             .Select(p => new PostListItemResponse(
                 p.Id,
                 p.Title ?? DefaultAltImgFor(p.User.Username),
                 p.PhotoUrl,
-                p.User.Username
+                p.User.Username,
+                0,
+                false
             ))
             .Take(limit + 1)
             .ToListAsync();
@@ -134,7 +134,7 @@ public class PostService : IPostService
 
 		if (post.UserId != currentUserId)
 			throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer ce post.");
-		
+
 		_db.Posts.Remove(post);
         await _db.SaveChangesAsync();
 
@@ -160,4 +160,7 @@ public class PostService : IPostService
 
 		return true;
     }
+
+    public Task<bool> ToggleLikeAsync(int postId, int userId)
+        => throw new NotImplementedException();
 }
