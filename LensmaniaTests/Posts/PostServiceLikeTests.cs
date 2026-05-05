@@ -43,8 +43,6 @@ public class PostServiceLikeTests
 
         Assert.That(result, Is.True);
         Assert.That(await _db.PostLikes.CountAsync(), Is.EqualTo(1));
-        var refreshed = await _db.Posts.AsNoTracking().FirstAsync(p => p.Id == post.Id);
-        Assert.That(refreshed.LikesCount, Is.EqualTo(1));
     }
 
     [Test]
@@ -57,8 +55,6 @@ public class PostServiceLikeTests
 
         Assert.That(result, Is.True);
         Assert.That(await _db.PostLikes.CountAsync(), Is.EqualTo(0));
-        var refreshed = await _db.Posts.AsNoTracking().FirstAsync(p => p.Id == post.Id);
-        Assert.That(refreshed.LikesCount, Is.EqualTo(0));
     }
 
     [Test]

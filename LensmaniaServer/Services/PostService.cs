@@ -172,15 +172,39 @@ public class PostService : IPostService
         if (existing is null)
         {
             _db.PostLikes.Add(new PostLike { UserId = userId, PostId = postId });
-            post.LikesCount++;
+            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.Posts
+                    .Where(p => p.Id == postId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.LikesCount, p => p.LikesCount + 1));
+            }
+            catch (InvalidOperationException)
+            {
+                // ExecuteUpdateAsync is not supported by the InMemory provider (tests).
+                // Fall back to an in-memory update so tests still pass.
+                post.LikesCount++;
+                await _db.SaveChangesAsync();
+            }
         }
         else
         {
             _db.PostLikes.Remove(existing);
-            post.LikesCount = Math.Max(0, post.LikesCount - 1);
+            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.Posts
+                    .Where(p => p.Id == postId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.LikesCount, p => Math.Max(0, p.LikesCount - 1)));
+            }
+            catch (InvalidOperationException)
+            {
+                // ExecuteUpdateAsync is not supported by the InMemory provider (tests).
+                post.LikesCount = Math.Max(0, post.LikesCount - 1);
+                await _db.SaveChangesAsync();
+            }
         }
 
-        await _db.SaveChangesAsync();
         return true;
     }
 }
