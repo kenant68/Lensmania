@@ -30,7 +30,7 @@
                 <li class="nav-item">
 					<AuthorizeView>
 						<Authorized>
-                    		<NavLink class="nav-link" href=@($"/profile/{GetDisplayName(context)}")>Profil</NavLink>
+                    		<NavLink class="nav-link" href=@($"/profile/{Uri.EscapeDataString(GetDisplayName(context) ?? string.Empty)}")>Profil</NavLink>
 						</Authorized>
         				<NotAuthorized>
 							<NavLink class="nav-link" href="login">Profil</NavLink>
