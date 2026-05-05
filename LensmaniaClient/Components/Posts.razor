@@ -49,6 +49,15 @@ else {
                                 </p>
         
                                 <p class="small fw-light opacity-75">@_selectedPostDetailed.CreatedAt.ToShortDateString()</p>
+                                
+                                <AuthorizeView>
+                                    <Authorized>
+                                        @if (IsOwnProfile)
+                                        {
+                                            <DeletePostButton PostId="@post.Id"/>
+                                        }
+                                    </Authorized>
+                                </AuthorizeView>
                             }
                         </div>
                     }
