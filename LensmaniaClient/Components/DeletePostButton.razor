@@ -1,0 +1,28 @@
+@using LensmaniaLibrary.DTOs.Posts
+
+<button class="btn btn-danger btn-sm" @onclick="OpenModal">
+    Supprimer
+</button>
+
+<DeletePostModal
+    IsOpen="@isModalOpen"
+    PostId="@PostId"
+    OnClose="CloseModal"
+    OnPostDeleted="HandlePostDeleted"
+/>
+
+@code {
+    [Parameter, EditorRequired] public int PostId { get; set; }
+    [Parameter] public EventCallback<int> OnPostDeleted { get; set; }
+
+    private bool isModalOpen = false;
+
+    void OpenModal() => isModalOpen = true;
+    void CloseModal() => isModalOpen = false;
+
+    private async Task HandlePostDeleted(int postId)
+    {
+        isModalOpen = false;
+        await OnPostDeleted.InvokeAsync(postId);
+    }
+}

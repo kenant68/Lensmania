@@ -65,4 +65,28 @@ public class PostsController : ControllerBase
         	return BadRequest(new { message = ex.Message });
     	}
     }
+    
+	[Authorize]
+	[HttpDelete("{id:int}")]
+	public async Task<IActionResult> DeletePost(int id)
+	{
+		var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+		if (!int.TryParse(userIdClaim, out var userId))
+			return Unauthorized();
+		
+		try
+		{
+			var postToDelete = await _postService.DeletePostAsync(id, userId);
+
+			if (!postToDelete)
+				return NotFound();
+			
+			return NoContent();
+		}
+		catch (UnauthorizedAccessException)
+		{
+			return Forbid();
+		}
+	}
 }
