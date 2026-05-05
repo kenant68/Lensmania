@@ -74,7 +74,7 @@ public class PostServiceLikeTests
         p!.LikesCount = 3;
         await _db.SaveChangesAsync();
 
-        var result = await _service.GetAllAsync(null, 10, null);
+        var result = await _service.GetAllAsync(null, null, 10);
 
         Assert.That(result.Posts[0].LikesCount, Is.EqualTo(3));
     }
@@ -86,7 +86,7 @@ public class PostServiceLikeTests
         _db.PostLikes.Add(new PostLike { UserId = user.Id, PostId = post.Id });
         await _db.SaveChangesAsync();
 
-        var result = await _service.GetAllAsync(null, 10, user.Id);
+        var result = await _service.GetAllAsync(null, null, 10, user.Id);
 
         Assert.That(result.Posts[0].IsLikedByCurrentUser, Is.True);
     }
@@ -98,7 +98,7 @@ public class PostServiceLikeTests
         _db.PostLikes.Add(new PostLike { UserId = user.Id, PostId = post.Id });
         await _db.SaveChangesAsync();
 
-        var result = await _service.GetAllAsync(null, 10, null);
+        var result = await _service.GetAllAsync(null, null, 10);
 
         Assert.That(result.Posts[0].IsLikedByCurrentUser, Is.False);
     }
