@@ -11,7 +11,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 {
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
-    [Inject] public PostService _postService { get; set; } = default!;
+    [Inject] private PostService _postService { get; set; } = default!;
 
 
     // Parameters
