@@ -71,7 +71,10 @@ else {
                                 @onerror="OnImageFailed"/>
                         </div>
                         <div class="post-overlay">
-                            <button class="like-btn @(post.IsLikedByCurrentUser ? "liked" : "")"
+                            <button type="button"
+                                    class="like-btn @(post.IsLikedByCurrentUser ? "liked" : "")"
+                                    aria-label="@(post.IsLikedByCurrentUser ? "Retirer le like" : "Liker la photo")"
+                                    aria-pressed="@post.IsLikedByCurrentUser"
                                     @onclick="() => ToggleLike(post)"
                                     @onclick:stopPropagation="true">
                                 <span class="heart-icon">@(post.IsLikedByCurrentUser ? "♥" : "♡")</span>
