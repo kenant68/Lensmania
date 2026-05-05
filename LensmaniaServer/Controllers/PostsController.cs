@@ -27,6 +27,9 @@ public class PostsController : ControllerBase
 	    [FromQuery] int? cursor = null,
         [FromQuery] int limit = 10)
     {
+		if (userId.HasValue && userId.Value <= 0)
+        	return BadRequest("`userId` must be a positive integer.");
+
         if (limit < 1 || limit > 50)
             return BadRequest("`limit` must be between 1 and 50.");
         
