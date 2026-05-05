@@ -124,4 +124,40 @@ public class PostService : IPostService
             post.UserId
         );
     }
+
+    public async Task<bool> DeletePostAsync(int postId, int currentUserId)
+    {
+        var post = await _db.Posts.FindAsync(postId);
+
+		if (post is null)
+			return false;
+
+		if (post.UserId != currentUserId)
+			throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer ce post.");
+		
+		_db.Posts.Remove(post);
+        await _db.SaveChangesAsync();
+
+        var uploadsFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "uploads", "photos"));
+        var fullPath = Path.GetFullPath(Path.Combine(uploadsFolder, post.PhotoUrl));
+
+        if (fullPath.StartsWith(uploadsFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            && File.Exists(fullPath))
+        {
+            try
+            {
+                File.Delete(fullPath);
+            }
+            catch (IOException)
+            {
+                // best effort cleanup; keep request successful after DB deletion
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // best effort cleanup; avoid leaking as auth failure at controller level
+            }
+        }
+
+		return true;
+    }
 }

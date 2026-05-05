@@ -7,7 +7,8 @@ public enum AuthApiErrorType
     DuplicateIdentity,
     ValidationFailed,
     NetworkFailure,
-    UnexpectedServerError
+    UnexpectedServerError,
+    InvalidOrExpiredResetToken
 }
 
 public sealed record AuthApiError(AuthApiErrorType Type, string Message, string? Code = null);

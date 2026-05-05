@@ -15,13 +15,33 @@ public sealed class AuthApiClient
         _authenticationStateProvider = authenticationStateProvider;
     }
 
-    public Task<AuthApiResult<AuthResponseDto>> RegisterAsync(RegisterRequestDto request) =>
-        SendAsync("api/auth/register", request);
+    public async Task<AuthApiResult<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
+    {
+        var result = await SendAsync<RegisterRequestDto, AuthResponseDto>("api/auth/register", request);
+        if (result.IsSuccess && result.Data is not null)
+        {
+            await _authenticationStateProvider.SetTokenAsync(result.Data.Token);
+        }
+        return result;
+    }
 
-    public Task<AuthApiResult<AuthResponseDto>> LoginAsync(LoginRequestDto request) =>
-        SendAsync("api/auth/login", request);
+    public async Task<AuthApiResult<AuthResponseDto>> LoginAsync(LoginRequestDto request)
+    {
+        var result = await SendAsync<LoginRequestDto, AuthResponseDto>("api/auth/login", request);
+        if (result.IsSuccess && result.Data is not null)
+        {
+            await _authenticationStateProvider.SetTokenAsync(result.Data.Token);
+        }
+        return result;
+    }
 
-    private async Task<AuthApiResult<AuthResponseDto>> SendAsync<TRequest>(string url, TRequest request)
+    public Task<AuthApiResult<SimpleMessageResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request) =>
+        SendAsync<ForgotPasswordRequestDto, SimpleMessageResponseDto>("api/auth/forgot-password", request);
+
+    public Task<AuthApiResult<SimpleMessageResponseDto>> ResetPasswordAsync(ResetPasswordRequestDto request) =>
+        SendAsync<ResetPasswordRequestDto, SimpleMessageResponseDto>("api/auth/reset-password", request);
+
+    private async Task<AuthApiResult<TResponse>> SendAsync<TRequest, TResponse>(string url, TRequest request)
     {
         try
         {
@@ -29,17 +49,16 @@ public sealed class AuthApiClient
 
             if (response.IsSuccessStatusCode)
             {
-                var payload = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
+                var payload = await response.Content.ReadFromJsonAsync<TResponse>();
                 if (payload is null)
                 {
-                    return AuthApiResult<AuthResponseDto>.Failure(
+                    return AuthApiResult<TResponse>.Failure(
                         new AuthApiError(
                             AuthApiErrorType.UnexpectedServerError,
                             "Authentication response body is empty."));
                 }
 
-                await _authenticationStateProvider.SetTokenAsync(payload.Token);
-                return AuthApiResult<AuthResponseDto>.Success(payload);
+                return AuthApiResult<TResponse>.Success(payload);
             }
 
             var apiError = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
@@ -49,36 +68,41 @@ public sealed class AuthApiClient
             return response.StatusCode switch
             {
                 HttpStatusCode.Unauthorized =>
-                    AuthApiResult<AuthResponseDto>.Failure(
+                    AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.InvalidCredentials, message, code)),
                 HttpStatusCode.Conflict =>
-                    AuthApiResult<AuthResponseDto>.Failure(
+                    AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.DuplicateIdentity, message, code)),
                 HttpStatusCode.BadRequest =>
-                    AuthApiResult<AuthResponseDto>.Failure(
-                        new AuthApiError(AuthApiErrorType.ValidationFailed, message, code)),
+                    AuthApiResult<TResponse>.Failure(
+                        new AuthApiError(MapBadRequestErrorType(code), message, code)),
                 _ =>
-                    AuthApiResult<AuthResponseDto>.Failure(
+                    AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.UnexpectedServerError, message, code))
             };
         }
         catch (HttpRequestException)
         {
-            return AuthApiResult<AuthResponseDto>.Failure(
+            return AuthApiResult<TResponse>.Failure(
                 new AuthApiError(AuthApiErrorType.NetworkFailure, "Impossible de contacter le serveur. Verifiez votre connexion."));
         }
         catch (NotSupportedException)
         {
-            return AuthApiResult<AuthResponseDto>.Failure(
+            return AuthApiResult<TResponse>.Failure(
                 new AuthApiError(AuthApiErrorType.UnexpectedServerError, "Reponse serveur non prise en charge."));
         }
-        
         catch (System.Text.Json.JsonException)
         {
-            return AuthApiResult<AuthResponseDto>.Failure(
+            return AuthApiResult<TResponse>.Failure(
                 new AuthApiError(AuthApiErrorType.UnexpectedServerError, "Format de reponse serveur invalide."));
         }
     }
+
+    private static AuthApiErrorType MapBadRequestErrorType(string? code) => code switch
+    {
+        "AUTH_INVALID_OR_EXPIRED_RESET_TOKEN" => AuthApiErrorType.InvalidOrExpiredResetToken,
+        _ => AuthApiErrorType.ValidationFailed
+    };
 
     private static string ExtractUserMessage(ApiErrorDto? apiError)
     {
