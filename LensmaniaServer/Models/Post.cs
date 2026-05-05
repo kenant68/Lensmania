@@ -7,7 +7,9 @@ public class Post
     public required string PhotoUrl { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int LikesCount { get; set; }
 
-	public int UserId { get; set; }
-	public User User { get; set; } = null!;
+    public int UserId { get; set; }
+    public User User { get; set; } = null!;
+    public List<PostLike> Likes { get; } = new();
 }

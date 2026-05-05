@@ -23,7 +23,7 @@ public class PostService
 
         return await response.Content.ReadFromJsonAsync<PostListItemResponse>();
     }
-    
+
     public async Task<string?> UploadImageAsync(IBrowserFile file)
     {
         using var content = new MultipartFormDataContent();
@@ -49,18 +49,24 @@ public class PostService
 
         return await _http.GetFromJsonAsync<PaginatedPosts?>(url);
 	}
-    
+
     public async Task<DeletePostResult> DeletePostAsync(int postId)
     {
         var response = await _http.DeleteAsync($"api/posts/{postId}");
-        
+
         return response.StatusCode switch
         {
             HttpStatusCode.NoContent => DeletePostResult.Success,
             HttpStatusCode.NotFound => DeletePostResult.NotFound,
             HttpStatusCode.Forbidden => DeletePostResult.Forbidden,
-			      HttpStatusCode.Unauthorized => DeletePostResult.Unauthorized,
+            HttpStatusCode.Unauthorized => DeletePostResult.Unauthorized,
             _ => DeletePostResult.Error
         };
+    }
+
+    public async Task<bool> ToggleLikeAsync(int postId)
+    {
+        var response = await _http.PostAsync($"api/posts/{postId}/likes", null);
+        return response.IsSuccessStatusCode;
     }
 }
