@@ -75,7 +75,13 @@ public class PostsController : ControllerBase
 	[HttpGet("{username}")]
 	public async Task<ActionResult<PaginatedPosts>> GetPostsByUsername(string username, int? cursor, int limit = 10)
     {       
-    	var user = await _userService.GetByUsernameAsync(username);
+    	if (limit < 1 || limit > 50)
+        	return BadRequest("`limit` must be between 1 and 50.");
+
+    	if (cursor.HasValue && cursor.Value <= 0)
+        	return BadRequest("`cursor` must be a positive integer.");
+		
+		var user = await _userService.GetByUsernameAsync(username);
 
     	if (user == null)
         	return NotFound();

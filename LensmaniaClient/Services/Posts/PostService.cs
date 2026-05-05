@@ -39,9 +39,13 @@ public class PostService
     }
 
 	public async Task<PaginatedPosts?> GetPostsByUsernameAsync(
-    	string username, int? cursor, int limit)
+        string username, int? cursor, int limit)
 	{
-    	return await _http.GetFromJsonAsync<PaginatedPosts?>(
-        	$"api/posts/{username}?cursor={cursor}&limit={limit}");
+        var url = $"api/posts/{Uri.EscapeDataString(username)}?limit={limit}";
+
+        if (cursor.HasValue)
+            url += $"&cursor={cursor.Value}";
+
+        return await _http.GetFromJsonAsync<PaginatedPosts?>(url);
 	}
 }
