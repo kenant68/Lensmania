@@ -36,8 +36,8 @@
         var user = state.User;
 
         var usernameClaim = user.FindFirst(ClaimTypes.Name)?.Value;
-
-        _isOwnProfile = usernameClaim == Username;
+        
+        _isOwnProfile = string.Equals(usernameClaim, Username, StringComparison.OrdinalIgnoreCase);
         _username = _isOwnProfile ? usernameClaim : Username;
     }
 }
