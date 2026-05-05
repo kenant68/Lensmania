@@ -10,4 +10,6 @@ public class User {
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
 	public List<Post> Posts { get; } = new();
+    public List<Event> Events { get; } = new();
+	public List<Earn> Earns { get; } = new();
 }
