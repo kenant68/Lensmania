@@ -31,6 +31,13 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.AddOptions<PasswordResetOptions>()
+    .BindConfiguration("PasswordReset")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
+builder.Services.AddScoped<PasswordResetService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
