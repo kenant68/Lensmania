@@ -128,17 +128,28 @@ public class PostService : IPostService
 		if (post.UserId != currentUserId)
 			throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer ce post.");
 		
-		var uploadsFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "uploads", "photos"));
-        var fullPath = Path.GetFullPath(Path.Combine(uploadsFolder, post.PhotoUrl));
-
-        if (fullPath.StartsWith(uploadsFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) 
-			&& File.Exists(fullPath)) 
-		{
-			File.Delete(fullPath);
-		}
-
 		_db.Posts.Remove(post);
         await _db.SaveChangesAsync();
+
+        var uploadsFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "uploads", "photos"));
+        var fullPath = Path.GetFullPath(Path.Combine(uploadsFolder, post.PhotoUrl));
+
+        if (fullPath.StartsWith(uploadsFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            && File.Exists(fullPath))
+        {
+            try
+            {
+                File.Delete(fullPath);
+            }
+            catch (IOException)
+            {
+                // best effort cleanup; keep request successful after DB deletion
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // best effort cleanup; avoid leaking as auth failure at controller level
+            }
+        }
 
 		return true;
     }

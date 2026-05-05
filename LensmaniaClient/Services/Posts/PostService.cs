@@ -48,6 +48,7 @@ public class PostService
             HttpStatusCode.NoContent => DeletePostResult.Success,
             HttpStatusCode.NotFound => DeletePostResult.NotFound,
             HttpStatusCode.Forbidden => DeletePostResult.Forbidden,
+			HttpStatusCode.Unauthorized => DeletePostResult.Unauthorized,
             _ => DeletePostResult.Error
         };
     }
