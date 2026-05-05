@@ -5,6 +5,7 @@
         var(--color-pink)   45%,
         var(--color-light-purple) 100%);
     padding: 60px 80px 72px;
+    flex: 1;
 }
 
 /* ── Hero ── */
