@@ -5,8 +5,7 @@
     --color-light-purple: #BDB3DD;
     --color-lighter-purple: #E6E3F2;
     --color-pink: #F4A6B9;
-
-    --font-main: Montserrat, Arial, sans-serif;
+    --font-main: 'Montserrat', Arial, sans-serif;
 }
 
 html, body {
