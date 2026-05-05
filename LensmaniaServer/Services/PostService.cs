@@ -39,8 +39,8 @@ public class PostService : IPostService
                 p.Title ?? DefaultAltImgFor(p.User.Username),
                 p.PhotoUrl,
                 p.User.Username,
-                0,
-                false
+                p.LikesCount,
+                currentUserId.HasValue && p.Likes.Any(l => l.UserId == currentUserId.Value)
             ))
             .Take(limit + 1)
             .ToListAsync();
@@ -161,6 +161,26 @@ public class PostService : IPostService
 		return true;
     }
 
-    public Task<bool> ToggleLikeAsync(int postId, int userId)
-        => throw new NotImplementedException();
+    public async Task<bool> ToggleLikeAsync(int postId, int userId)
+    {
+        var post = await _db.Posts.FindAsync(postId);
+        if (post is null) return false;
+
+        var existing = await _db.PostLikes
+            .FirstOrDefaultAsync(l => l.UserId == userId && l.PostId == postId);
+
+        if (existing is null)
+        {
+            _db.PostLikes.Add(new PostLike { UserId = userId, PostId = postId });
+            post.LikesCount++;
+        }
+        else
+        {
+            _db.PostLikes.Remove(existing);
+            post.LikesCount = Math.Max(0, post.LikesCount - 1);
+        }
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }
