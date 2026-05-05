@@ -16,8 +16,11 @@ public class UserService : IUserService
     
     public async Task<UserResponse?> GetByUsernameAsync(string username)
     {
+        if (string.IsNullOrWhiteSpace(username)) 
+            return null;
+        
         return await _db.Users
-            .Where(u => u.Username == username)
+            .Where(u => u.Username.ToLower() == username.ToLower())
             .Select(u => new UserResponse(
                 u.Id,
                 u.Username
