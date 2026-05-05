@@ -64,11 +64,19 @@ else {
                     else
                     {
                         <div @onclick="() => SelectPost(post)">
-                            <img src="@($"{ApiBaseUrl}/uploads/photos/{post.PhotoUrl}")" 
-                                alt="@post.Title" 
+                            <img src="@($"{ApiBaseUrl}/uploads/photos/{post.PhotoUrl}")"
+                                alt="@post.Title"
                                 class="card-img-top"
                                 @onload="OnImageLoaded"
                                 @onerror="OnImageFailed"/>
+                        </div>
+                        <div class="post-overlay">
+                            <button class="like-btn @(post.IsLikedByCurrentUser ? "liked" : "")"
+                                    @onclick="() => ToggleLike(post)"
+                                    @onclick:stopPropagation="true">
+                                <span class="heart-icon">@(post.IsLikedByCurrentUser ? "♥" : "♡")</span>
+                                <span class="like-count">@FormatLikeCount(post.LikesCount)</span>
+                            </button>
                         </div>
                     }
 				</div>

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.Net.Http.Json;
 using Soenneker.Blazor.Masonry;
@@ -12,6 +13,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private PostService _postService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
 
 
     // Parameters
@@ -27,6 +30,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     private bool _isLoading = false;
 	private bool _hasError = false;
 	private string _errorMessage = string.Empty;
+    private readonly HashSet<int> _pendingLikes = new();
 	
 	// Masonry / images
 	private Masonry? _masonry;
@@ -253,6 +257,52 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    _selectedPostItem = null;
     }
     
+    // --- Likes ---
+    private async Task ToggleLike(PostListItemResponse post)
+    {
+        if (!_pendingLikes.Add(post.Id)) return;
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated != true)
+            {
+                Nav.NavigateTo("/login");
+                return;
+            }
+
+            var index = _posts.IndexOf(post);
+            if (index < 0) return;
+
+            var newIsLiked = !post.IsLikedByCurrentUser;
+            var newCount = newIsLiked ? post.LikesCount + 1 : Math.Max(0, post.LikesCount - 1);
+            _posts[index] = post with { IsLikedByCurrentUser = newIsLiked, LikesCount = newCount };
+            StateHasChanged();
+
+            var success = await _postService.ToggleLikeAsync(post.Id);
+            if (!success)
+            {
+                _posts[index] = post;
+                StateHasChanged();
+            }
+        }
+        finally
+        {
+            _pendingLikes.Remove(post.Id);
+        }
+    }
+
+    private static string FormatLikeCount(int count)
+    {
+        if (count < 1_000) return count.ToString();
+        if (count < 1_000_000)
+        {
+            var k = count / 1_000.0;
+            return k == Math.Floor(k) ? $"{(int)k}K" : $"{k:0.0}K".Replace('.', ',');
+        }
+        var m = count / 1_000_000.0;
+        return m == Math.Floor(m) ? $"{(int)m}M" : $"{m:0.0}M".Replace('.', ',');
+    }
+
     // --- Dispose ---
     // Cleans up JS interop and .NET references when component is removed
     public async ValueTask DisposeAsync()
