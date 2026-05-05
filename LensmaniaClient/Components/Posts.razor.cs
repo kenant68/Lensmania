@@ -52,23 +52,18 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    await ReloadAsync();
     }
     
-    public void RequestMasonryLayout()
-    {
-	    _needsMasonryLayout = true;
-	    StateHasChanged();
-    }
-    
 	// Runs after each render. On first render : it loads first posts and sets up the sentinel <div>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-	    if (!firstRender) return;
+	    if (firstRender)
+	    {
+		    _dotNetRef = DotNetObjectReference.Create(this);
+		    _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+			    "import", "./js/infiniteScroll.js");
 
-        _dotNetRef = DotNetObjectReference.Create(this);
-        _jsModule = await JS.InvokeAsync<IJSObjectReference>(
-            "import", "./js/infiniteScroll.js");
-
-        if (_sentinel.Id != null && _hasMore)
-            await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
+		    if (_sentinel.Id != null && _hasMore)
+			    await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);  
+	    }
         
         if (_needsMasonryLayout && _masonry != null)
         {

@@ -29,7 +29,6 @@
     private Posts? _postsComponent;
     private bool _isOwnProfile;
     private string? _username;
-    private bool _pendingMasonry;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -40,16 +39,5 @@
 
         _isOwnProfile = usernameClaim == Username;
         _username = _isOwnProfile ? usernameClaim : Username;
-
-        _pendingMasonry = true;
-    }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_pendingMasonry)
-        {
-            _pendingMasonry = false;
-            _postsComponent?.RequestMasonryLayout();
-        }
     }
 }
