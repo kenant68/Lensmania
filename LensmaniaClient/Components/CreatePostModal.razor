@@ -40,7 +40,7 @@
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
 
-    [Inject] public PostService PostService { get; set; } = default!;
+    [Inject] private PostService PostService { get; set; } = default!;
 
     private string? title;
     private string? description;

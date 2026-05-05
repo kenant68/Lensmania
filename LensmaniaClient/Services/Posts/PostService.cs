@@ -38,6 +38,17 @@ public class PostService
 
         return await response.Content.ReadAsStringAsync();
     }
+
+	public async Task<PaginatedPosts?> GetPostsByUsernameAsync(
+        string username, int? cursor, int limit)
+	{
+        var url = $"api/posts/{Uri.EscapeDataString(username)}?limit={limit}";
+
+        if (cursor.HasValue)
+            url += $"&cursor={cursor.Value}";
+
+        return await _http.GetFromJsonAsync<PaginatedPosts?>(url);
+	}
     
     public async Task<DeletePostResult> DeletePostAsync(int postId)
     {
@@ -48,7 +59,7 @@ public class PostService
             HttpStatusCode.NoContent => DeletePostResult.Success,
             HttpStatusCode.NotFound => DeletePostResult.NotFound,
             HttpStatusCode.Forbidden => DeletePostResult.Forbidden,
-			HttpStatusCode.Unauthorized => DeletePostResult.Unauthorized,
+			      HttpStatusCode.Unauthorized => DeletePostResult.Unauthorized,
             _ => DeletePostResult.Error
         };
     }

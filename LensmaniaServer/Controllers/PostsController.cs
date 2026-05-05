@@ -12,25 +12,31 @@ public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IUserService _userService;
 
-    public PostsController(IPostService postService, IFileStorageService fileStorageService)
+    public PostsController(IPostService postService, IFileStorageService fileStorageService, IUserService userService)
     {
         _postService = postService;
         _fileStorageService = fileStorageService;
+        _userService = userService;
     }
 
     [HttpGet]
     public async Task<ActionResult<PaginatedPosts>> GetAll(
-        [FromQuery] int? cursor = null,
+	    [FromQuery] int? userId,
+	    [FromQuery] int? cursor = null,
         [FromQuery] int limit = 10)
     {
+		if (userId.HasValue && userId.Value <= 0)
+        	return BadRequest("`userId` must be a positive integer.");
+
         if (limit < 1 || limit > 50)
             return BadRequest("`limit` must be between 1 and 50.");
         
         if (cursor.HasValue && cursor.Value <= 0)
             return BadRequest("`cursor` must be a positive integer.");
         
-        var result = await _postService.GetAllAsync(cursor, limit);
+        var result = await _postService.GetAllAsync(userId, cursor, limit);
         return Ok(result);
     }
 
@@ -64,6 +70,25 @@ public class PostsController : ControllerBase
     	{
         	return BadRequest(new { message = ex.Message });
     	}
+    }
+
+	[HttpGet("{username}")]
+	public async Task<ActionResult<PaginatedPosts>> GetPostsByUsername(string username, int? cursor, int limit = 10)
+    {       
+    	if (limit < 1 || limit > 50)
+        	return BadRequest("`limit` must be between 1 and 50.");
+
+    	if (cursor.HasValue && cursor.Value <= 0)
+        	return BadRequest("`cursor` must be a positive integer.");
+		
+		var user = await _userService.GetByUsernameAsync(username);
+
+    	if (user == null)
+        	return NotFound();
+
+    	var posts = await _postService.GetAllAsync(user.Id, cursor, limit);
+
+    	return Ok(posts);
     }
     
 	[Authorize]

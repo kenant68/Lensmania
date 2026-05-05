@@ -1,6 +1,9 @@
 let observer = null;
 
 export function observe(sentinel, dotNetRef) {
+    
+    unobserve();
+    
     observer = new IntersectionObserver(async (entries) => {
         if (entries[0].isIntersecting) {
             try {
@@ -18,6 +21,7 @@ export function observe(sentinel, dotNetRef) {
 
 export function unobserve() {
     observer?.disconnect();
+    observer = null;
 }
 
 export function getScrollY() {

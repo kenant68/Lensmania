@@ -1,0 +1,23 @@
+@page "/posts"
+@using LensmaniaLibrary.DTOs.Posts
+@using LensmaniaClient.Components
+
+<h1>Lensmania</h1>
+
+<div class="feed-page">
+    <Posts @ref="_postsComponent"
+           DisplayCreateButton="true"
+           IsOwnProfile="false"
+           OnPostCreated="HandlePostCreated"
+    />
+</div>
+
+@code {
+    private Posts? _postsComponent;
+
+    private async Task HandlePostCreated(PostListItemResponse _)
+    {
+        if (_postsComponent is not null)
+            await _postsComponent.ReloadAsync();
+    }
+}

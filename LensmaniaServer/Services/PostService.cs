@@ -19,11 +19,15 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? cursor, int limit)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit)
     {
-        var query = _db.Posts
-            .OrderByDescending(p => p.Id)
-            .AsQueryable();
+        var query = _db.Posts.AsQueryable();
+
+		// Filter by userId and cursor
+        if (userId.HasValue)
+        {
+            query = query.Where(p => p.UserId == userId.Value);
+        }
 
         if (cursor.HasValue)
         {
@@ -31,6 +35,7 @@ public class PostService : IPostService
         }
         
         var posts = await query
+            .OrderByDescending(p => p.Id)
             .Select(p => new PostListItemResponse(
                 p.Id,
                 p.Title ?? DefaultAltImgFor(p.User.Username),
@@ -61,7 +66,8 @@ public class PostService : IPostService
                 p.PhotoUrl,
                 p.Description,
                 p.CreatedAt,
-                p.User.Username
+                p.User.Username,
+                p.UserId
             ))
             .FirstOrDefaultAsync();
     }
@@ -114,7 +120,8 @@ public class PostService : IPostService
             post.PhotoUrl,
             post.Description,
             post.CreatedAt,
-            post.User.Username
+            post.User.Username,
+            post.UserId
         );
     }
 
