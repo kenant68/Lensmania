@@ -181,11 +181,11 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	{
 			_isMasonryInitialized = true;
 			
-			if (_masonry != null)
+			if (_masonry != null && _jsModule != null)
         	{
-            	var scrollY = await _jsModule!.InvokeAsync<double>("getScrollY");
+		        var scrollY = await _jsModule.InvokeAsync<double>("getScrollY");
             	await _masonry.Init();
-            	await _jsModule!.InvokeVoidAsync("scrollTo", 0, scrollY);
+	            await _jsModule.InvokeVoidAsync("scrollTo", 0, scrollY);
         	}
 			
         	_imagesLoaded = 0;
