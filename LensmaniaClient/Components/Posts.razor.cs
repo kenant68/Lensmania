@@ -12,7 +12,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
     // Parameters
-    [Parameter] public int? UserId { get; set; }
+    [Parameter] public string? Username { get; set; }
     [Parameter] public bool DisplayCreateButton { get; set; } = false;
     [Parameter] public bool IsOwnProfile { get; set; } = false;
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
@@ -30,6 +30,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	private int _imagesLoaded = 0;
 	private int _imagesToLoad = 0;
 	private bool _isMasonryInitialized = false;
+	private bool _needsMasonryLayout;
 	
 	// Infinite scroll
     private ElementReference _sentinel;
@@ -40,16 +41,18 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     private PostListItemResponse? _selectedPostItem = null;
     private PostResponse? _selectedPostDetailed = null;
     private bool _isLoadingDetail = false;
-
     
-    // --- Initialize ---
-    private bool _initialized = false;
 
-    // Manages UserId changes
+    // Manages Username changes
     protected override async Task OnParametersSetAsync()
     {
-	    if (!_initialized) return;
 	    await ReloadAsync();
+    }
+    
+    public void RequestMasonryLayout()
+    {
+	    _needsMasonryLayout = true;
+	    StateHasChanged();
     }
     
 	// Runs after each render. On first render : it loads first posts and sets up the sentinel <div>
@@ -67,6 +70,14 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 
         if (_sentinel.Id != null && _hasMore)
             await _jsModule.InvokeVoidAsync("observe", _sentinel, _dotNetRef);
+        
+        if (_needsMasonryLayout && _masonry != null)
+        {
+	        _needsMasonryLayout = false;
+        
+	        await Task.Delay(30);
+	        await _masonry.Init();
+        }
     }
 
     // --- Infinite scroll ---
@@ -93,8 +104,13 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 			if (_cursor.HasValue)
     			url += $"&cursor={_cursor}";
 			
-			if (UserId.HasValue)
-				url += $"&userId={UserId}";
+			if (!string.IsNullOrWhiteSpace(Username))
+			{
+				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10";
+
+				if (_cursor.HasValue)
+					url += $"&cursor={_cursor}";
+			}
 
         	var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
 

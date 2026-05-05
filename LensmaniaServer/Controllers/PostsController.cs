@@ -12,11 +12,13 @@ public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IUserService _userService;
 
-    public PostsController(IPostService postService, IFileStorageService fileStorageService)
+    public PostsController(IPostService postService, IFileStorageService fileStorageService, IUserService userService)
     {
         _postService = postService;
         _fileStorageService = fileStorageService;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -65,5 +67,18 @@ public class PostsController : ControllerBase
     	{
         	return BadRequest(new { message = ex.Message });
     	}
+    }
+
+	[HttpGet("{username}")]
+	public async Task<ActionResult<PaginatedPosts>> GetPostsByUsername(string username, int? cursor, int limit = 10)
+    {       
+    	var user = await _userService.GetByUsernameAsync(username);
+
+    	if (user == null)
+        	return NotFound();
+
+    	var posts = await _postService.GetAllAsync(user.Id, cursor, limit);
+
+    	return Ok(posts);
     }
 }
