@@ -281,8 +281,12 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             var success = await _postService.ToggleLikeAsync(post.Id);
             if (!success)
             {
-                _posts[index] = post;
-                StateHasChanged();
+                var currentIndex = _posts.FindIndex(p => p.Id == post.Id);
+                if (currentIndex >= 0)
+                {
+                    _posts[currentIndex] = post;
+                    StateHasChanged();
+                }
             }
         }
         finally
