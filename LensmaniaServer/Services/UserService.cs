@@ -8,12 +8,10 @@ namespace LensmaniaServer.Services;
 public class UserService : IUserService
 {
     private readonly AppDbContext _db;
-	private readonly IWebHostEnvironment _env;
 
-    public UserService(AppDbContext db, IWebHostEnvironment env)
+    public UserService(AppDbContext db)
 	{
 		_db = db;
-		_env = env;
 	}
     
     public async Task<UserResponse?> GetByUsernameAsync(string username)
