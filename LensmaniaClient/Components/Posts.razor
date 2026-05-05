@@ -45,7 +45,7 @@ else {
         
                                 <p>
                                     Par 
-                                    <NavLink class="nav-link fw-semibold" href=@($"profile/{_selectedPostDetailed.UserId}")>@_selectedPostDetailed.Username</NavLink>
+                                    <NavLink class="nav-link fw-semibold" href=@($"/profile/{_selectedPostDetailed.Username}")>@_selectedPostDetailed.Username</NavLink>
                                 </p>
         
                                 <p class="small fw-light opacity-75">@_selectedPostDetailed.CreatedAt.ToShortDateString()</p>
