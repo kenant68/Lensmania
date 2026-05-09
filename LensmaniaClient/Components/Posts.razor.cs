@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using Soenneker.Blazor.Masonry;
 using LensmaniaLibrary.DTOs.Posts;
 using LensmaniaClient.Services.Posts;
+using LensmaniaLibrary.Enums;
 
 namespace LensmaniaClient.Components;
 
@@ -22,7 +23,10 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Parameter] public bool DisplayCreateButton { get; set; } = false;
     [Parameter] public bool IsOwnProfile { get; set; } = false;
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
-    
+    [Parameter] public bool ShowSortToggle { get; set; } = false;
+
+    private PostSortOrder _sortOrder = PostSortOrder.DateDesc;
+
     private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
     private List<PostListItemResponse> _posts = [];
     private int? _cursor = null;
@@ -98,17 +102,18 @@ public partial class Posts : ComponentBase, IAsyncDisposable
         	_hasError = false;
 			StateHasChanged();
 
-			var url = $"api/posts?limit=10";
-			if (_cursor.HasValue)
-    			url += $"&cursor={_cursor}";
-			
+			var sortParam = _sortOrder == PostSortOrder.DateAsc ? "date_asc" : "date_desc";
+
+			string url;
 			if (!string.IsNullOrWhiteSpace(Username))
 			{
-				//TODO: replace by _postService.GetPostsByUsernameAsync
-				// var result = await _postService.GetPostsByUsernameAsync(Username, _cursor, 10);
-
-				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10";
-			
+				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10&sort={sortParam}";
+				if (_cursor.HasValue)
+					url += $"&cursor={_cursor}";
+			}
+			else
+			{
+				url = $"api/posts?limit=10&sort={sortParam}";
 				if (_cursor.HasValue)
 					url += $"&cursor={_cursor}";
 			}
@@ -154,6 +159,12 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    _selectedPostItem = null;
     }
     
+    private async Task ToggleSortOrder()
+    {
+        _sortOrder = _sortOrder == PostSortOrder.DateDesc ? PostSortOrder.DateAsc : PostSortOrder.DateDesc;
+        await ReloadAsync();
+    }
+
     // Reload method exposed for parent pages
     public async Task ReloadAsync()
     {

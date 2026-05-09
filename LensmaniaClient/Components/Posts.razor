@@ -1,5 +1,15 @@
 ﻿@using Soenneker.Blazor.Masonry
 @using LensmaniaClient.Components
+@using LensmaniaLibrary.Enums
+
+@if (ShowSortToggle)
+{
+    <div class="sort-toggle">
+        <button class="btn btn-primary" @onclick="ToggleSortOrder">
+            @(_sortOrder == PostSortOrder.DateDesc ? "Récents ↓" : "Anciens ↑")
+        </button>
+    </div>
+}
 
 @if (DisplayCreateButton)
 {

@@ -97,3 +97,9 @@
     text-align: center;
     z-index: 100;
 }
+
+.sort-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
