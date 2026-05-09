@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using LensmaniaServer.Models;
 using LensmaniaLibrary.DTOs.Posts;
+using LensmaniaLibrary.Enums;
 using LensmaniaServer.Database;
 
 namespace LensmaniaServer.Services;
@@ -19,21 +20,25 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc)
     {
         var query = _db.Posts.AsQueryable();
 
-		// Filter by userId and cursor
         if (userId.HasValue)
-        {
             query = query.Where(p => p.UserId == userId.Value);
-        }
 
         if (cursor.HasValue)
-            query = query.Where(p => p.Id < cursor.Value);
+        {
+            query = sortOrder == PostSortOrder.DateAsc
+                ? query.Where(p => p.Id > cursor.Value)
+                : query.Where(p => p.Id < cursor.Value);
+        }
+
+        query = sortOrder == PostSortOrder.DateAsc
+            ? query.OrderBy(p => p.Id)
+            : query.OrderByDescending(p => p.Id);
 
         var posts = await query
-            .OrderByDescending(p => p.Id)
             .Select(p => new PostListItemResponse(
                 p.Id,
                 p.Title ?? DefaultAltImgFor(p.User.Username),
