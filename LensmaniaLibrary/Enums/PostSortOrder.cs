@@ -4,4 +4,6 @@ public enum PostSortOrder
 {
     DateDesc,
     DateAsc,
+    LikesDesc,
+    LikesAsc,
 }
