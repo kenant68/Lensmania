@@ -5,9 +5,12 @@
 @if (ShowSortToggle)
 {
     <div class="sort-toggle">
-        <button class="btn btn-primary" @onclick="ToggleSortOrder">
-            @(_sortOrder == PostSortOrder.DateDesc ? "Récents ↓" : "Anciens ↑")
-        </button>
+        <select class="sort-select" value="@_sortOrder.ToString()" @onchange="OnSortChanged">
+            <option value="DateDesc">Récents ↓</option>
+            <option value="DateAsc">Anciens ↑</option>
+            <option value="LikesDesc">Plus likés ↓</option>
+            <option value="LikesAsc">Moins likés ↑</option>
+        </select>
     </div>
 }
 

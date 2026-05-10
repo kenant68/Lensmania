@@ -26,6 +26,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Parameter] public bool ShowSortToggle { get; set; } = false;
 
     private PostSortOrder _sortOrder = PostSortOrder.DateDesc;
+    private int _offset = 0;
 
     private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
     private List<PostListItemResponse> _posts = [];
@@ -97,72 +98,91 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	// Loads the next batch of posts and updates component state
     private async Task LoadMorePosts()
     {
-		try {
-			_isLoading = true;
-        	_hasError = false;
-			StateHasChanged();
+        try {
+            _isLoading = true;
+            _hasError = false;
+            StateHasChanged();
 
-			var sortParam = _sortOrder == PostSortOrder.DateAsc ? "date_asc" : "date_desc";
+            var isLikesSort = _sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc;
+            var sortParam = _sortOrder switch
+            {
+                PostSortOrder.DateAsc   => "date_asc",
+                PostSortOrder.LikesDesc => "likes_desc",
+                PostSortOrder.LikesAsc  => "likes_asc",
+                _                       => "date_desc",
+            };
 
-			string url;
-			if (!string.IsNullOrWhiteSpace(Username))
-			{
-				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10&sort={sortParam}";
-				if (_cursor.HasValue)
-					url += $"&cursor={_cursor}";
-			}
-			else
-			{
-				url = $"api/posts?limit=10&sort={sortParam}";
-				if (_cursor.HasValue)
-					url += $"&cursor={_cursor}";
-			}
+            string url;
+            if (!string.IsNullOrWhiteSpace(Username))
+            {
+                url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10&sort={sortParam}";
+                if (!isLikesSort && _cursor.HasValue)
+                    url += $"&cursor={_cursor}";
+                else if (isLikesSort && _offset > 0)
+                    url += $"&offset={_offset}";
+            }
+            else
+            {
+                url = $"api/posts?limit=10&sort={sortParam}";
+                if (!isLikesSort && _cursor.HasValue)
+                    url += $"&cursor={_cursor}";
+                else if (isLikesSort && _offset > 0)
+                    url += $"&offset={_offset}";
+            }
 
-        	var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
-	        
-        	if (result != null)
-        	{
-            	_posts.AddRange(result.Posts);
-            	_cursor = result.NextCursor;
-            	_hasMore = result.HasMore;
-            	_imagesToLoad += result.Posts.Count;
-            	_imagesLoaded = 0;
-				_isMasonryInitialized = false;
-        	}
-		} 
-		catch (HttpRequestException)
-    	{
-        	_hasError = true;
-        	_errorMessage = "Erreur de connexion lors du chargement des posts.";
-    	}
-		catch (Exception e)
-    	{
-        	_hasError = true;
-			_errorMessage = "Erreur inattendue lors du chargement des posts.";
-    		Console.Error.WriteLine($"Erreur : {e.Message}");
-    	}      
-		finally
-		{
-        	_isLoading = false;
-        	StateHasChanged();
-		}
+            var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
+
+            if (result != null)
+            {
+                _posts.AddRange(result.Posts);
+                _hasMore = result.HasMore;
+                _imagesToLoad += result.Posts.Count;
+                _imagesLoaded = 0;
+                _isMasonryInitialized = false;
+
+                if (isLikesSort)
+                    _offset = result.NextOffset ?? _offset;
+                else
+                    _cursor = result.NextCursor;
+            }
+        }
+        catch (HttpRequestException)
+        {
+            _hasError = true;
+            _errorMessage = "Erreur de connexion lors du chargement des posts.";
+        }
+        catch (Exception e)
+        {
+            _hasError = true;
+            _errorMessage = "Erreur inattendue lors du chargement des posts.";
+            Console.Error.WriteLine($"Erreur : {e.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
     
     private void ResetState()
     {
-	    _posts.Clear();
-	    _cursor = null;
-	    _hasMore = true;
-	    _imagesToLoad = 0;
-	    _imagesLoaded = 0;
-	    _isMasonryInitialized = false;
-	    _selectedPostItem = null;
+        _posts.Clear();
+        _cursor = null;
+        _hasMore = true;
+        _imagesToLoad = 0;
+        _imagesLoaded = 0;
+        _isMasonryInitialized = false;
+        _selectedPostItem = null;
+        _offset = 0;
     }
     
-    private async Task ToggleSortOrder()
+    private async Task OnSortChanged(ChangeEventArgs e)
     {
-        _sortOrder = _sortOrder == PostSortOrder.DateDesc ? PostSortOrder.DateAsc : PostSortOrder.DateDesc;
-        await ReloadAsync();
+        if (Enum.TryParse<PostSortOrder>(e.Value?.ToString(), out var sortOrder))
+        {
+            _sortOrder = sortOrder;
+            await ReloadAsync();
+        }
     }
 
     // Reload method exposed for parent pages
