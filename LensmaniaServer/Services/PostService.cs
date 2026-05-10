@@ -20,23 +20,30 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc, int? offset = null)
     {
         var query = _db.Posts.AsQueryable();
 
         if (userId.HasValue)
             query = query.Where(p => p.UserId == userId.Value);
 
-        if (cursor.HasValue)
+        if (cursor.HasValue && sortOrder is PostSortOrder.DateDesc or PostSortOrder.DateAsc)
         {
             query = sortOrder == PostSortOrder.DateAsc
                 ? query.Where(p => p.Id > cursor.Value)
                 : query.Where(p => p.Id < cursor.Value);
         }
 
-        query = sortOrder == PostSortOrder.DateAsc
-            ? query.OrderBy(p => p.Id)
-            : query.OrderByDescending(p => p.Id);
+        query = sortOrder switch
+        {
+            PostSortOrder.DateAsc   => query.OrderBy(p => p.Id),
+            PostSortOrder.LikesDesc => query.OrderByDescending(p => p.LikesCount).ThenByDescending(p => p.Id),
+            PostSortOrder.LikesAsc  => query.OrderBy(p => p.LikesCount).ThenBy(p => p.Id),
+            _                       => query.OrderByDescending(p => p.Id),
+        };
+
+        if (sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc && offset.HasValue)
+            query = query.Skip(offset.Value);
 
         var posts = await query
             .Select(p => new PostListItemResponse(
@@ -52,12 +59,14 @@ public class PostService : IPostService
 
         var hasMore = posts.Count > limit;
         var items = hasMore ? posts.Take(limit).ToList() : posts;
+        var isLikesSort = sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc;
 
         return new PaginatedPosts
         {
             Posts = items,
             HasMore = hasMore,
-            NextCursor = hasMore ? items.Last().Id : null
+            NextCursor = !isLikesSort && hasMore ? items.Last().Id : null,
+            NextOffset = isLikesSort && hasMore ? (offset ?? 0) + items.Count : null,
         };
     }
 
