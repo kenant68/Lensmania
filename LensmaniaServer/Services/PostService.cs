@@ -42,7 +42,7 @@ public class PostService : IPostService
             _                       => query.OrderByDescending(p => p.Id),
         };
 
-        if (sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc && offset.HasValue)
+        if ((sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc) && offset.HasValue)
             query = query.Skip(offset.Value);
 
         var posts = await query
