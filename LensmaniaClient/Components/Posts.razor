@@ -1,5 +1,18 @@
 ﻿@using Soenneker.Blazor.Masonry
 @using LensmaniaClient.Components
+@using LensmaniaLibrary.Enums
+
+@if (ShowSortToggle)
+{
+    <div class="sort-toggle">
+        <select class="sort-select" aria-label="Trier les posts" value="@_sortOrder.ToString()" @onchange="OnSortChanged">
+            <option value="DateDesc">Récents ↓</option>
+            <option value="DateAsc">Anciens ↑</option>
+            <option value="LikesDesc">Plus likés ↓</option>
+            <option value="LikesAsc">Moins likés ↑</option>
+        </select>
+    </div>
+}
 
 @if (DisplayCreateButton)
 {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using LensmaniaLibrary.DTOs.Posts;
+using LensmaniaLibrary.Enums;
 using LensmaniaServer.Services;
 
 namespace LensmaniaServer.Controllers;
@@ -23,12 +24,14 @@ public class PostsController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<PaginatedPosts>> GetAll(
-	    [FromQuery] int? userId,
-	    [FromQuery] int? cursor = null,
-        [FromQuery] int limit = 10)
+        [FromQuery] int? userId,
+        [FromQuery] int? cursor = null,
+        [FromQuery] int limit = 10,
+        [FromQuery] string sort = "date_desc",
+        [FromQuery] int? offset = null)
     {
-		if (userId.HasValue && userId.Value <= 0)
-        	return BadRequest("`userId` must be a positive integer.");
+        if (userId.HasValue && userId.Value <= 0)
+            return BadRequest("`userId` must be a positive integer.");
 
         if (limit < 1 || limit > 50)
             return BadRequest("`limit` must be between 1 and 50.");
@@ -36,10 +39,21 @@ public class PostsController : ControllerBase
         if (cursor.HasValue && cursor.Value <= 0)
             return BadRequest("`cursor` must be a positive integer.");
 
+        if (offset.HasValue && offset.Value < 0)
+            return BadRequest("`offset` must be a non-negative integer.");
+
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         int? currentUserId = int.TryParse(userIdClaim, out var id) ? id : null;
 
-        var result = await _postService.GetAllAsync(userId, cursor, limit, currentUserId);
+        var sortOrder = sort switch
+        {
+            "date_asc"   => PostSortOrder.DateAsc,
+            "likes_desc" => PostSortOrder.LikesDesc,
+            "likes_asc"  => PostSortOrder.LikesAsc,
+            _            => PostSortOrder.DateDesc,
+        };
+
+        var result = await _postService.GetAllAsync(userId, cursor, limit, currentUserId, sortOrder, offset);
         return Ok(result);
     }
 
@@ -89,23 +103,39 @@ public class PostsController : ControllerBase
     	}
     }
 
-	[HttpGet("{username}")]
-	public async Task<ActionResult<PaginatedPosts>> GetPostsByUsername(string username, int? cursor, int limit = 10)
-    {       
-    	if (limit < 1 || limit > 50)
-        	return BadRequest("`limit` must be between 1 and 50.");
+    [HttpGet("{username}")]
+    public async Task<ActionResult<PaginatedPosts>> GetPostsByUsername(
+        string username,
+        [FromQuery] int? cursor,
+        [FromQuery] int limit = 10,
+        [FromQuery] string sort = "date_desc",
+        [FromQuery] int? offset = null)
+    {
+        if (limit < 1 || limit > 50)
+            return BadRequest("`limit` must be between 1 and 50.");
 
-    	if (cursor.HasValue && cursor.Value <= 0)
-        	return BadRequest("`cursor` must be a positive integer.");
-		
-		var user = await _userService.GetByUsernameAsync(username);
+        if (cursor.HasValue && cursor.Value <= 0)
+            return BadRequest("`cursor` must be a positive integer.");
 
-    	if (user == null)
-        	return NotFound();
+        if (offset.HasValue && offset.Value < 0)
+            return BadRequest("`offset` must be a non-negative integer.");
 
-    	var posts = await _postService.GetAllAsync(user.Id, cursor, limit);
+        var user = await _userService.GetByUsernameAsync(username);
 
-    	return Ok(posts);
+        if (user == null)
+            return NotFound();
+
+        var sortOrder = sort switch
+        {
+            "date_asc"   => PostSortOrder.DateAsc,
+            "likes_desc" => PostSortOrder.LikesDesc,
+            "likes_asc"  => PostSortOrder.LikesAsc,
+            _            => PostSortOrder.DateDesc,
+        };
+
+        var posts = await _postService.GetAllAsync(user.Id, cursor, limit, sortOrder: sortOrder, offset: offset);
+
+        return Ok(posts);
     }
     
 	[Authorize]
