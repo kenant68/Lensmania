@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using Soenneker.Blazor.Masonry;
 using LensmaniaLibrary.DTOs.Posts;
 using LensmaniaClient.Services.Posts;
+using LensmaniaLibrary.Enums;
 
 namespace LensmaniaClient.Components;
 
@@ -22,7 +23,11 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Parameter] public bool DisplayCreateButton { get; set; } = false;
     [Parameter] public bool IsOwnProfile { get; set; } = false;
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
-    
+    [Parameter] public bool ShowSortToggle { get; set; } = false;
+
+    private PostSortOrder _sortOrder = PostSortOrder.DateDesc;
+    private int _offset = 0;
+
     private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
     private List<PostListItemResponse> _posts = [];
     private int? _cursor = null;
@@ -93,67 +98,93 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	// Loads the next batch of posts and updates component state
     private async Task LoadMorePosts()
     {
-		try {
-			_isLoading = true;
-        	_hasError = false;
-			StateHasChanged();
+        try {
+            _isLoading = true;
+            _hasError = false;
+            StateHasChanged();
 
-			var url = $"api/posts?limit=10";
-			if (_cursor.HasValue)
-    			url += $"&cursor={_cursor}";
-			
-			if (!string.IsNullOrWhiteSpace(Username))
-			{
-				//TODO: replace by _postService.GetPostsByUsernameAsync
-				// var result = await _postService.GetPostsByUsernameAsync(Username, _cursor, 10);
+            var isLikesSort = _sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc;
+            var sortParam = _sortOrder switch
+            {
+                PostSortOrder.DateAsc   => "date_asc",
+                PostSortOrder.LikesDesc => "likes_desc",
+                PostSortOrder.LikesAsc  => "likes_asc",
+                _                       => "date_desc",
+            };
 
-				url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10";
-			
-				if (_cursor.HasValue)
-					url += $"&cursor={_cursor}";
-			}
+            string url;
+            if (!string.IsNullOrWhiteSpace(Username))
+            {
+                url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10&sort={sortParam}";
+                if (!isLikesSort && _cursor.HasValue)
+                    url += $"&cursor={_cursor}";
+                else if (isLikesSort && _offset > 0)
+                    url += $"&offset={_offset}";
+            }
+            else
+            {
+                url = $"api/posts?limit=10&sort={sortParam}";
+                if (!isLikesSort && _cursor.HasValue)
+                    url += $"&cursor={_cursor}";
+                else if (isLikesSort && _offset > 0)
+                    url += $"&offset={_offset}";
+            }
 
-        	var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
-	        
-        	if (result != null)
-        	{
-            	_posts.AddRange(result.Posts);
-            	_cursor = result.NextCursor;
-            	_hasMore = result.HasMore;
-            	_imagesToLoad += result.Posts.Count;
-            	_imagesLoaded = 0;
-				_isMasonryInitialized = false;
-        	}
-		} 
-		catch (HttpRequestException)
-    	{
-        	_hasError = true;
-        	_errorMessage = "Erreur de connexion lors du chargement des posts.";
-    	}
-		catch (Exception e)
-    	{
-        	_hasError = true;
-			_errorMessage = "Erreur inattendue lors du chargement des posts.";
-    		Console.Error.WriteLine($"Erreur : {e.Message}");
-    	}      
-		finally
-		{
-        	_isLoading = false;
-        	StateHasChanged();
-		}
+            var result = await Http.GetFromJsonAsync<PaginatedPosts>(url);
+
+            if (result != null)
+            {
+                _posts.AddRange(result.Posts);
+                _hasMore = result.HasMore;
+                _imagesToLoad += result.Posts.Count;
+                _imagesLoaded = 0;
+                _isMasonryInitialized = false;
+
+                if (isLikesSort)
+                    _offset = result.NextOffset ?? _offset;
+                else
+                    _cursor = result.NextCursor;
+            }
+        }
+        catch (HttpRequestException)
+        {
+            _hasError = true;
+            _errorMessage = "Erreur de connexion lors du chargement des posts.";
+        }
+        catch (Exception e)
+        {
+            _hasError = true;
+            _errorMessage = "Erreur inattendue lors du chargement des posts.";
+            Console.Error.WriteLine($"Erreur : {e.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
     
     private void ResetState()
     {
-	    _posts.Clear();
-	    _cursor = null;
-	    _hasMore = true;
-	    _imagesToLoad = 0;
-	    _imagesLoaded = 0;
-	    _isMasonryInitialized = false;
-	    _selectedPostItem = null;
+        _posts.Clear();
+        _cursor = null;
+        _hasMore = true;
+        _imagesToLoad = 0;
+        _imagesLoaded = 0;
+        _isMasonryInitialized = false;
+        _selectedPostItem = null;
+        _offset = 0;
     }
     
+    private async Task OnSortChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<PostSortOrder>(e.Value?.ToString(), out var sortOrder))
+        {
+            _sortOrder = sortOrder;
+            await ReloadAsync();
+        }
+    }
+
     // Reload method exposed for parent pages
     public async Task ReloadAsync()
     {

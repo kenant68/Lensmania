@@ -97,3 +97,25 @@
     text-align: center;
     z-index: 100;
 }
+
+.sort-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.sort-select {
+    background-color: var(--color-dark-purple);
+    color: var(--color-yellow);
+    border: 1px solid var(--color-yellow);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+}
+
+.sort-select option {
+    background-color: var(--color-dark-purple);
+    color: var(--color-yellow);
+}

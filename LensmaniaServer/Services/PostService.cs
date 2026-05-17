@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using LensmaniaServer.Models;
 using LensmaniaLibrary.DTOs.Posts;
+using LensmaniaLibrary.Enums;
 using LensmaniaServer.Database;
 
 namespace LensmaniaServer.Services;
@@ -19,21 +20,42 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc, int? offset = null)
     {
         var query = _db.Posts.AsQueryable();
 
-		// Filter by userId and cursor
         if (userId.HasValue)
-        {
             query = query.Where(p => p.UserId == userId.Value);
+
+        if (cursor.HasValue && sortOrder is PostSortOrder.DateDesc or PostSortOrder.DateAsc)
+        {
+            var anchor = await _db.Posts
+                .Where(p => p.Id == cursor.Value)
+                .Select(p => new { p.Id, p.CreatedAt })
+                .FirstOrDefaultAsync();
+
+            if (anchor is not null)
+            {
+                query = sortOrder == PostSortOrder.DateAsc
+                    ? query.Where(p => p.CreatedAt > anchor.CreatedAt
+                        || (p.CreatedAt == anchor.CreatedAt && p.Id > anchor.Id))
+                    : query.Where(p => p.CreatedAt < anchor.CreatedAt
+                        || (p.CreatedAt == anchor.CreatedAt && p.Id < anchor.Id));
+            }
         }
 
-        if (cursor.HasValue)
-            query = query.Where(p => p.Id < cursor.Value);
+        query = sortOrder switch
+        {
+            PostSortOrder.DateAsc   => query.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id),
+            PostSortOrder.LikesDesc => query.OrderByDescending(p => p.LikesCount).ThenByDescending(p => p.Id),
+            PostSortOrder.LikesAsc  => query.OrderBy(p => p.LikesCount).ThenBy(p => p.Id),
+            _                       => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
+        };
+
+        if ((sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc) && offset.HasValue)
+            query = query.Skip(offset.Value);
 
         var posts = await query
-            .OrderByDescending(p => p.Id)
             .Select(p => new PostListItemResponse(
                 p.Id,
                 p.Title ?? DefaultAltImgFor(p.User.Username),
@@ -47,12 +69,14 @@ public class PostService : IPostService
 
         var hasMore = posts.Count > limit;
         var items = hasMore ? posts.Take(limit).ToList() : posts;
+        var isLikesSort = sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc;
 
         return new PaginatedPosts
         {
             Posts = items,
             HasMore = hasMore,
-            NextCursor = hasMore ? items.Last().Id : null
+            NextCursor = !isLikesSort && hasMore ? items.Last().Id : null,
+            NextOffset = isLikesSort && hasMore ? (offset ?? 0) + items.Count : null,
         };
     }
 
