@@ -38,8 +38,15 @@ public class AppDbContext : DbContext {
       			.WithMany(u => u.Posts)
       			.HasForeignKey(p => p.UserId)
       			.OnDelete(DeleteBehavior.Restrict);
+			
+			entity.HasOne(p => p.Event)
+				.WithMany(e => e.Posts)
+				.HasForeignKey(p => p.EventId)
+				.IsRequired(false)
+				.OnDelete(DeleteBehavior.SetNull);
 
 			entity.HasIndex(p => p.UserId);
+			entity.HasIndex(p => p.EventId);
         });
         
         modelBuilder.Entity<PasswordResetToken>(entity =>
@@ -104,6 +111,17 @@ public class AppDbContext : DbContext {
 		        .WithMany(u => u.Events)
 		        .HasForeignKey(e => e.UserId)
 		        .OnDelete(DeleteBehavior.Restrict);
+	        
+	        entity.HasMany(e => e.Posts)
+		        .WithOne(p => p.Event)
+		        .HasForeignKey(p => p.EventId)
+		        .IsRequired(false)
+		        .OnDelete(DeleteBehavior.SetNull);
+	        
+	        entity.HasMany(e => e.Badges)
+		        .WithOne(b => b.Event)
+		        .HasForeignKey(b => b.EventId)
+		        .OnDelete(DeleteBehavior.Cascade);
         });
         
         modelBuilder.Entity<Badge>(entity =>
@@ -125,6 +143,8 @@ public class AppDbContext : DbContext {
         
         modelBuilder.Entity<Earn>(entity =>
         {
+	        entity.HasKey(e => new { e.UserId, e.BadgeId });
+
 	        entity.HasOne(e => e.User)
 		        .WithMany(u => u.Earns)
 		        .HasForeignKey(e => e.UserId)

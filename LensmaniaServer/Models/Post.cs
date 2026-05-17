@@ -9,9 +9,9 @@ public class Post
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int LikesCount { get; set; }
     public int UserId { get; set; }
-	public int EventId { get; set; }
+	public int? EventId { get; set; }
 
     public User User { get; set; } = null!;
-	public Event Event { get; set; } = null!;
+	public Event? Event { get; set; } = null!;
     public List<PostLike> Likes { get; } = new();
 }
