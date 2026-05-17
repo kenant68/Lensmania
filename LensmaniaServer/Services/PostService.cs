@@ -29,17 +29,27 @@ public class PostService : IPostService
 
         if (cursor.HasValue && sortOrder is PostSortOrder.DateDesc or PostSortOrder.DateAsc)
         {
-            query = sortOrder == PostSortOrder.DateAsc
-                ? query.Where(p => p.Id > cursor.Value)
-                : query.Where(p => p.Id < cursor.Value);
+            var anchor = await _db.Posts
+                .Where(p => p.Id == cursor.Value)
+                .Select(p => new { p.Id, p.CreatedAt })
+                .FirstOrDefaultAsync();
+
+            if (anchor is not null)
+            {
+                query = sortOrder == PostSortOrder.DateAsc
+                    ? query.Where(p => p.CreatedAt > anchor.CreatedAt
+                        || (p.CreatedAt == anchor.CreatedAt && p.Id > anchor.Id))
+                    : query.Where(p => p.CreatedAt < anchor.CreatedAt
+                        || (p.CreatedAt == anchor.CreatedAt && p.Id < anchor.Id));
+            }
         }
 
         query = sortOrder switch
         {
-            PostSortOrder.DateAsc   => query.OrderBy(p => p.Id),
+            PostSortOrder.DateAsc   => query.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id),
             PostSortOrder.LikesDesc => query.OrderByDescending(p => p.LikesCount).ThenByDescending(p => p.Id),
             PostSortOrder.LikesAsc  => query.OrderBy(p => p.LikesCount).ThenBy(p => p.Id),
-            _                       => query.OrderByDescending(p => p.Id),
+            _                       => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
         };
 
         if ((sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc) && offset.HasValue)
