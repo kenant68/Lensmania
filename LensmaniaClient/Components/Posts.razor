@@ -5,7 +5,7 @@
 @if (ShowSortToggle)
 {
     <div class="sort-toggle">
-        <select class="sort-select" value="@_sortOrder.ToString()" @onchange="OnSortChanged">
+        <select class="sort-select" aria-label="Trier les posts" value="@_sortOrder.ToString()" @onchange="OnSortChanged">
             <option value="DateDesc">Récents ↓</option>
             <option value="DateAsc">Anciens ↑</option>
             <option value="LikesDesc">Plus likés ↓</option>
