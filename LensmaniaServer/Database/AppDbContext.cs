@@ -92,6 +92,9 @@ public class AppDbContext : DbContext {
 
         modelBuilder.Entity<Event>(entity =>
         {
+			entity.ToTable(t => 
+				t.HasCheckConstraint("CK_Events_DateRange", "\"EndDate\" >= \"StartDate\""));
+	        
 	        entity.HasKey(e => e.Id);
 
 	        entity.Property(e => e.Name)
