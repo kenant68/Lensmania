@@ -3,48 +3,56 @@
 @inject CustomAuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Lensmania</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+<aside class="sidebar">
+
+    <div class="sidebar-header">
+        <a class="navbar-brand" href="/">
+            Lensmania
+        </a>
+
+        <button
+            title="Navigation menu"
+            class="navbar-toggler"
+            @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Accueil
-            </NavLink>
-        </div>
+    
+    <nav class="@NavMenuCssClass nav-scrollable">
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3 pt-2 small text-white-50">
-                    Connecté : <strong class="text-white">@GetDisplayName(context)</strong>
+                <div class="nav-section">
+                    <NavLink class="nav-link-admin" href="admin/users">
+                        Utilisateurs
+                    </NavLink>
+
+                    <NavLink class="nav-link-admin" href="events">
+                        Evènements
+                    </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <button type="button" class="nav-link btn btn-link text-start w-100 border-0 p-0" @onclick="LogoutAsync">
-                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Déconnexion
+
+                <div class="sidebar-footer">
+                    <span class="text-white-50 small text-lg-start">
+                        @GetDisplayName(context)
+                    </span>
+                    <button type="button" class="btn btn-outline-light" @onclick="LogoutAsync">
+                        Déconnexion
                     </button>
                 </div>
             </Authorized>
+
             <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@AuthRoutes.Login">
-                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Connexion
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@AuthRoutes.Register">
-                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Inscription
-                    </NavLink>
-                </div>
+                <NavLink class="btn btn-secondary" href="@AuthRoutes.Login">
+                    Connexion
+                </NavLink>
+                <NavLink class="btn btn-primary" href="@AuthRoutes.Register">
+                    Inscription
+                </NavLink>
             </NotAuthorized>
         </AuthorizeView>
     </nav>
-</div>
+    
+</aside>
 
 @code {
     private bool collapseNavMenu = true;
