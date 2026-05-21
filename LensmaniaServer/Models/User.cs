@@ -7,6 +7,7 @@ public class User {
     public string PasswordHash { get; set; } = "";
     public bool IsAdmin { get; set; } = false;
     public bool IsPremium { get; set; } = false;
+    public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
 	public List<Post> Posts { get; } = new();
