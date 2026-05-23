@@ -106,10 +106,17 @@ public class UserController : ControllerBase {
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> AdminDeleteUser(int id)
     {
-        var deleted = await _userService.DeleteByAdminAsync(id);
-        if (!deleted) 
-            return NotFound();
+		try
+		{
+        	var deleted = await _userService.DeleteByAdminAsync(id);
+        	if (!deleted) 
+            	return NotFound();
         
-        return NoContent();
+        	return NoContent();
+		}
+        catch (UnauthorizedAccessException e)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = e.Message });
+        }
     }
 }

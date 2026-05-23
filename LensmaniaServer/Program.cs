@@ -69,7 +69,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return;
                 }
 
-                var userId = int.Parse(userIdClaim.Value);
+                if (!int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    context.Fail("Invalid token");
+                    return;
+                }
+                
                 var isActive = await userService.IsActiveAsync(userId);
 
                 if (!isActive)

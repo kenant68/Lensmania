@@ -63,26 +63,28 @@ public class UserService : IUserService
         if (user is null || !user.IsActive) 
             return null;
 
-        if (!string.IsNullOrWhiteSpace(request.Username) &&
+        var normalizedUsername = request.Username?.Trim();
+        if (!string.IsNullOrWhiteSpace(normalizedUsername) &&
             request.Username != user.Username)
         {
             var taken = await _db.Users
-                .AnyAsync(u => u.Username.ToLower() == request.Username.ToLower() && u.Id != userId);
+                .AnyAsync(u => u.Username.ToLower() == normalizedUsername.ToLower() && u.Id != userId);
             if (taken)
                 throw new ArgumentException("Ce nom d'utilisateur est déjà pris.");
 
-            user.Username = request.Username.Trim();
+            user.Username = normalizedUsername;
         }
         
-        if (!string.IsNullOrWhiteSpace(request.Email) &&
-            request.Email != user.Email)
+		var normalizedEmail = request.Email?.Trim();
+        if (!string.IsNullOrWhiteSpace(normalizedEmail) &&
+            normalizedEmail != user.Email)
         {
             var taken = await _db.Users
-                .AnyAsync(u => u.Email == request.Email && u.Id != userId);
+                .AnyAsync(u => u.Email == normalizedEmail && u.Id != userId);
             if (taken)
                 throw new ArgumentException("Cet email n'est pas disponible.");
 
-            user.Email = request.Email.Trim();
+            user.Email = normalizedEmail;
         }
 
         await _db.SaveChangesAsync();
