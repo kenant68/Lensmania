@@ -23,8 +23,20 @@ public class UserManagementPageBase : ComponentBase
     private async Task LoadAsync()
     {
         IsLoading = true;
-        PagedUsers = await UserService.GetAllAsync(CurrentOffset, PageSize);
-        IsLoading = false;
+        try
+        {
+            PagedUsers = await UserService.GetAllAsync(CurrentOffset, PageSize);
+
+            if (PagedUsers.Total > 0 && CurrentOffset >= PagedUsers.Total)
+            {
+                CurrentOffset = Math.Max(0, CurrentOffset - PageSize);
+                PagedUsers = await UserService.GetAllAsync(CurrentOffset, PageSize);
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     protected async Task NextPage()

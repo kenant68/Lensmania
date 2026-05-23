@@ -13,11 +13,12 @@ public class UserService
         _http = http;
     }
 
-    public async Task<PaginatedUsers?> GetAllAsync(int offset = 0, int limit = 10)
+    public async Task<PaginatedUsers> GetAllAsync(int offset = 0, int limit = 10)
     {
         var url = $"api/user?offset={offset}&limit={limit}";
 
-        return await _http.GetFromJsonAsync<PaginatedUsers>(url);
+        return await _http.GetFromJsonAsync<PaginatedUsers>(url)
+			?? new PaginatedUsers();
     }
     
     public async Task ToggleUserIsActiveAsync(int userId, bool isActive)

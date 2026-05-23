@@ -44,7 +44,10 @@ public sealed class CustomAuthenticationStateProvider : AuthenticationStateProvi
     public async Task SetTokenAsync(string token)
     {
         await _tokenStore.SaveTokenAsync(token);
+        
+        LogoutReason = null;
         _currentState = BuildAuthenticationState(token);
+        
         NotifyAuthenticationStateChanged(Task.FromResult(_currentState));
     }
 

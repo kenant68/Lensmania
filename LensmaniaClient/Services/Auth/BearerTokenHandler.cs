@@ -30,12 +30,10 @@ public sealed class BearerTokenHandler : DelegatingHandler
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        if ((response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+        if (response.StatusCode == HttpStatusCode.Unauthorized
             && !IsAuthEndpoint(request.RequestUri))
         {
-            await _authenticationStateProvider.ClearTokenAsync(
-                response.StatusCode == HttpStatusCode.Forbidden ? "blocked" : "unauthorized");
-            
+            await _authenticationStateProvider.ClearTokenAsync("unauthorized");
             _navigationManager.NavigateTo(AuthRoutes.Login);
         }
 

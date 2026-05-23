@@ -28,10 +28,16 @@ public sealed class AuthApiClient
     public async Task<AuthApiResult<AuthResponseDto>> LoginAsync(LoginRequestDto request)
     {
         var result = await SendAsync<LoginRequestDto, AuthResponseDto>("api/auth/login", request);
+        
         if (result.IsSuccess && result.Data is not null)
         {
             await _authenticationStateProvider.SetTokenAsync(result.Data.Token);
+        } 
+        else if (result.Error?.Type == AuthApiErrorType.BlockedUser)
+        {
+            await _authenticationStateProvider.ClearTokenAsync("blocked");
         }
+        
         return result;
     }
 
@@ -70,6 +76,9 @@ public sealed class AuthApiClient
                 HttpStatusCode.Unauthorized =>
                     AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.InvalidCredentials, message, code)),
+                HttpStatusCode.Forbidden =>
+                    AuthApiResult<TResponse>.Failure(
+                        new AuthApiError(AuthApiErrorType.BlockedUser, message, code)),
                 HttpStatusCode.Conflict =>
                     AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.DuplicateIdentity, message, code)),
