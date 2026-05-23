@@ -11,15 +11,6 @@
     color: #1e1e1e;
 }
 
-/* -- Toolbar -- */
-.toolbar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
 /* -- Table -- */
 .users-table {
     width: 100%;
