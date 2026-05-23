@@ -22,8 +22,14 @@ public class UserService
     }
     
     public async Task ToggleUserIsActiveAsync(int userId, bool isActive)
-        => await _http.PatchAsJsonAsync($"api/user/{userId}/active", isActive);
-    
+	{        
+ 		var response = await _http.PatchAsJsonAsync($"api/user/{userId}/active", isActive);
+		response.EnsureSuccessStatusCode();
+    }
+
     public async Task DeleteUserAsync(int userId)
-        => await _http.DeleteAsync($"api/user/{userId}");
+	{
+    	var response = await _http.DeleteAsync($"api/user/{userId}");
+		response.EnsureSuccessStatusCode();
+	}
 }
