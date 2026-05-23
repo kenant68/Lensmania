@@ -27,7 +27,7 @@ public class UserController : ControllerBase {
     }
     
     [HttpGet("{username}")]
-    public async Task<ActionResult<UserResponse>> GetByUsername(string username)
+    public async Task<ActionResult<PublicUserProfileResponse>> GetByUsername(string username)
     {
         var user = await _userService.GetByUsernameAsync(username);
         if (user is null) 

@@ -14,17 +14,16 @@ public class UserService : IUserService
 		_db = db;
 	}
     
-    public async Task<UserResponse?> GetByUsernameAsync(string username)
+    public async Task<PublicUserProfileResponse?> GetByUsernameAsync(string username)
     {
         if (string.IsNullOrWhiteSpace(username)) 
             return null;
         
         return await _db.Users
             .Where(u => u.Username.ToLower() == username.ToLower())
-            .Select(u => new UserResponse(
+            .Select(u => new PublicUserProfileResponse(
                 u.Id,
-                u.Username,
-                u.Email
+                u.Username
             ))
             .FirstOrDefaultAsync();
     }
