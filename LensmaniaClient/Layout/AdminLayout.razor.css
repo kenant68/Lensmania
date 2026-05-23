@@ -11,6 +11,6 @@
 
 @media (max-width: 640px) {
     .page {
-        flex-direction: row;
+        flex-direction: column;
     }
 }

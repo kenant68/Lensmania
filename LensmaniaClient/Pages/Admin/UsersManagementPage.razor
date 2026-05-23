@@ -54,7 +54,11 @@
 
         <div class="pagination">
             <span class="pagination-info">
-                @(CurrentOffset + 1)–@(Math.Min(CurrentOffset + PageSize, PagedUsers.Total)) de @PagedUsers.Total
+				@{
+                    var start = PagedUsers.Total == 0 ? 0 : Math.Min(CurrentOffset + 1, PagedUsers.Total);
+                    var end = Math.Min(CurrentOffset + PageSize, PagedUsers.Total);
+                }
+                @start à @end sur @PagedUsers.Total
             </span>
             <button class="btn-page" disabled="@(CurrentOffset == 0)" @onclick="PreviousPage">‹</button>
             <button class="btn-page" disabled="@(!HasNextPage)" @onclick="NextPage">›</button>
