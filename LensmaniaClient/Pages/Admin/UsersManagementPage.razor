@@ -1,6 +1,7 @@
 @page "/admin/users"
 @inherits UserManagementPageBase
 @using LensmaniaLibrary.DTOs.Users
+@using LensmaniaClient.Components.Utils
 
 <h1 class="page-title py-4">Gestion des utilisateurs</h1>
 
@@ -47,7 +48,7 @@
                         <td>
                             <button class="btn-icon btn-delete"
                                     title="Supprimer"
-                                    @onclick="() => OnDelete(user)">
+                                    @onclick="() => OpenDeleteModal(user)">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -63,5 +64,17 @@
             <button class="btn-page" disabled="@(CurrentOffset == 0)" @onclick="PreviousPage">‹</button>
             <button class="btn-page" disabled="@(!HasNextPage)" @onclick="NextPage">›</button>
         </div>
+        
+        <ConfirmationModal IsVisible="_showDeleteModal"
+                      Title="Supprimer l'utilisateur"
+                      ConfirmText="Supprimer"
+                      CancelText="Annuler"
+                      OnConfirm="ConfirmDeleteUser"
+                      OnCancel="CloseDeleteModal">
+
+            <p> Vous êtes sur le point de supprimer : <strong>@_selectedUserToDelete?.Username</strong> </p>
+            <p> <span class="text-muted">@_selectedUserToDelete?.Email</span> </p>
+            <p class="text-danger"> Cette action est irréversible. </p>
+        </ConfirmationModal>
     }
 </section>

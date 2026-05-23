@@ -14,7 +14,9 @@ public class UserManagementPageBase : ComponentBase
     protected int CurrentOffset { get; private set; } = 0;
     protected const int PageSize = 10;
     protected bool HasNextPage => PagedUsers is not null && CurrentOffset + PageSize < PagedUsers.Total;
-
+    protected UserAdminResponse? _selectedUserToDelete;
+    protected bool _showDeleteModal;
+    
     protected override async Task OnInitializedAsync()
         => await LoadAsync();
 
@@ -50,8 +52,33 @@ public class UserManagementPageBase : ComponentBase
 
     protected async Task OnDelete(UserAdminResponse user)
     {
-        //TODO: add a confirmation modal
         await UserService.DeleteUserAsync(user.Id);
+        await LoadAsync();
+    }
+    
+    // --- Confirmation modal ---
+    protected void OpenDeleteModal(UserAdminResponse user)
+    {
+        _selectedUserToDelete = user;
+        _showDeleteModal = true;
+    }
+
+    protected void CloseDeleteModal()
+    {
+        _selectedUserToDelete = null;
+        _showDeleteModal = false;
+    }
+
+    protected async Task ConfirmDeleteUser()
+    {
+        if (_selectedUserToDelete is null)
+            return;
+
+        await UserService.DeleteUserAsync(_selectedUserToDelete.Id);
+
+        _selectedUserToDelete = null;
+        _showDeleteModal = false;
+
         await LoadAsync();
     }
 }
