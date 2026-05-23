@@ -1,6 +1,8 @@
 using LensmaniaServer.Models;
 using LensmaniaServer.Services;
+using LensmaniaServer.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LensmaniaServer.Controllers;
 
@@ -16,11 +18,13 @@ public class AuthController : ControllerBase {
 
     private readonly AuthService _auth;
     private readonly PasswordResetService _passwordReset;
+    private readonly AppDbContext _db;
 
-    public AuthController(AuthService auth, PasswordResetService passwordReset)
+    public AuthController(AuthService auth, PasswordResetService passwordReset, AppDbContext db)
     {
         _auth = auth;
         _passwordReset = passwordReset;
+        _db = db;
     }
 
     [HttpPost("register")]
@@ -44,7 +48,17 @@ public class AuthController : ControllerBase {
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest req) {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
+
+        if (user != null && !user.IsActive)
+        {
+            return StatusCode(403, new ApiErrorResponse(
+                AuthErrorCodes.UserIsBlocked, 
+                "Votre compte a été bloqué"));
+        }
+        
         var result = await _auth.Login(req);
+        
         return result is null
             ? Unauthorized(new ApiErrorResponse(
                 AuthErrorCodes.InvalidCredentials,

@@ -10,4 +10,5 @@ public interface IUserService
     Task<bool> DeleteByAdminAsync(int userId);
     Task<bool> DeleteMeAsync(int userId);
     Task<bool> ToggleIsActiveAsync(int userId, bool isActive);
+    Task<bool> IsActiveAsync(int userId);
 }

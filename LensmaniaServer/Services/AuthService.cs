@@ -36,8 +36,14 @@ public class AuthService {
 
     public async Task<AuthResponse?> Login(LoginRequest req) {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
-        if (user == null) return null;
+        
+		if (user == null) return null;
+
+		if (!user.IsActive)
+			return null;
+
         if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash)) return null;
-        return new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium, user.IsActive);
+        
+		return new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium, user.IsActive);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -52,6 +53,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
+        };
+        o.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userService = context.HttpContext.RequestServices
+                    .GetRequiredService<IUserService>();
+                var userIdClaim = context.Principal?
+                    .FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim is null)
+                {
+                    context.Fail("Invalid token");
+                    return;
+                }
+
+                var userId = int.Parse(userIdClaim.Value);
+                var isActive = await userService.IsActiveAsync(userId);
+
+                if (!isActive)
+                {
+                    context.Fail("User is blocked");
+                }
+            }
         };
     });
 builder.Services.AddAuthorization(options =>

@@ -131,4 +131,12 @@ public class UserService : IUserService
         
         return true;
     }
+
+	public async Task<bool> IsActiveAsync(int userId)
+	{
+    	return await _db.Users
+        	.Where(u => u.Id == userId)
+        	.Select(u => u.IsActive)
+        	.FirstOrDefaultAsync();
+	}
 }

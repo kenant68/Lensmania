@@ -11,6 +11,7 @@ public sealed class CustomAuthenticationStateProvider : AuthenticationStateProvi
     private readonly ITokenStore _tokenStore;
     private AuthenticationState _currentState = new(Anonymous);
     private bool _isInitialized;
+    public string? LogoutReason { get; private set; }
 
     public CustomAuthenticationStateProvider(ITokenStore tokenStore)
     {
@@ -47,10 +48,13 @@ public sealed class CustomAuthenticationStateProvider : AuthenticationStateProvi
         NotifyAuthenticationStateChanged(Task.FromResult(_currentState));
     }
 
-    public async Task ClearTokenAsync()
+    public async Task ClearTokenAsync(string? reason = null)
     {
         await _tokenStore.ClearTokenAsync();
+        
+        LogoutReason = reason;
         _currentState = new AuthenticationState(Anonymous);
+        
         NotifyAuthenticationStateChanged(Task.FromResult(_currentState));
     }
 
