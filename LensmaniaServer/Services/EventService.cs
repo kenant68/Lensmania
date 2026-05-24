@@ -86,8 +86,8 @@ public class EventService : IEventService
         {
             Name        = request.Name.Trim(),
             Description = request.Description.Trim(),
-            StartDate   = request.StartDate,
-            EndDate     = request.EndDate,
+            StartDate   = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc),
+            EndDate     = DateTime.SpecifyKind(request.EndDate,   DateTimeKind.Utc),
             IsPremium   = request.IsPremium,
             ThemeId     = request.ThemeId,
             UserId      = request.UserId,
@@ -143,8 +143,8 @@ public class EventService : IEventService
 
         ev.Name        = request.Name.Trim();
         ev.Description = request.Description.Trim();
-        ev.StartDate   = request.StartDate;
-        ev.EndDate     = request.EndDate;
+        ev.StartDate   = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc);
+        ev.EndDate     = DateTime.SpecifyKind(request.EndDate,   DateTimeKind.Utc);
         ev.IsPremium   = request.IsPremium;
         ev.ThemeId     = request.ThemeId;
 
