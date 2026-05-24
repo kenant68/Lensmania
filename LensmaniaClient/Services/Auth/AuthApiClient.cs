@@ -35,7 +35,7 @@ public sealed class AuthApiClient
         } 
         else if (result.Error?.Type == AuthApiErrorType.BlockedUser)
         {
-            await _authenticationStateProvider.ClearTokenAsync("blocked");
+            await _authenticationStateProvider.ClearTokenAsync(LogoutReason.Blocked);
         }
         
         return result;

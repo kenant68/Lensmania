@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
+using LensmaniaClient.Models.Auth;
 
 namespace LensmaniaClient.Services.Auth;
 
@@ -11,7 +12,7 @@ public sealed class CustomAuthenticationStateProvider : AuthenticationStateProvi
     private readonly ITokenStore _tokenStore;
     private AuthenticationState _currentState = new(Anonymous);
     private bool _isInitialized;
-    public string? LogoutReason { get; private set; }
+    public LogoutReason LogoutReason { get; private set; } = LogoutReason.None;    
 
     public CustomAuthenticationStateProvider(ITokenStore tokenStore)
     {
@@ -45,13 +46,13 @@ public sealed class CustomAuthenticationStateProvider : AuthenticationStateProvi
     {
         await _tokenStore.SaveTokenAsync(token);
         
-        LogoutReason = null;
+        LogoutReason = LogoutReason.None;
         _currentState = BuildAuthenticationState(token);
         
         NotifyAuthenticationStateChanged(Task.FromResult(_currentState));
     }
 
-    public async Task ClearTokenAsync(string? reason = null)
+    public async Task ClearTokenAsync(LogoutReason reason = LogoutReason.None)
     {
         await _tokenStore.ClearTokenAsync();
         

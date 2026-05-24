@@ -62,15 +62,18 @@
         
         
         var provider = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
-        if (provider.LogoutReason == "blocked")
+        
+        switch (provider.LogoutReason)
         {
-            isError = true;
-            message = "Votre compte a été bloqué.";
-        }
-        else if (provider.LogoutReason == "unauthorized")
-        {
-            isError = true;
-            message = "Session expirée, veuillez vous reconnecter.";
+            case LogoutReason.Blocked:
+                isError = true;
+                message = "Votre compte a été bloqué.";
+                break;
+
+            case LogoutReason.Unauthorized:
+                isError = true;
+                message = "Session expirée, veuillez vous reconnecter.";
+                break;
         }
     }
 

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Components;
+using LensmaniaClient.Models.Auth;
 
 namespace LensmaniaClient.Services.Auth;
 
@@ -33,7 +34,7 @@ public sealed class BearerTokenHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.Unauthorized
             && !IsAuthEndpoint(request.RequestUri))
         {
-            await _authenticationStateProvider.ClearTokenAsync("unauthorized");
+            await _authenticationStateProvider.ClearTokenAsync(LogoutReason.Unauthorized);
             _navigationManager.NavigateTo(AuthRoutes.Login);
         }
 
