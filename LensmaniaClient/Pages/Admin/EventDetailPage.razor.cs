@@ -1,3 +1,4 @@
+using System.Net.Http;
 using LensmaniaLibrary.DTOs.Events;
 using LensmaniaClient.Services;
 using Microsoft.AspNetCore.Components;
@@ -8,6 +9,9 @@ public class EventDetailPageBase : ComponentBase
 {
     [Inject] private EventService EventSvc { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
+    [Inject] private HttpClient Http { get; set; } = default!;
+
+    protected string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
 
     [Parameter] public int Id { get; set; }
 

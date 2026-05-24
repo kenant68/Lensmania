@@ -75,19 +75,19 @@
                     <div class="d-flex flex-wrap gap-3">
                         @foreach (var badge in Event.Badges)
                         {
-                            <div class="text-center">
+                            <div class="text-center" title="@badge.Name">
                                 @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
                                 {
-                                    <img src="@badge.ImageUrl"
+                                    <img src="@($"{ApiBaseUrl}/{badge.ImageUrl}")"
                                          alt="@badge.Name"
-                                         style="width:64px;height:64px;object-fit:contain;"
-                                         onerror="this.style.display='none'" />
+                                         style="width:72px;height:72px;object-fit:contain;border-radius:50%;border:2px solid var(--color-lighter-purple);background:#fff;" />
                                 }
                                 else
                                 {
-                                    <div style="width:64px;height:64px;background:var(--color-lighter-purple);border-radius:50%;"></div>
+                                    <div style="width:72px;height:72px;background:var(--color-lighter-purple);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-award fs-4" style="color:var(--color-dark-purple);"></i>
+                                    </div>
                                 }
-                                <div class="small mt-1">@badge.Name</div>
                             </div>
                         }
                     </div>
