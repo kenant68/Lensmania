@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
+using LensmaniaClient.Models.Auth;
 using LensmaniaLibrary.DTOs.Events;
- 
+
 namespace LensmaniaClient.Services;
 
 public class EventService
@@ -18,24 +19,37 @@ public class EventService
             $"api/events?offset={offset}&limit={limit}");
     }
 
-    public async Task<EventResponse?> GetByIdAsync(int id)
+    public async Task<EventDetailledResponse?> GetByIdAsync(int id)
     {
-        return await _http.GetFromJsonAsync<EventResponse>($"api/events/{id}");
+        return await _http.GetFromJsonAsync<EventDetailledResponse>($"api/events/{id}");
     }
-    
-    public async Task<EventResponse> CreateAsync(CreateEventRequest request)
+
+    public async Task<EventDetailledResponse> CreateAsync(CreateEventRequest request)
     {
         var response = await _http.PostAsJsonAsync("api/events", request);
- 
+
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
             throw new Exception(error?.Message ?? "Une erreur est survenue.");
         }
- 
-        return (await response.Content.ReadFromJsonAsync<EventResponse>())!;
+
+        return (await response.Content.ReadFromJsonAsync<EventDetailledResponse>())!;
     }
- 
+
+    public async Task<EventDetailledResponse> UpdateAsync(int id, UpdateEventRequest request)
+    {
+        var response = await _http.PutAsJsonAsync($"api/events/{id}", request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
+            throw new Exception(error?.Message ?? "Une erreur est survenue.");
+        }
+
+        return (await response.Content.ReadFromJsonAsync<EventDetailledResponse>())!;
+    }
+
     public async Task DeleteAsync(int id)
     {
         var response = await _http.DeleteAsync($"api/events/{id}");

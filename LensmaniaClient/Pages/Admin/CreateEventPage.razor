@@ -7,6 +7,7 @@
 @inject EventService EventSvc
 @inject ThemeService ThemeSvc
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 
 <div class="create-event-page container py-4">
 
@@ -210,15 +211,18 @@
 
     private bool _isSubmitting;
     private string? _errorMessage;
-    private EventResponse? _createdEvent;
+    private EventDetailledResponse? _createdEvent;
     private Dictionary<string, string> _fieldErrors = new();
+    private int _currentUserId;
 
-    // TODO : récupérer le UserId de l'auteur
-    private const int AdminUserId = 1;
-    
     protected override async Task OnInitializedAsync()
     {
         _themes = await ThemeSvc.GetAllAsync();
+
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        var claim = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
+                 ?? state.User.FindFirst("sub");
+        _currentUserId = int.TryParse(claim?.Value, out var uid) ? uid : 0;
     }
     
     private void AddBadge()
@@ -252,7 +256,7 @@
                 _form.EndDate,
                 _form.IsPremium,
                 _form.ThemeId,
-                AdminUserId,
+                _currentUserId,
                 _badges
             );
 
