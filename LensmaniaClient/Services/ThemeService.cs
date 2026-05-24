@@ -14,7 +14,7 @@ public class ThemeService
  
     public async Task<List<ThemeResponse>> GetAllAsync()
     {
-        return await _http.GetFromJsonAsync<List<ThemeResponse>>("api/themes")
-               ?? new List<ThemeResponse>();
+        var result = await _http.GetFromJsonAsync<PaginatedThemes>("api/themes?limit=100");
+        return result?.Themes ?? new List<ThemeResponse>();
     }
 }

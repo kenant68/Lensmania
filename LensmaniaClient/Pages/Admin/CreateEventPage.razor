@@ -12,7 +12,7 @@
 <div class="create-event-page container py-4">
 
     <div class="page-header mb-4">
-        <a href="/admin/events" class="btn btn-link btn-back ps-0">
+        <a href="/admin/events" class="btn btn-back ps-0">
             <i class="bi bi-arrow-left me-1"></i> Retour aux événements
         </a>
         <h1 class="page-title mt-1">Nouvel événement</h1>
@@ -170,7 +170,7 @@
             }
 
             <button type="button"
-                    class="btn btn-outline-primary btn-sm mt-1"
+                    class="btn btn-add-badge btn-sm mt-1"
                     @onclick="AddBadge">
                 <i class="bi bi-plus-circle me-1"></i>Ajouter un badge
             </button>
@@ -183,7 +183,7 @@
                     Annuler
                 </a>
                 <button type="button"
-                        class="btn btn-primary px-4"
+                        class="btn btn-submit px-4"
                         disabled="@_isSubmitting"
                         @onclick="SubmitAsync">
                     @if (_isSubmitting)
