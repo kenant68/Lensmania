@@ -1,0 +1,60 @@
+@using LensmaniaLibrary.DTOs.Badges
+
+<div class="badge-item card mb-2 p-3">
+    <div class="row g-2 align-items-end">
+
+        <div class="col-12 col-md-5">
+            <label class="form-label fw-semibold" for="badge-name-@Index">
+                Nom du badge <span class="text-danger">*</span>
+            </label>
+            <input id="badge-name-@Index"
+                   type="text"
+                   class="form-control"
+                   placeholder="Ex : Photographe du mois"
+                   value="@Badge.Name"
+                   @oninput="e => OnNameChanged(e.Value?.ToString() ?? string.Empty)" />
+        </div>
+
+        <div class="col-12 col-md-5">
+            <label class="form-label fw-semibold" for="badge-url-@Index">
+                URL de l'image
+            </label>
+            <input id="badge-url-@Index"
+                   type="url"
+                   class="form-control"
+                   placeholder="https://…/badge.png"
+                   value="@Badge.ImageUrl"
+                   @oninput="e => OnImageUrlChanged(e.Value?.ToString() ?? string.Empty)" />
+        </div>
+
+        <div class="col-12 col-md-2 d-flex align-items-end">
+            @if (!string.IsNullOrWhiteSpace(Badge.ImageUrl))
+            {
+                <img src="@Badge.ImageUrl"
+                     alt="Aperçu badge"
+                     class="badge-preview me-2"
+                     onerror="this.style.display='none'" />
+            }
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    title="Supprimer ce badge"
+                    @onclick="() => OnRemove.InvokeAsync(Index)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CreateBadgeRequest Badge { get; set; } = default!;
+    [Parameter, EditorRequired] public int Index { get; set; }
+    [Parameter] public EventCallback<int> OnRemove { get; set; }
+    [Parameter] public EventCallback<CreateBadgeRequest> OnChange { get; set; }
+
+    private void OnNameChanged(string value)
+        => OnChange.InvokeAsync(Badge with { Name = value });
+
+    private void OnImageUrlChanged(string value)
+        => OnChange.InvokeAsync(Badge with { ImageUrl = value });
+}
