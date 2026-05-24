@@ -55,6 +55,22 @@ public class EventsController : ControllerBase
     }
 
     [Authorize(Policy = "AdminOnly")]
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<EventDetailledResponse>> Update(int id, [FromBody] UpdateEventRequest request)
+    {
+        try
+        {
+            var ev = await _eventService.UpdateAsync(id, request);
+            if (ev is null) return NotFound();
+            return Ok(ev);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

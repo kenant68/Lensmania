@@ -123,6 +123,61 @@ public class EventService : IEventService
         );
     }
     
+    public async Task<EventDetailledResponse?> UpdateAsync(int id, UpdateEventRequest request)
+    {
+        var ev = await _db.Events
+            .Include(e => e.Badges)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (ev is null) return null;
+
+        if (string.IsNullOrWhiteSpace(request.Name))
+            throw new ArgumentException("Le nom de l'événement est obligatoire.");
+
+        if (request.EndDate <= request.StartDate)
+            throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
+
+        var themeExists = await _db.Themes.AnyAsync(t => t.Id == request.ThemeId);
+        if (!themeExists)
+            throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");
+
+        ev.Name        = request.Name.Trim();
+        ev.Description = request.Description.Trim();
+        ev.StartDate   = request.StartDate;
+        ev.EndDate     = request.EndDate;
+        ev.IsPremium   = request.IsPremium;
+        ev.ThemeId     = request.ThemeId;
+
+        _db.Badges.RemoveRange(ev.Badges);
+        ev.Badges.Clear();
+
+        foreach (var b in request.Badges)
+        {
+            if (string.IsNullOrWhiteSpace(b.Name))
+                throw new ArgumentException("Chaque badge doit avoir un nom.");
+
+            ev.Badges.Add(new Badge
+            {
+                Name     = b.Name.Trim(),
+                ImageUrl = b.ImageUrl.Trim()
+            });
+        }
+
+        await _db.SaveChangesAsync();
+        await _db.Entry(ev).Reference(e => e.Theme).LoadAsync();
+
+        return new EventDetailledResponse(
+            ev.Id,
+            ev.Name,
+            ev.Description,
+            ev.StartDate,
+            ev.EndDate,
+            ev.IsPremium,
+            new ThemeResponse(ev.Theme.Id, ev.Theme.Name, ev.Theme.Icon),
+            ev.Badges.Select(b => new BadgeResponse(b.Id, b.Name, b.ImageUrl)).ToList()
+        );
+    }
+
     public async Task<bool> DeleteAsync(int id)
     {
         var ev = await _db.Events.FindAsync(id);
