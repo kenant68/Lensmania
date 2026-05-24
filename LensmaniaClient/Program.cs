@@ -28,6 +28,8 @@ builder.Services.AddMasonryInteropAsScoped();
 builder.Services.AddScoped<AuthApiClient>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<ThemeService>();
 
 var host = builder.Build();
 await host.Services.GetRequiredService<CustomAuthenticationStateProvider>().InitializeAsync();
