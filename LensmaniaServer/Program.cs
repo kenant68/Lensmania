@@ -40,6 +40,8 @@ builder.Services.AddOptions<PasswordResetOptions>()
     .ValidateOnStart();
 builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
 builder.Services.AddScoped<PasswordResetService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IThemeService, ThemeService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
