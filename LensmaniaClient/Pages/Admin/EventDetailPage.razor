@@ -1,0 +1,108 @@
+@page "/admin/events/{Id:int}"
+@inherits EventDetailPageBase
+@using LensmaniaLibrary.DTOs.Events
+@using LensmaniaClient.Components.Utils
+
+<div class="container py-4" style="max-width: 800px;">
+
+    <div class="mb-4">
+        <a href="/admin/events" class="btn btn-link ps-0">
+            <i class="bi bi-arrow-left me-1"></i>Retour aux événements
+        </a>
+    </div>
+
+    @if (IsLoading)
+    {
+        <p>Chargement…</p>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+    else if (Event is not null)
+    {
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="h2 fw-bold">@Event.Name</h1>
+                @if (Event.IsPremium)
+                {
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-star-fill me-1"></i>Premium
+                    </span>
+                }
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/admin/events/@Event.Id/edit" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i>Modifier
+                </a>
+                <button class="btn btn-outline-danger" @onclick="OpenDeleteModal">
+                    <i class="bi bi-trash me-1"></i>Supprimer
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-3">Informations</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Thème</dt>
+                    <dd class="col-sm-9">@(Event.Theme.Icon is not null ? Event.Theme.Icon + " " : "")@Event.Theme.Name</dd>
+
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Event.Description) ? "—" : Event.Description)</dd>
+
+                    <dt class="col-sm-3">Date de début</dt>
+                    <dd class="col-sm-9">@Event.StartDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-3">Date de fin</dt>
+                    <dd class="col-sm-9">@Event.EndDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-3">
+                    Badges
+                    <span class="badge bg-secondary ms-2">@Event.Badges.Count</span>
+                </h5>
+                @if (!Event.Badges.Any())
+                {
+                    <p class="text-muted fst-italic">Aucun badge associé.</p>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach (var badge in Event.Badges)
+                        {
+                            <div class="text-center">
+                                @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
+                                {
+                                    <img src="@badge.ImageUrl"
+                                         alt="@badge.Name"
+                                         style="width:64px;height:64px;object-fit:contain;"
+                                         onerror="this.style.display='none'" />
+                                }
+                                else
+                                {
+                                    <div style="width:64px;height:64px;background:var(--color-lighter-purple);border-radius:50%;"></div>
+                                }
+                                <div class="small mt-1">@badge.Name</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <ConfirmationModal IsVisible="ShowDeleteModal"
+                           Title="Supprimer l'événement"
+                           ConfirmText="Supprimer"
+                           CancelText="Annuler"
+                           OnConfirm="ConfirmDelete"
+                           OnCancel="CloseDeleteModal">
+            <p>Supprimer <strong>@Event.Name</strong> ?</p>
+            <p class="text-danger">Cette action est irréversible.</p>
+        </ConfirmationModal>
+    }
+</div>
