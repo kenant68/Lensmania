@@ -46,6 +46,48 @@ public class FileStorageService : IFileStorageService
         return fileName;
     }
     
+    public async Task<string> UploadBadgeAsync(IFormFile file)
+    {
+        if (file is null || file.Length == 0)
+            throw new ArgumentException("Aucun fichier sélectionné ou fichier vide.");
+
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".svg" };
+
+        if (!allowedExtensions.Contains(ext))
+            throw new ArgumentException("Format non autorisé. Utilisez JPG, PNG, WebP ou SVG.");
+
+        if (file.Length > 2 * 1024 * 1024)
+            throw new ArgumentException("Fichier trop volumineux (max 2 Mo).");
+
+        if (ext == ".svg")
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
+            var content = await reader.ReadToEndAsync();
+            if (!content.TrimStart().StartsWith("<svg", StringComparison.OrdinalIgnoreCase)
+                && !content.TrimStart().StartsWith("<?xml", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Contenu SVG invalide.");
+        }
+        else
+        {
+            using var binaryReader = new BinaryReader(file.OpenReadStream());
+            var magicBytes = binaryReader.ReadBytes(4);
+            if (!IsValidImage(magicBytes))
+                throw new ArgumentException("Contenu du fichier invalide.");
+        }
+
+        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "badges");
+        Directory.CreateDirectory(uploadsFolder);
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var fullPath = Path.Combine(uploadsFolder, fileName);
+
+        using var stream = new FileStream(fullPath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return $"uploads/badges/{fileName}";
+    }
+
     private bool IsValidImage(byte[] bytes)
     {
         if (bytes == null || bytes.Length < 4)
