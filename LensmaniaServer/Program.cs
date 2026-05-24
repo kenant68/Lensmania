@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -53,8 +54,41 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+        o.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userService = context.HttpContext.RequestServices
+                    .GetRequiredService<IUserService>();
+                var userIdClaim = context.Principal?
+                    .FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim is null)
+                {
+                    context.Fail("Invalid token");
+                    return;
+                }
+
+                if (!int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    context.Fail("Invalid token");
+                    return;
+                }
+                
+                var isActive = await userService.IsActiveAsync(userId);
+
+                if (!isActive)
+                {
+                    context.Fail("User is blocked");
+                }
+            }
+        };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("isAdmin", "true"));
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(

@@ -8,7 +8,8 @@ public enum AuthApiErrorType
     ValidationFailed,
     NetworkFailure,
     UnexpectedServerError,
-    InvalidOrExpiredResetToken
+    InvalidOrExpiredResetToken,
+    BlockedUser
 }
 
 public sealed record AuthApiError(AuthApiErrorType Type, string Message, string? Code = null);

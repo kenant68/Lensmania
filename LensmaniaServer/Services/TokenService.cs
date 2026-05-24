@@ -34,8 +34,9 @@ public class TokenService {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("isAdmin", user.IsAdmin.ToString()),
-            new Claim("isPremium", user.IsPremium.ToString())
+            new Claim("isAdmin", user.IsAdmin.ToString().ToLower()),
+            new Claim("isPremium", user.IsPremium.ToString().ToLower()),
+            new Claim("isActive", user.IsActive.ToString().ToLower())
         };
         var token = new JwtSecurityToken(
             issuer: _cfg["Jwt:Issuer"],

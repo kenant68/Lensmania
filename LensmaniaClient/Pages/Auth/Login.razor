@@ -56,8 +56,22 @@
     protected override async Task OnInitializedAsync()
     {
         var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        
         if (state.User.Identity?.IsAuthenticated == true)
             Navigation.NavigateTo("/");
+        
+        
+        var provider = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
+        if (provider.LogoutReason == "blocked")
+        {
+            isError = true;
+            message = "Votre compte a été bloqué.";
+        }
+        else if (provider.LogoutReason == "unauthorized")
+        {
+            isError = true;
+            message = "Session expirée, veuillez vous reconnecter.";
+        }
     }
 
     private async Task SubmitAsync()
