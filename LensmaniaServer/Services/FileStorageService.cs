@@ -1,12 +1,52 @@
+using System.Text;
+using Ganss.Xss;
+
 namespace LensmaniaServer.Services;
 
 public class FileStorageService : IFileStorageService
 {
     private readonly IWebHostEnvironment _env;
 
+    private static readonly HtmlSanitizer SvgSanitizer = BuildSvgSanitizer();
+
     public FileStorageService(IWebHostEnvironment env)
     {
         _env = env;
+    }
+
+    private static HtmlSanitizer BuildSvgSanitizer()
+    {
+        var sanitizer = new HtmlSanitizer();
+
+        sanitizer.AllowedTags.Clear();
+        foreach (var tag in new[]
+        {
+            "svg", "g", "path", "rect", "circle", "ellipse", "line", "polyline",
+            "polygon", "text", "tspan", "defs", "lineargradient", "radialgradient",
+            "stop", "clippath", "mask", "pattern", "symbol", "use", "marker",
+            "title", "desc"
+        })
+            sanitizer.AllowedTags.Add(tag);
+
+        sanitizer.AllowedAttributes.Clear();
+        foreach (var attr in new[]
+        {
+            "id", "class", "style", "fill", "fill-opacity", "fill-rule", "stroke",
+            "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-dasharray",
+            "stroke-dashoffset", "stroke-opacity", "opacity", "d", "cx", "cy", "r",
+            "rx", "ry", "x", "y", "x1", "x2", "y1", "y2", "width", "height", "points",
+            "transform", "viewbox", "preserveaspectratio", "xmlns", "version",
+            "gradientunits", "gradienttransform", "spreadmethod", "fx", "fy", "offset",
+            "stop-color", "stop-opacity", "font-family", "font-size", "font-weight",
+            "text-anchor", "dominant-baseline", "clip-path", "mask", "patternunits",
+            "patterncontentunits", "markerwidth", "markerheight", "refx", "refy", "orient"
+        })
+            sanitizer.AllowedAttributes.Add(attr);
+
+        // No href/xlink:href and no URI schemes -> blocks external/javascript references.
+        sanitizer.AllowedSchemes.Clear();
+
+        return sanitizer;
     }
 
     public async Task<string> UploadPhotoAsync(IFormFile file)
@@ -60,12 +100,16 @@ public class FileStorageService : IFileStorageService
         if (file.Length > 2 * 1024 * 1024)
             throw new ArgumentException("Fichier trop volumineux (max 2 Mo).");
 
+        string? sanitizedSvg = null;
+
         if (ext == ".svg")
         {
             using var reader = new StreamReader(file.OpenReadStream());
             var content = await reader.ReadToEndAsync();
-            if (!content.TrimStart().StartsWith("<svg", StringComparison.OrdinalIgnoreCase)
-                && !content.TrimStart().StartsWith("<?xml", StringComparison.OrdinalIgnoreCase))
+
+            sanitizedSvg = SvgSanitizer.Sanitize(content);
+
+            if (sanitizedSvg.IndexOf("<svg", StringComparison.OrdinalIgnoreCase) < 0)
                 throw new ArgumentException("Contenu SVG invalide.");
         }
         else
@@ -82,8 +126,15 @@ public class FileStorageService : IFileStorageService
         var fileName = $"{Guid.NewGuid()}{ext}";
         var fullPath = Path.Combine(uploadsFolder, fileName);
 
-        using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
+        if (sanitizedSvg is not null)
+        {
+            await File.WriteAllTextAsync(fullPath, sanitizedSvg, Encoding.UTF8);
+        }
+        else
+        {
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+        }
 
         return $"uploads/badges/{fileName}";
     }
