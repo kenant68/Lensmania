@@ -10,6 +10,8 @@ namespace LensmaniaServer.Controllers;
 [Route("api/[controller]")]
 public class ThemesController : ControllerBase
 {
+    private const int MaxLimit = 100;
+
     private readonly IThemeService _themeService;
 
     public ThemesController(IThemeService themeService)
@@ -22,6 +24,12 @@ public class ThemesController : ControllerBase
         [FromQuery] int offset = 0,
         [FromQuery] int limit = 10)
     {
+        if (offset < 0)
+            return BadRequest(new { message = "offset doit être supérieur ou égal à 0." });
+
+        if (limit <= 0 || limit > MaxLimit)
+            return BadRequest(new { message = $"limit doit être compris entre 1 et {MaxLimit}." });
+
         var result = await _themeService.GetAllAsync(offset, limit);
         return Ok(result);
     }
