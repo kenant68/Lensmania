@@ -25,7 +25,6 @@ public class EventDetailPageBase : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         if (_loadedId == Id) return;
-        _loadedId = Id;
 
         IsLoading = true;
         ErrorMessage = null;
@@ -33,6 +32,7 @@ public class EventDetailPageBase : ComponentBase
         try
         {
             Event = await EventSvc.GetByIdAsync(Id);
+            _loadedId = Id;
             if (Event is null) ErrorMessage = "Événement introuvable.";
         }
         catch
