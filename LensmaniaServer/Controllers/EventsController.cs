@@ -37,7 +37,7 @@ public class EventsController : ControllerBase
 
     // GET api/events/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult<EventResponse>> GetById(int id)
+    public async Task<ActionResult<EventDetailedResponse>> GetById(int id)
     {
         var ev = await _eventService.GetByIdAsync(id);
 
@@ -49,7 +49,7 @@ public class EventsController : ControllerBase
     
     [Authorize(Policy = "AdminOnly")]
     [HttpPost]
-    public async Task<ActionResult<EventResponse>> Create([FromBody] CreateEventRequest request)
+    public async Task<ActionResult<EventDetailedResponse>> Create([FromBody] CreateEventRequest request)
     {
         try
         {
