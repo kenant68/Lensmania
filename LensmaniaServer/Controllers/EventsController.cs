@@ -10,8 +10,10 @@ namespace LensmaniaServer.Controllers;
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
 {
+    private const int MaxLimit = 100;
+
     private readonly IEventService _eventService;
-    
+
     public EventsController(IEventService eventService)
     {
         _eventService = eventService;
@@ -23,6 +25,12 @@ public class EventsController : ControllerBase
         [FromQuery] int offset = 0,
         [FromQuery] int limit  = 10)
     {
+        if (offset < 0)
+            return BadRequest(new { message = "offset doit être supérieur ou égal à 0." });
+
+        if (limit <= 0 || limit > MaxLimit)
+            return BadRequest(new { message = $"limit doit être compris entre 1 et {MaxLimit}." });
+
         var result = await _eventService.GetAllAsync(offset, limit);
         return Ok(result);
     }
