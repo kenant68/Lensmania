@@ -1,4 +1,5 @@
 using LensmaniaServer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LensmaniaServer.Database;
 
@@ -6,7 +7,7 @@ public class SeederTheme
 {
     public static async Task Seed(AppDbContext context)
     {
-        if (context.Themes.Any()) return;
+        if (await context.Themes.AnyAsync()) return;
 
         var themes = new List<Theme>
         {
