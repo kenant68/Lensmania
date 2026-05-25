@@ -85,8 +85,8 @@ public class EditEventPageBase : ComponentBase
             var request = new UpdateEventRequest(
                 _form.Name.Trim(),
                 _form.Description.Trim(),
-                _form.StartDate,
-                _form.EndDate,
+                DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
+                DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
                 _form.IsPremium,
                 _form.ThemeId,
                 _badges
