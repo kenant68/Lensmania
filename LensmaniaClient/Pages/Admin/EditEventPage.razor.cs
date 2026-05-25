@@ -38,8 +38,8 @@ public class EditEventPageBase : ComponentBase
             {
                 Name        = ev.Name,
                 Description = ev.Description,
-                StartDate   = ev.StartDate,
-                EndDate     = ev.EndDate,
+                StartDate   = ev.StartDate.Kind == DateTimeKind.Utc ? ev.StartDate.ToLocalTime() : ev.StartDate,
+                EndDate     = ev.EndDate.Kind == DateTimeKind.Utc ? ev.EndDate.ToLocalTime() : ev.EndDate,
                 IsPremium   = ev.IsPremium,
                 ThemeId     = ev.Theme.Id
             };
