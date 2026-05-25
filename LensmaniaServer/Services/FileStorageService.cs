@@ -71,7 +71,7 @@ public class FileStorageService : IFileStorageService
         else
         {
             using var binaryReader = new BinaryReader(file.OpenReadStream());
-            var magicBytes = binaryReader.ReadBytes(4);
+            var magicBytes = binaryReader.ReadBytes(12);
             if (!IsValidImage(magicBytes))
                 throw new ArgumentException("Contenu du fichier invalide.");
         }
@@ -98,7 +98,13 @@ public class FileStorageService : IFileStorageService
             return true;
         
         // PNG: 89 50 4E 47
-        if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) 
+        if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+            return true;
+
+        // WebP: "RIFF" (0-3) .... "WEBP" (8-11)
+        if (bytes.Length >= 12
+            && bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46
+            && bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50)
             return true;
 
         return false;
