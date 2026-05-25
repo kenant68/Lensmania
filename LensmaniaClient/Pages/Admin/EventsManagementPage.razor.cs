@@ -30,7 +30,7 @@ public class EventsManagementPageBase : ComponentBase
 
             if (PagedEvents is not null && PagedEvents.Total > 0 && CurrentOffset >= PagedEvents.Total)
             {
-                CurrentOffset = Math.Max(0, CurrentOffset - PageSize);
+                CurrentOffset = Math.Max(0, ((PagedEvents.Total - 1) / PageSize) * PageSize);
                 PagedEvents = await EventSvc.GetAllAsync(CurrentOffset, PageSize);
             }
         }
