@@ -47,13 +47,13 @@ public class EventService : IEventService
         };
     }
 
-    public async Task<EventDetailledResponse?> GetByIdAsync(int id)
+    public async Task<EventDetailedResponse?> GetByIdAsync(int id)
     {
         return await _db.Events
             .Include(e => e.Theme)
             .Include(e => e.Badges)
             .Where(e => e.Id == id)
-            .Select(e => new EventDetailledResponse(
+            .Select(e => new EventDetailedResponse(
                 e.Id,
                 e.Name,
                 e.Description,
@@ -66,7 +66,7 @@ public class EventService : IEventService
             .FirstOrDefaultAsync();
     }
     
-    public async Task<EventDetailledResponse> CreateAsync(CreateEventRequest request)
+    public async Task<EventDetailedResponse> CreateAsync(CreateEventRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
             throw new ArgumentException("Le nom de l'événement est obligatoire.");
@@ -111,7 +111,7 @@ public class EventService : IEventService
 
         await _db.Entry(ev).Reference(e => e.Theme).LoadAsync();
 
-        return new EventDetailledResponse(
+        return new EventDetailedResponse(
             ev.Id,
             ev.Name,
             ev.Description,
@@ -123,7 +123,7 @@ public class EventService : IEventService
         );
     }
     
-    public async Task<EventDetailledResponse?> UpdateAsync(int id, UpdateEventRequest request)
+    public async Task<EventDetailedResponse?> UpdateAsync(int id, UpdateEventRequest request)
     {
         var ev = await _db.Events
             .Include(e => e.Badges)
@@ -166,7 +166,7 @@ public class EventService : IEventService
         await _db.SaveChangesAsync();
         await _db.Entry(ev).Reference(e => e.Theme).LoadAsync();
 
-        return new EventDetailledResponse(
+        return new EventDetailedResponse(
             ev.Id,
             ev.Name,
             ev.Description,

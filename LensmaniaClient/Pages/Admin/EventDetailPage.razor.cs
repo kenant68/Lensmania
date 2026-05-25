@@ -15,7 +15,7 @@ public class EventDetailPageBase : ComponentBase
 
     [Parameter] public int Id { get; set; }
 
-    protected EventDetailledResponse? Event { get; private set; }
+    protected EventDetailedResponse? Event { get; private set; }
     protected bool IsLoading { get; private set; }
     protected string? ErrorMessage { get; private set; }
     protected bool ShowDeleteModal { get; private set; }

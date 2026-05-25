@@ -56,7 +56,7 @@ public class EventsController : ControllerBase
 
     [Authorize(Policy = "AdminOnly")]
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<EventDetailledResponse>> Update(int id, [FromBody] UpdateEventRequest request)
+    public async Task<ActionResult<EventDetailedResponse>> Update(int id, [FromBody] UpdateEventRequest request)
     {
         try
         {

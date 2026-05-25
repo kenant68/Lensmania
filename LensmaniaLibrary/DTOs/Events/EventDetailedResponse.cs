@@ -3,7 +3,7 @@ using LensmaniaLibrary.DTOs.Badges;
 
 namespace LensmaniaLibrary.DTOs.Events;
 
-public record EventDetailledResponse(
+public record EventDetailedResponse(
     int Id,
     string Name,
     string Description,
