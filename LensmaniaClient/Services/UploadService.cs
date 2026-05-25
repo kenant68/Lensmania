@@ -14,7 +14,7 @@ public class UploadService
     public async Task<string?> UploadBadgeAsync(IBrowserFile file)
     {
         using var content = new MultipartFormDataContent();
-        await using var stream = file.OpenReadStream(maxAllowedSize: 2_000_000);
+        await using var stream = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024);
 
         content.Add(new StreamContent(stream), "badge", file.Name);
 
