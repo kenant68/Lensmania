@@ -67,7 +67,10 @@ public class EditEventPageBase : ComponentBase
     }
 
     protected void UpdateBadge(int index, CreateBadgeRequest updated)
-        => _badges[index] = updated;
+    {
+        if (index >= 0 && index < _badges.Count)
+            _badges[index] = updated;
+    }
 
     protected async Task SubmitAsync()
     {
