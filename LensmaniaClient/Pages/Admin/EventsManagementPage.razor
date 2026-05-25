@@ -54,14 +54,15 @@
                             }
                         </td>
                         <td>
-                            <a href="/admin/events/@ev.Id" class="btn-icon" title="Voir">
+                            <a href="/admin/events/@ev.Id" class="btn-icon" title="Voir" aria-label="@($"Voir l'événement {ev.Name}")">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="/admin/events/@ev.Id/edit" class="btn-icon" title="Modifier">
+                            <a href="/admin/events/@ev.Id/edit" class="btn-icon" title="Modifier" aria-label="@($"Modifier l'événement {ev.Name}")">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button class="btn-icon btn-delete"
                                     title="Supprimer"
+                                    aria-label="@($"Supprimer l'événement {ev.Name}")"
                                     @onclick="() => OpenDeleteModal(ev)">
                                 <i class="bi bi-trash"></i>
                             </button>
