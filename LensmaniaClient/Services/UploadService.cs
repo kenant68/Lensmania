@@ -21,7 +21,11 @@ public class UploadService
         var response = await _http.PostAsync("api/uploads/badge", content);
 
         if (!response.IsSuccessStatusCode)
-            return null;
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                string.IsNullOrWhiteSpace(error) ? response.ReasonPhrase : error);
+        }
 
         return await response.Content.ReadAsStringAsync();
     }
