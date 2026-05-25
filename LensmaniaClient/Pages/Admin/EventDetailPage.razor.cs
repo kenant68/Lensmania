@@ -20,9 +20,16 @@ public class EventDetailPageBase : ComponentBase
     protected string? ErrorMessage { get; private set; }
     protected bool ShowDeleteModal { get; private set; }
 
-    protected override async Task OnInitializedAsync()
+    private int? _loadedId;
+
+    protected override async Task OnParametersSetAsync()
     {
+        if (_loadedId == Id) return;
+        _loadedId = Id;
+
         IsLoading = true;
+        ErrorMessage = null;
+        Event = null;
         try
         {
             Event = await EventSvc.GetByIdAsync(Id);
