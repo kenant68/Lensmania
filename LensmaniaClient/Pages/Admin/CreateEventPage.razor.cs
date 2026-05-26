@@ -29,7 +29,12 @@ public class CreateEventPageBase : ComponentBase
         var state = await AuthStateProvider.GetAuthenticationStateAsync();
         var claim = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                  ?? state.User.FindFirst("sub");
-        _currentUserId = int.TryParse(claim?.Value, out var uid) ? uid : 0;
+        if (claim is null || !int.TryParse(claim.Value, out var uid))
+        {
+            _errorMessage = "Session expirée, veuillez vous reconnecter.";
+            return;
+        }
+        _currentUserId = uid;
     }
 
     protected void AddBadge()
@@ -52,6 +57,12 @@ public class CreateEventPageBase : ComponentBase
         _errorMessage = null;
         _createdEvent = null;
         _fieldErrors  = new();
+
+        if (_currentUserId == 0)
+        {
+            _errorMessage = "Session expirée, veuillez vous reconnecter.";
+            return;
+        }
 
         if (!Validate()) return;
 
