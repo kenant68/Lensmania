@@ -102,9 +102,10 @@ public class UserManagementPageBase : ComponentBase
             return;
         }
 
+        ApiErrorResponse? error = null;
         try
         {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+            error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
         }
         catch
         {
