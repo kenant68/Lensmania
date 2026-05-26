@@ -33,7 +33,7 @@ public class UserManagementPageBase : ComponentBase
 
             if (PagedUsers.Total > 0 && CurrentOffset >= PagedUsers.Total)
             {
-                CurrentOffset = Math.Max(0, CurrentOffset - PageSize);
+                CurrentOffset = Math.Max(0, ((PagedUsers.Total - 1) / PageSize) * PageSize);
                 PagedUsers = await UserService.GetAllAsync(CurrentOffset, PageSize);
             }
         }
