@@ -70,6 +70,8 @@ public class UserManagementPageBase : ComponentBase
     protected void OpenDeleteModal(UserAdminResponse user)
     {
         _selectedUserToDelete = user;
+        message = null;
+        isError = false;
         _showDeleteModal = true;
     }
 
@@ -77,6 +79,8 @@ public class UserManagementPageBase : ComponentBase
     {
         _selectedUserToDelete = null;
         _showDeleteModal = false;
+        message = null;
+        isError = false;
     }
 
     protected async Task ConfirmDeleteUser()
@@ -98,12 +102,16 @@ public class UserManagementPageBase : ComponentBase
             return;
         }
 
-        if (!response.IsSuccessStatusCode)
+        try
         {
             var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-
-            message = error?.Message ?? "Erreur lors de la suppression.";
-            isError = true;
         }
+        catch
+        {
+            // fallback to generic message when JSON parse fails
+        }
+
+        message = error?.Message ?? "Erreur lors de la suppression.";
+        isError = true;
     }
 }
