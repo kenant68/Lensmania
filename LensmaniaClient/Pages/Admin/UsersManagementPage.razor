@@ -34,8 +34,9 @@
                         <td>@user.Email</td>
                         <td>@(user.IsAdmin ? "Admin" : user.IsPremium ? "Premium" : "")</td>
                         <td>
-                            <button class="btn-icon btn-ban @(!user.IsActive ? "banned" : "")"
-                                    title="@(!user.IsActive ? "Débannir" : "Bannir")"
+                            <button class="btn-icon btn-ban @(!user.IsActive ? "blocked" : "")"
+                                    title="@(!user.IsActive ? "Débloquer" : "Bloquer")"
+									aria-label="@(!user.IsActive ? "Débloquer l'utilisateur" : "Bloquer l'utilisateur")"
                                     @onclick="() => OnToggleBlock(user)">
                                 <i class="bi @(user.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
                             </button>
@@ -43,6 +44,7 @@
                         <td>
                             <button class="btn-icon btn-delete"
                                     title="Supprimer"
+									aria-label="Supprimer l'utilisateur"
                                     @onclick="() => OpenDeleteModal(user)">
                                 <i class="bi bi-trash"></i>
                             </button>
