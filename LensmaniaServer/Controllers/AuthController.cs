@@ -1,6 +1,7 @@
 using LensmaniaServer.Models;
 using LensmaniaServer.Services;
 using LensmaniaServer.Database;
+using LensmaniaLibrary.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,13 +19,11 @@ public class AuthController : ControllerBase {
 
     private readonly AuthService _auth;
     private readonly PasswordResetService _passwordReset;
-    private readonly AppDbContext _db;
 
-    public AuthController(AuthService auth, PasswordResetService passwordReset, AppDbContext db)
+    public AuthController(AuthService auth, PasswordResetService passwordReset)
     {
         _auth = auth;
         _passwordReset = passwordReset;
-        _db = db;
     }
 
     [HttpPost("register")]
@@ -47,23 +46,26 @@ public class AuthController : ControllerBase {
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest req) {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
-
-        if (user != null && !user.IsActive)
+    public async Task<IActionResult> Login(LoginRequest req) 
+    {
+        var (status, response) = await _auth.Login(req);
+        
+        return status switch
         {
-            return StatusCode(403, new ApiErrorResponse(
-                AuthErrorCodes.UserIsBlocked, 
-                "Votre compte a été bloqué"));
-        }
-        
-        var result = await _auth.Login(req);
-        
-        return result is null
-            ? Unauthorized(new ApiErrorResponse(
+            LoginStatus.Success => Ok(response),
+            
+            LoginStatus.Blocked => StatusCode(403, new ApiErrorResponse(
+                AuthErrorCodes.UserIsBlocked,
+                "Votre compte a été bloqué")),
+            
+            LoginStatus.InvalidCredentials => Unauthorized(new ApiErrorResponse(
                 AuthErrorCodes.InvalidCredentials,
-                "E-mail ou mot de passe incorrect."))
-            : Ok(result);
+                "E-mail ou mot de passe incorrect.")),
+            
+            _ => StatusCode(500, new ApiErrorResponse(
+                "unknown_login_status",
+                "État de login inconnu"))
+        };
     }
 
     [HttpPost("forgot-password")]
