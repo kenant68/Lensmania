@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LensmaniaLibrary.DTOs.Users;
+using LensmaniaLibrary.DTOs;
 using LensmaniaServer.Services;
 using LensmaniaServer.Exceptions;
 
@@ -117,7 +118,7 @@ public class UserController : ControllerBase {
 		}
         catch (BusinessException e)
         {
-			return Conflict(new { message = e.Message });
+			return Conflict(new ApiErrorResponse("business_rule_violation", e.Message));
         }
     }
 }
