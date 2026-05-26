@@ -26,7 +26,7 @@
             <tbody>
                 @foreach (var user in PagedUsers.Users)
                 {
-                    <tr class="@(!user.IsActive ? "row-banned" : "")">
+                    <tr class="@(!user.IsActive ? "row-blocked" : "")">
                         <td>
                             <div class="user-avatar-placeholder"></div>
                         </td>

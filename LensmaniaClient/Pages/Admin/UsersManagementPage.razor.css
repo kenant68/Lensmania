@@ -61,7 +61,7 @@
     background-color: var(--color-light-purple);
 }
 
-.row-banned td {
+.row-blocked td {
     opacity: 0.5;
 }
 
