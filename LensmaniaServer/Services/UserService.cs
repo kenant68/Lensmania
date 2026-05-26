@@ -2,6 +2,7 @@
 using LensmaniaServer.Models;
 using LensmaniaLibrary.DTOs.Users;
 using LensmaniaServer.Database;
+using LensmaniaServer.Exceptions;
 
 namespace LensmaniaServer.Services;
 
@@ -99,7 +100,7 @@ public class UserService : IUserService
             return false;
 
         if (user.IsAdmin)
-            throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer un administrateur.");
+            throw new BusinessException("Vous n'êtes pas autorisé à supprimer un administrateur.");
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();

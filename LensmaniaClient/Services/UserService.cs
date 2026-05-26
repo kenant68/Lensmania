@@ -27,9 +27,8 @@ public class UserService
 		response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteUserAsync(int userId)
+    public async Task<HttpResponseMessage> DeleteUserAsync(int userId)
 	{
-    	var response = await _http.DeleteAsync($"api/user/{userId}");
-		response.EnsureSuccessStatusCode();
+    	return await _http.DeleteAsync($"api/user/{userId}");
 	}
 }

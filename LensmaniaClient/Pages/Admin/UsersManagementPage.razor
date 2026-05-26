@@ -36,7 +36,7 @@
                         <td>
                             <button class="btn-icon btn-ban @(!user.IsActive ? "banned" : "")"
                                     title="@(!user.IsActive ? "Débannir" : "Bannir")"
-                                    @onclick="() => OnToggleBan(user)">
+                                    @onclick="() => OnToggleBlock(user)">
                                 <i class="bi @(user.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
                             </button>
                         </td>
@@ -74,6 +74,13 @@
             <p> Vous êtes sur le point de supprimer : <strong>@_selectedUserToDelete?.Username</strong> </p>
             <p> <span class="text-muted">@_selectedUserToDelete?.Email</span> </p>
             <p class="text-danger"> Cette action est irréversible. </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="alert @("alert--error")" role="alert">
+                @message
+            </div>
+        }
         </ConfirmationModal>
     }
 </section>

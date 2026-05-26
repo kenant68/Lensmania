@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LensmaniaLibrary.DTOs.Users;
 using LensmaniaServer.Services;
+using LensmaniaServer.Exceptions;
 
 namespace LensmaniaServer.Controllers;
 
@@ -114,9 +115,9 @@ public class UserController : ControllerBase {
         
         	return NoContent();
 		}
-        catch (UnauthorizedAccessException e)
+        catch (BusinessException e)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new { message = e.Message });
+			return Conflict(new { message = e.Message });
         }
     }
 }
