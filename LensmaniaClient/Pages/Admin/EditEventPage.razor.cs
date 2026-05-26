@@ -21,9 +21,14 @@ public class EditEventPageBase : ComponentBase
     protected bool _isSubmitting;
     protected string? _errorMessage;
     protected Dictionary<string, string> _fieldErrors = new();
+    private int? _previousId;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        if (_previousId == Id) return;
+        _previousId = Id;
+
+        _errorMessage = null;
         _isLoading = true;
         try
         {
