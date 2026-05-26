@@ -79,7 +79,7 @@
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <div class="alert @("alert--error")" role="alert">
+            <div class="alert @(isError ? "alert--error" : "alert--success")" role="alert">
                 @message
             </div>
         }

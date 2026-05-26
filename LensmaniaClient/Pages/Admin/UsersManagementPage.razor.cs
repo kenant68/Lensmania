@@ -96,11 +96,14 @@ public class UserManagementPageBase : ComponentBase
 
             await LoadAsync();
             return;
-        } 
-        
-        var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+        }
 
-        message = error?.Message ?? "Erreur lors de la suppression.";
-        isError = true;
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+
+            message = error?.Message ?? "Erreur lors de la suppression.";
+            isError = true;
+        }
     }
 }
