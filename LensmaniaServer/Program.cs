@@ -40,6 +40,8 @@ builder.Services.AddOptions<PasswordResetOptions>()
     .ValidateOnStart();
 builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
 builder.Services.AddScoped<PasswordResetService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IThemeService, ThemeService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -126,6 +128,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await SeederTheme.Seed(context);
     await SeederPost.Seed(context);
 }
 
