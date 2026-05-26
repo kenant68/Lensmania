@@ -13,7 +13,7 @@ public class EventService
         _http = http;
     }
 
-    public async Task<PaginatedEvents?> GetAllAsync(int offset = 0, int limit = 20)
+    public async Task<PaginatedEvents?> GetAllAsync(int offset = 0, int limit = 10)
     {
         return await _http.GetFromJsonAsync<PaginatedEvents>(
             $"api/events?offset={offset}&limit={limit}");
