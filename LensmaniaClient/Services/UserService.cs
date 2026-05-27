@@ -13,6 +13,13 @@ public class UserService
         _http = http;
     }
 
+	public async Task<PublicUserProfileResponse?> GetByUsernameAsync(string username)
+    {
+        var url = $"api/user/{username}";
+
+        return await _http.GetFromJsonAsync<PublicUserProfileResponse?>(url);
+    }
+
     public async Task<PaginatedUsers> GetAllAsync(int offset = 0, int limit = 10)
     {
         var url = $"api/user?offset={offset}&limit={limit}";
@@ -32,4 +39,20 @@ public class UserService
     	var response = await _http.DeleteAsync($"api/user/{userId}");
 		response.EnsureSuccessStatusCode();
 	}
+
+    public async Task DeleteMeAsync()
+	{
+    	var response = await _http.DeleteAsync($"api/user/me");
+		response.EnsureSuccessStatusCode();
+	}
+
+    public async Task<UserResponse?> UpdateMeAsync(UpdateUserRequest request)
+    {
+        var response = await _http.PutAsJsonAsync("api/user/me", request);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<UserResponse>();
+    }
 }
