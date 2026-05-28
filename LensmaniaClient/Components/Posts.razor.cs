@@ -314,6 +314,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             var newIsLiked = !post.IsLikedByCurrentUser;
             var newCount = newIsLiked ? post.LikesCount + 1 : Math.Max(0, post.LikesCount - 1);
             _posts[index] = post with { IsLikedByCurrentUser = newIsLiked, LikesCount = newCount };
+            if (EventId.HasValue)
+                _posts.Sort((a, b) => b.LikesCount.CompareTo(a.LikesCount));
             StateHasChanged();
 
             var success = await _postService.ToggleLikeAsync(post.Id);
@@ -323,6 +325,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
                 if (currentIndex >= 0)
                 {
                     _posts[currentIndex] = post;
+                    if (EventId.HasValue)
+                        _posts.Sort((a, b) => b.LikesCount.CompareTo(a.LikesCount));
                     StateHasChanged();
                 }
             }
