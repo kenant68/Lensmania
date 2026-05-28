@@ -16,14 +16,27 @@ public class EventService : IEventService
         _db = db;
     }
 
-    public async Task<PaginatedEvents> GetAllAsync(int offset, int limit)
+    public async Task<PaginatedEvents> GetAllAsync(int offset, int limit, string? status = null)
     {
-        var total = await _db.Events.CountAsync();
-
-        var events = await _db.Events
+        var query = _db.Events
             .Include(e => e.Theme)
             .Include(e => e.Badges)
-            .OrderByDescending(e => e.StartDate)
+            .Include(e => e.CoverPhoto)
+            .AsQueryable();
+
+        var now = DateTime.UtcNow;
+        if (status == "active")
+            query = query.Where(e => e.StartDate <= now && e.EndDate >= now);
+        else if (status == "past")
+            query = query.Where(e => e.EndDate < now);
+
+        var total = await query.CountAsync();
+
+        query = status == "past"
+            ? query.OrderByDescending(e => e.EndDate)
+            : query.OrderByDescending(e => e.StartDate);
+
+        var events = await query
             .Skip(offset)
             .Take(limit)
             .Select(e => new EventResponse(
@@ -34,7 +47,8 @@ public class EventService : IEventService
                 e.IsPremium,
                 e.Theme.Name,
                 e.Theme.Icon,
-                e.Badges.Count
+                e.Badges.Count,
+                e.CoverPhoto != null ? e.CoverPhoto.PhotoUrl : null
             ))
             .ToListAsync();
 
@@ -52,6 +66,7 @@ public class EventService : IEventService
         return await _db.Events
             .Include(e => e.Theme)
             .Include(e => e.Badges)
+            .Include(e => e.CoverPhoto)
             .Where(e => e.Id == id)
             .Select(e => new EventDetailedResponse(
                 e.Id,
@@ -61,7 +76,8 @@ public class EventService : IEventService
                 e.EndDate,
                 e.IsPremium,
                 new ThemeResponse(e.Theme.Id, e.Theme.Name, e.Theme.Icon),
-                e.Badges.Select(b => new BadgeResponse(b.Id, b.Name, b.ImageUrl)).ToList()
+                e.Badges.Select(b => new BadgeResponse(b.Id, b.Name, b.ImageUrl)).ToList(),
+                e.CoverPhoto != null ? e.CoverPhoto.PhotoUrl : null
             ))
             .FirstOrDefaultAsync();
     }
@@ -186,5 +202,37 @@ public class EventService : IEventService
         _db.Events.Remove(ev);
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<EventDetailedResponse?> SetCoverPhotoAsync(int eventId, int postId)
+    {
+        var ev = await _db.Events
+            .Include(e => e.Badges)
+            .Include(e => e.Theme)
+            .FirstOrDefaultAsync(e => e.Id == eventId);
+
+        if (ev is null) return null;
+
+        var post = await _db.Posts
+            .FirstOrDefaultAsync(p => p.Id == postId && p.EventId == eventId);
+
+        if (post is null) return null;
+
+        ev.CoverPhotoPostId = postId;
+        await _db.SaveChangesAsync();
+
+        await _db.Entry(ev).Reference(e => e.CoverPhoto).LoadAsync();
+
+        return new EventDetailedResponse(
+            ev.Id,
+            ev.Name,
+            ev.Description,
+            ev.StartDate,
+            ev.EndDate,
+            ev.IsPremium,
+            new ThemeResponse(ev.Theme.Id, ev.Theme.Name, ev.Theme.Icon),
+            ev.Badges.Select(b => new BadgeResponse(b.Id, b.Name, b.ImageUrl)).ToList(),
+            ev.CoverPhoto?.PhotoUrl
+        );
     }
 }
