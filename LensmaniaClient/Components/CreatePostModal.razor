@@ -39,6 +39,7 @@
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
+    [Parameter] public int? EventId { get; set; }
 
     [Inject] private PostService PostService { get; set; } = default!;
 
@@ -90,7 +91,8 @@
             {
                 Title = title,
                 Description = description,
-                PhotoUrl = photoUrl
+                PhotoUrl = photoUrl,
+                EventId = EventId
             });
 
             if (createdPost is null)

@@ -11,5 +11,6 @@ public record EventDetailedResponse(
     DateTime EndDate,
     bool IsPremium,
     ThemeResponse Theme,
-    List<BadgeResponse> Badges
+    List<BadgeResponse> Badges,
+    string? CoverPhotoUrl = null
 );

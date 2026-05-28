@@ -69,4 +69,10 @@ public class PostService
         var response = await _http.PostAsync($"api/posts/{postId}/likes", null);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<PaginatedPosts?> GetByEventAsync(int eventId, int limit = 10)
+    {
+        return await _http.GetFromJsonAsync<PaginatedPosts?>(
+            $"api/posts?eventId={eventId}&sort=likes_desc&limit={limit}");
+    }
 }

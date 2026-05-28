@@ -19,11 +19,12 @@ public class EventsController : ControllerBase
         _eventService = eventService;
     }
 
-    // GET api/events?offset=0&limit=10
+    // GET api/events?offset=0&limit=10&status=active
     [HttpGet]
     public async Task<ActionResult<PaginatedEvents>> GetAll(
         [FromQuery] int offset = 0,
-        [FromQuery] int limit  = 10)
+        [FromQuery] int limit  = 10,
+        [FromQuery] string? status = null)
     {
         if (offset < 0)
             return BadRequest(new { message = "offset doit être supérieur ou égal à 0." });
@@ -31,7 +32,15 @@ public class EventsController : ControllerBase
         if (limit <= 0 || limit > MaxLimit)
             return BadRequest(new { message = $"limit doit être compris entre 1 et {MaxLimit}." });
 
-        var result = await _eventService.GetAllAsync(offset, limit);
+        string? normalizedStatus = null;
+        if (status is not null)
+        {
+            normalizedStatus = status.Trim().ToLowerInvariant();
+            if (normalizedStatus is not "active" and not "past")
+                return BadRequest(new { message = "status doit être 'active' ou 'past'." });
+        }
+
+        var result = await _eventService.GetAllAsync(offset, limit, normalizedStatus);
         return Ok(result);
     }
 
@@ -46,7 +55,7 @@ public class EventsController : ControllerBase
 
         return Ok(ev);
     }
-    
+
     [Authorize(Policy = "AdminOnly")]
     [HttpPost]
     public async Task<ActionResult<EventDetailedResponse>> Create([FromBody] CreateEventRequest request)
@@ -83,10 +92,21 @@ public class EventsController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _eventService.DeleteAsync(id);
-        
-        if (!deleted) 
+
+        if (!deleted)
             return NotFound();
-        
+
         return NoContent();
+    }
+
+    // PUT api/events/{id}/cover
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPut("{id:int}/cover")]
+    public async Task<ActionResult<EventDetailedResponse>> SetCoverPhoto(int id, [FromBody] SetCoverPhotoRequest request)
+    {
+        var ev = await _eventService.SetCoverPhotoAsync(id, request.PostId);
+        if (ev is null)
+            return NotFound(new { message = "Événement introuvable ou le post n'appartient pas à cet événement." });
+        return Ok(ev);
     }
 }

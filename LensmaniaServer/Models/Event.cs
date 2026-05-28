@@ -10,10 +10,12 @@ public class Event
     public bool IsPremium { get; set; } = false;
     public int ThemeId { get; set; }
     public int UserId { get; set; }
+    public int? CoverPhotoPostId { get; set; }
 
     public Theme Theme { get; set; } = null!;
     public User User { get; set; } = null!;
-    
+    public Post? CoverPhoto { get; set; }
+
     public List<Post> Posts { get; } = new();
     public List<Badge> Badges { get; } = new();
 }

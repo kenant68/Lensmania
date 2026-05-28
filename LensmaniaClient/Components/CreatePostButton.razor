@@ -14,6 +14,7 @@
     IsOpen="@isModalOpen"
     OnClose="CloseModal"
     OnPostCreated="HandlePostCreated"
+    EventId="@EventId"
 />
 
 @code {
@@ -26,6 +27,9 @@
     }
 
     void CloseModal() => isModalOpen = false;
+
+    [Parameter]
+    public int? EventId { get; set; }
 
     [Parameter]
     public EventCallback<PostListItemResponse> OnPostCreated { get; set; }

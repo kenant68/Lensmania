@@ -18,7 +18,7 @@
 {
     <AuthorizeView>
         <Authorized>
-            <CreatePostButton OnPostCreated="HandlePostCreated" />
+            <CreatePostButton OnPostCreated="HandlePostCreated" EventId="@EventId" />
         </Authorized>
         <NotAuthorized>
             <p class="text-center mb-4">Connectez-vous pour publier !</p>

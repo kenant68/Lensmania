@@ -8,5 +8,6 @@ public record EventResponse(
     bool IsPremium,
     string ThemeName,
     string? ThemeIcon,
-    int BadgeCount
+    int BadgeCount,
+    string? CoverPhotoUrl = null
 );

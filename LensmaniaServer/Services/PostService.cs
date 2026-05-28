@@ -20,12 +20,15 @@ public class PostService : IPostService
 		_env = env;
 	}
     
-    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc, int? offset = null)
+    public async Task<PaginatedPosts> GetAllAsync(int? userId, int? cursor, int limit, int? currentUserId = null, PostSortOrder sortOrder = PostSortOrder.DateDesc, int? offset = null, int? eventId = null)
     {
         var query = _db.Posts.AsQueryable();
 
         if (userId.HasValue)
             query = query.Where(p => p.UserId == userId.Value);
+
+        if (eventId.HasValue)
+            query = query.Where(p => p.EventId == eventId.Value);
 
         if (cursor.HasValue && sortOrder is PostSortOrder.DateDesc or PostSortOrder.DateAsc)
         {
@@ -121,14 +124,22 @@ public class PostService : IPostService
         // Verify the file was actually uploaded
         if (!File.Exists(fullPath))
             throw new ArgumentException("The referenced photo does not exist on the server");
-        
+
+        if (request.EventId.HasValue)
+        {
+            var eventExists = await _db.Events.AnyAsync(e => e.Id == request.EventId.Value);
+            if (!eventExists)
+                throw new ArgumentException($"L'événement #{request.EventId.Value} n'existe pas.");
+        }
+
         var post = new Post
         {
             Title = request.Title,
             PhotoUrl = request.PhotoUrl,
             Description = request.Description,
             CreatedAt = DateTime.UtcNow,
-            UserId = userId
+            UserId = userId,
+            EventId = request.EventId
         };
 
         _db.Posts.Add(post);

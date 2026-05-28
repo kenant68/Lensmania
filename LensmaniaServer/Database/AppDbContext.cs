@@ -125,6 +125,12 @@ public class AppDbContext : DbContext {
 		        .WithOne(b => b.Event)
 		        .HasForeignKey(b => b.EventId)
 		        .OnDelete(DeleteBehavior.Cascade);
+
+	        entity.HasOne(e => e.CoverPhoto)
+		        .WithMany()
+		        .HasForeignKey(e => e.CoverPhotoPostId)
+		        .IsRequired(false)
+		        .OnDelete(DeleteBehavior.SetNull);
         });
         
         modelBuilder.Entity<Badge>(entity =>
