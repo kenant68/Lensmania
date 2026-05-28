@@ -32,7 +32,15 @@ public class EventsController : ControllerBase
         if (limit <= 0 || limit > MaxLimit)
             return BadRequest(new { message = $"limit doit être compris entre 1 et {MaxLimit}." });
 
-        var result = await _eventService.GetAllAsync(offset, limit, status);
+        string? normalizedStatus = null;
+        if (status is not null)
+        {
+            normalizedStatus = status.Trim().ToLowerInvariant();
+            if (normalizedStatus is not "active" and not "past")
+                return BadRequest(new { message = "status doit être 'active' ou 'past'." });
+        }
+
+        var result = await _eventService.GetAllAsync(offset, limit, normalizedStatus);
         return Ok(result);
     }
 
