@@ -39,7 +39,6 @@ public class EventDetailPageBase : ComponentBase
         try
         {
             Event = await EventSvc.GetByIdAsync(Id);
-            _loadedId = Id;
 
             if (Event is null)
             {
@@ -49,6 +48,7 @@ public class EventDetailPageBase : ComponentBase
 
             var posts = await PostSvc.GetByEventAsync(Id);
             EventPosts = posts?.Posts ?? [];
+            _loadedId = Id;
         }
         catch
         {
@@ -80,6 +80,7 @@ public class EventDetailPageBase : ComponentBase
     protected async Task SetCoverPhoto(int postId)
     {
         IsSettingCover = true;
+        ErrorMessage = null;
         try
         {
             var updated = await EventSvc.SetCoverPhotoAsync(Id, postId);
