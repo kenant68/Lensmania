@@ -28,7 +28,8 @@ public class PostsController : ControllerBase
         [FromQuery] int? cursor = null,
         [FromQuery] int limit = 10,
         [FromQuery] string sort = "date_desc",
-        [FromQuery] int? offset = null)
+        [FromQuery] int? offset = null,
+        [FromQuery] int? eventId = null)
     {
         if (userId.HasValue && userId.Value <= 0)
             return BadRequest("`userId` must be a positive integer.");
@@ -53,7 +54,7 @@ public class PostsController : ControllerBase
             _            => PostSortOrder.DateDesc,
         };
 
-        var result = await _postService.GetAllAsync(userId, cursor, limit, currentUserId, sortOrder, offset);
+        var result = await _postService.GetAllAsync(userId, cursor, limit, currentUserId, sortOrder, offset, eventId);
         return Ok(result);
     }
 
