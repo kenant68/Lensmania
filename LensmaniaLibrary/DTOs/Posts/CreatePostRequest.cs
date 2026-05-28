@@ -7,9 +7,11 @@ public class CreatePostRequest
     [MaxLength(150)]
     public string? Title { get; set; }
 
-    [Required] 
+    [Required]
     public string PhotoUrl { get; set; } = string.Empty;
-    
+
     [MaxLength(300)]
     public string? Description { get; set; }
+
+    public int? EventId { get; set; }
 }
