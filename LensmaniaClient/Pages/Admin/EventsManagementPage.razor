@@ -1,0 +1,97 @@
+@page "/admin/events"
+@inherits EventsManagementPageBase
+@using LensmaniaLibrary.DTOs.Events
+@using LensmaniaClient.Components.Utils
+
+<h1 class="page-title py-4">Gestion des événements</h1>
+
+@if (_errorMessage is not null)
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>@_errorMessage</span>
+    </div>
+}
+
+<div class="d-flex justify-content-end mb-3" style="padding: 0 3rem;">
+    <a href="/admin/events/create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Nouvel événement
+    </a>
+</div>
+
+<section class="admin-events-section">
+    @if (IsLoading)
+    {
+        <p class="loading-text">Chargement…</p>
+    }
+    else if (PagedEvents is not null)
+    {
+        <table class="events-table">
+            <thead>
+                <tr>
+                    <th>NOM</th>
+                    <th>THÈME</th>
+                    <th>DÉBUT</th>
+                    <th>FIN</th>
+                    <th>BADGES</th>
+                    <th>PREMIUM</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in PagedEvents.Events)
+                {
+                    <tr>
+                        <td><strong>@ev.Name</strong></td>
+                        <td>@(ev.ThemeIcon is not null ? ev.ThemeIcon + " " : "")@ev.ThemeName</td>
+                        <td>@ev.StartDate.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td>@ev.EndDate.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td>@ev.BadgeCount</td>
+                        <td>
+                            @if (ev.IsPremium)
+                            {
+                                <i class="bi bi-star-fill text-warning" title="Premium"></i>
+                            }
+                        </td>
+                        <td>
+                            <a href="/admin/events/@ev.Id" class="btn-icon" title="Voir" aria-label="@($"Voir l'événement {ev.Name}")">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/admin/events/@ev.Id/edit" class="btn-icon" title="Modifier" aria-label="@($"Modifier l'événement {ev.Name}")">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn-icon btn-delete"
+                                    title="Supprimer"
+                                    aria-label="@($"Supprimer l'événement {ev.Name}")"
+                                    @onclick="() => OpenDeleteModal(ev)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span class="pagination-info">
+                @{
+                    var start = PagedEvents.Total == 0 ? 0 : Math.Min(CurrentOffset + 1, PagedEvents.Total);
+                    var end = Math.Min(CurrentOffset + PageSize, PagedEvents.Total);
+                }
+                @start à @end sur @PagedEvents.Total
+            </span>
+            <button class="btn-page" disabled="@(CurrentOffset == 0)" @onclick="PreviousPage">‹</button>
+            <button class="btn-page" disabled="@(!HasNextPage)" @onclick="NextPage">›</button>
+        </div>
+
+        <ConfirmationModal IsVisible="_showDeleteModal"
+                           Title="Supprimer l'événement"
+                           ConfirmText="Supprimer"
+                           CancelText="Annuler"
+                           OnConfirm="ConfirmDelete"
+                           OnCancel="CloseDeleteModal">
+            <p>Vous êtes sur le point de supprimer : <strong>@_selectedToDelete?.Name</strong></p>
+            <p class="text-danger">Cette action est irréversible.</p>
+        </ConfirmationModal>
+    }
+</section>
