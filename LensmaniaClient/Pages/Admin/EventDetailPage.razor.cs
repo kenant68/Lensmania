@@ -46,7 +46,7 @@ public class EventDetailPageBase : ComponentBase
                 return;
             }
 
-            var posts = await PostSvc.GetByEventAsync(Id);
+            var posts = await PostSvc.GetByEventAsync(Id, limit: 100);
             EventPosts = posts?.Posts ?? [];
             _loadedId = Id;
         }
