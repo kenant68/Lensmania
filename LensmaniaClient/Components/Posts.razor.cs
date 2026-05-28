@@ -24,6 +24,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Parameter] public bool IsOwnProfile { get; set; } = false;
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
     [Parameter] public bool ShowSortToggle { get; set; } = false;
+    [Parameter] public int? EventId { get; set; }
 
     private PostSortOrder _sortOrder = PostSortOrder.DateDesc;
     private int _offset = 0;
@@ -103,7 +104,7 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             _hasError = false;
             StateHasChanged();
 
-            var isLikesSort = _sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc;
+            var isLikesSort = _sortOrder is PostSortOrder.LikesDesc or PostSortOrder.LikesAsc || EventId.HasValue;
             var sortParam = _sortOrder switch
             {
                 PostSortOrder.DateAsc   => "date_asc",
@@ -113,7 +114,13 @@ public partial class Posts : ComponentBase, IAsyncDisposable
             };
 
             string url;
-            if (!string.IsNullOrWhiteSpace(Username))
+            if (EventId.HasValue)
+            {
+                url = $"api/posts?eventId={EventId.Value}&sort=likes_desc&limit=10";
+                if (_offset > 0)
+                    url += $"&offset={_offset}";
+            }
+            else if (!string.IsNullOrWhiteSpace(Username))
             {
                 url = $"api/posts/{Uri.EscapeDataString(Username)}?limit=10&sort={sortParam}";
                 if (!isLikesSort && _cursor.HasValue)
