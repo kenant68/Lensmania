@@ -1,0 +1,110 @@
+@page "/events"
+@inherits EventsPageBase
+@using LensmaniaLibrary.DTOs.Events
+
+<div class="container py-5" style="max-width: 960px;">
+    <h1 class="text-center mb-4">Évènements</h1>
+
+    @if (IsLoading)
+    {
+        <p class="text-center">Chargement…</p>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+    else
+    {
+        <section class="mb-5">
+            <h2 class="text-center mb-4">En cours</h2>
+            @if (!ActiveEvents.Any())
+            {
+                <p class="text-center text-muted fst-italic">Aucun événement en cours.</p>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var ev in ActiveEvents)
+                    {
+                        <div class="col-md-4">
+                            <a href="/events/@ev.Id" class="text-decoration-none">
+                                <div class="card h-100 shadow-sm">
+                                    @if (!string.IsNullOrEmpty(ev.CoverPhotoUrl))
+                                    {
+                                        <img src="@($"{ApiBaseUrl}/uploads/photos/{ev.CoverPhotoUrl}")"
+                                             class="card-img-top"
+                                             style="height: 180px; object-fit: cover;"
+                                             alt="@ev.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                             style="height: 180px;">
+                                            <span style="font-size: 3rem;">@(ev.ThemeIcon ?? "📷")</span>
+                                        </div>
+                                    }
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">@ev.Name</h5>
+                                        <p class="card-text small text-muted">
+                                            Du @ev.StartDate.ToLocalTime().ToString("dd/MM/yyyy")
+                                            au @ev.EndDate.ToLocalTime().ToString("dd/MM/yyyy")
+                                        </p>
+                                        @if (!string.IsNullOrEmpty(ev.ThemeName))
+                                        {
+                                            <span class="badge" style="background: var(--color-lighter-purple); color: var(--color-dark-purple);">
+                                                @ev.ThemeIcon @ev.ThemeName
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section>
+            <h2 class="text-center mb-4">Passés</h2>
+            @if (!PastEvents.Any())
+            {
+                <p class="text-center text-muted fst-italic">Aucun événement passé.</p>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var ev in PastEvents)
+                    {
+                        <div class="col-md-4">
+                            <a href="/events/@ev.Id" class="text-decoration-none">
+                                <div class="card h-100 shadow-sm opacity-75">
+                                    @if (!string.IsNullOrEmpty(ev.CoverPhotoUrl))
+                                    {
+                                        <img src="@($"{ApiBaseUrl}/uploads/photos/{ev.CoverPhotoUrl}")"
+                                             class="card-img-top"
+                                             style="height: 180px; object-fit: cover; filter: grayscale(30%);"
+                                             alt="@ev.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                             style="height: 180px;">
+                                            <span style="font-size: 3rem; opacity: 0.5;">@(ev.ThemeIcon ?? "📷")</span>
+                                        </div>
+                                    }
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">@ev.Name</h5>
+                                        <p class="card-text small text-muted">
+                                            Du @ev.StartDate.ToLocalTime().ToString("dd/MM/yyyy")
+                                            au @ev.EndDate.ToLocalTime().ToString("dd/MM/yyyy")
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+</div>
