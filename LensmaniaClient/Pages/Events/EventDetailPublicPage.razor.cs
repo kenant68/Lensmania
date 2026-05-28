@@ -1,4 +1,4 @@
-// LensmaniaClient/Pages/Events/EventDetailPublicPage.razor.cs
+using LensmaniaClient.Components;
 using LensmaniaClient.Services;
 using LensmaniaLibrary.DTOs.Events;
 using LensmaniaLibrary.DTOs.Posts;
@@ -21,6 +21,7 @@ public class EventDetailPublicPageBase : ComponentBase
     protected string? ErrorMessage { get; private set; }
     protected bool ShowModal { get; private set; }
     protected bool IsActive { get; private set; }
+    protected Posts? PostsComponent { get; set; }
 
     private int? _loadedId;
 
@@ -60,8 +61,10 @@ public class EventDetailPublicPageBase : ComponentBase
     protected void OpenModal() => ShowModal = true;
     protected void CloseModal() => ShowModal = false;
 
-    protected void HandlePostCreated(PostListItemResponse post)
+    protected async Task HandlePostCreated(PostListItemResponse post)
     {
         CloseModal();
+        if (PostsComponent is not null)
+            await PostsComponent.ReloadAsync();
     }
 }

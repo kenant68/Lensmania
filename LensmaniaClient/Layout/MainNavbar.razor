@@ -28,9 +28,6 @@
                     <NavLink class="nav-link" href="events">Événements</NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="challenges">Challenges</NavLink>
-                </li>
-                <li class="nav-item">
 					<AuthorizeView>
 						<Authorized>
                     		<NavLink class="nav-link" href=@($"/profile/{Uri.EscapeDataString(GetDisplayName(context) ?? string.Empty)}")>Profil</NavLink>
