@@ -55,4 +55,27 @@ public class EventService
         var response = await _http.DeleteAsync($"api/events/{id}");
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task<PaginatedEvents?> GetActiveAsync()
+    {
+        return await _http.GetFromJsonAsync<PaginatedEvents>("api/events?status=active&limit=100");
+    }
+
+    public async Task<PaginatedEvents?> GetPastAsync(int limit = 3)
+    {
+        return await _http.GetFromJsonAsync<PaginatedEvents>($"api/events?status=past&limit={limit}");
+    }
+
+    public async Task<EventDetailedResponse> SetCoverPhotoAsync(int eventId, int postId)
+    {
+        var response = await _http.PutAsJsonAsync($"api/events/{eventId}/cover", new SetCoverPhotoRequest(postId));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
+            throw new Exception(error?.Message ?? "Une erreur est survenue.");
+        }
+
+        return (await response.Content.ReadFromJsonAsync<EventDetailedResponse>())!;
+    }
 }
