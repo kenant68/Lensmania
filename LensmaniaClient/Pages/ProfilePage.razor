@@ -7,14 +7,18 @@
 {
     <p>Chargement...</p>
 }
-
-@if (_userNotFound)
+else if (_hasError)
+{
+        <div class="alert alert-danger">
+			Une erreur est survenue lors du chargement du profil.
+		</div>
+}
+else if (_userNotFound)
 {
     <div class="alert alert-warning">
         Profil introuvable
     </div>
 }
-
 else
 {
     <div class="profile-page">
@@ -81,19 +85,22 @@ else
                OnConfirm="ConfirmEditProfile"
                OnCancel="CloseEditModal">
     
-            <EditForm Model="_editModel">
+            <EditForm Model="_editModel" OnValidSubmit="ConfirmEditProfile">
                 <DataAnnotationsValidator />
+				<ValidationSummary />
         
                 <div class="mb-3">
                     <label>Pseudo</label>
                     <InputText class="form-control"
                                @bind-Value="_editModel.Username" />
+					<ValidationMessage For="@(() => _editModel.Username)" />
                 </div>
         
                 <div class="mb-3">
                     <label>Email</label>
                     <InputText class="form-control"
                                @bind-Value="_editModel.Email" />
+					<ValidationMessage For="@(() => _editModel.Email)" />
                 </div>
             </EditForm>
     

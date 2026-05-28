@@ -6,7 +6,7 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title">@Title</h5>
-                    <button type="button" class="btn-close" @onclick="Cancel"></button>
+                    <button type="button" class="btn-close" aria-label="@CancelText" @onclick="Cancel"></button>
                 </div>
 
                 <div class="modal-body">
@@ -18,7 +18,7 @@
                         @CancelText
                     </button>
 
-                    <button type="button" class="btn btn-primary" @onclick="Confirm">
+                    <button type="submit" class="btn btn-primary" @onclick="Confirm">
                         @ConfirmText
                     </button>
                 </div>

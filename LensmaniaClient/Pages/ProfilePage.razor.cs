@@ -24,6 +24,7 @@ public class ProfilePageBase : ComponentBase
     protected bool _showActionsMenu;
     protected bool _isLoading = true;
     protected bool _userNotFound = false;
+    protected bool _hasError = false;
     protected string? _currentUsername;
     protected string? _currentEmail;
     protected UpdateUserRequest _editModel = new();
@@ -54,10 +55,10 @@ public class ProfilePageBase : ComponentBase
             }
         }
         catch {
-            _userNotFound = true;
+            _hasError = true;
         }
         finally {
-        _isLoading = false;
+            _isLoading = false;
         }
     }
     
@@ -108,8 +109,14 @@ public class ProfilePageBase : ComponentBase
     
     protected async Task ConfirmEditProfile()
     {
-        await UserService.UpdateMeAsync(_editModel);
+        var updatedUser = await UserService.UpdateMeAsync(_editModel);
 
+        if (updatedUser is null)
+            return;
+
+        _currentUsername = updatedUser.Username;
+        _currentEmail = updatedUser.Email;
+        _username = updatedUser.Username;
         _showEditModal = false;
     }
 }

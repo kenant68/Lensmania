@@ -15,9 +15,14 @@ public class UserService
 
 	public async Task<PublicUserProfileResponse?> GetByUsernameAsync(string username)
     {
-        var url = $"api/user/{username}";
+        var response = await _http.GetAsync($"api/user/{Uri.EscapeDataString(username)}");
 
-        return await _http.GetFromJsonAsync<PublicUserProfileResponse?>(url);
+		if (response.StatusCode == HttpStatusCode.NotFound)
+		{
+			return null;
+		}
+
+        return await response.Content.ReadFromJsonAsync<PublicUserProfileResponse>();
     }
 
     public async Task<PaginatedUsers> GetAllAsync(int offset = 0, int limit = 10)
