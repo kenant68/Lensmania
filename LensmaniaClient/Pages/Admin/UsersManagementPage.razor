@@ -26,7 +26,7 @@
             <tbody>
                 @foreach (var user in PagedUsers.Users)
                 {
-                    <tr class="@(!user.IsActive ? "row-banned" : "")">
+                    <tr class="@(!user.IsActive ? "row-blocked" : "")">
                         <td>
                             <div class="user-avatar-placeholder"></div>
                         </td>
@@ -34,15 +34,17 @@
                         <td>@user.Email</td>
                         <td>@(user.IsAdmin ? "Admin" : user.IsPremium ? "Premium" : "")</td>
                         <td>
-                            <button class="btn-icon btn-ban @(!user.IsActive ? "banned" : "")"
-                                    title="@(!user.IsActive ? "Débannir" : "Bannir")"
-                                    @onclick="() => OnToggleBan(user)">
+                            <button class="btn-icon btn-ban @(!user.IsActive ? "blocked" : "")"
+                                    title="@(!user.IsActive ? "Débloquer" : "Bloquer")"
+									aria-label="@(!user.IsActive ? "Débloquer l'utilisateur" : "Bloquer l'utilisateur")"
+                                    @onclick="() => OnToggleBlock(user)">
                                 <i class="bi @(user.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
                             </button>
                         </td>
                         <td>
                             <button class="btn-icon btn-delete"
                                     title="Supprimer"
+									aria-label="Supprimer l'utilisateur"
                                     @onclick="() => OpenDeleteModal(user)">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -74,6 +76,13 @@
             <p> Vous êtes sur le point de supprimer : <strong>@_selectedUserToDelete?.Username</strong> </p>
             <p> <span class="text-muted">@_selectedUserToDelete?.Email</span> </p>
             <p class="text-danger"> Cette action est irréversible. </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="alert @(isError ? "alert--error" : "alert--success")" role="alert">
+                @message
+            </div>
+        }
         </ConfirmationModal>
     }
 </section>

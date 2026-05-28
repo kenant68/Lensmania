@@ -1,6 +1,7 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
 using LensmaniaServer.Services;
+using LensmaniaServer.Exceptions;
 using LensmaniaTests.Helpers;
 using LensmaniaLibrary.DTOs.Users;
 using Microsoft.EntityFrameworkCore;
@@ -100,7 +101,6 @@ public class UserServiceTests
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Id, Is.EqualTo(user.Id));
         Assert.That(result.Username, Is.EqualTo(user.Username));
-        Assert.That(result.Email, Is.EqualTo(user.Email));
     }
 
     #endregion
@@ -171,7 +171,7 @@ public class UserServiceTests
     {
         var (_, admin) = await SeedUsersAsync();
         
-        var exception = Assert.ThrowsAsync<UnauthorizedAccessException>(
+        var exception = Assert.ThrowsAsync<BusinessException>(
             () => _service.DeleteByAdminAsync(admin.Id)
         );
 

@@ -1,5 +1,6 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
+using LensmaniaLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -9,10 +10,12 @@ public class AuthService {
     private readonly AppDbContext _db;
     private readonly TokenService _tokens;
     public AuthService(AppDbContext db, TokenService tokens) {
-        _db = db; _tokens = tokens;
+        _db = db; 
+		_tokens = tokens;
     }
 
-    public async Task<AuthResponse?> Register(RegisterRequest req) {
+    public async Task<AuthResponse?> Register(RegisterRequest req) 
+	{
         if (await _db.Users.AnyAsync(u => u.Email == req.Email || u.Username == req.Username)) return null;
         var user = new User {
             Username = req.Username,
@@ -34,16 +37,22 @@ public class AuthService {
         return new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium, user.IsActive);
     }
 
-    public async Task<AuthResponse?> Login(LoginRequest req) {
+    public async Task<(LoginStatus Status, AuthResponse? Response)> Login(LoginRequest req) 
+	{
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
         
-		if (user == null) return null;
+		if (user is null || 
+			!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
+		{ 
+			return (LoginStatus.InvalidCredentials, null);
+		}
 
 		if (!user.IsActive)
-			return null;
-
-        if (!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash)) return null;
+			return (LoginStatus.Blocked, null);
         
-		return new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium, user.IsActive);
+		return (
+			LoginStatus.Success,
+			new AuthResponse(_tokens.GenerateToken(user), user.Username, user.IsAdmin, user.IsPremium, user.IsActive)
+		);
     }
 }
