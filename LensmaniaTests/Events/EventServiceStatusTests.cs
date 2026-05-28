@@ -79,5 +79,7 @@ public class EventServiceStatusTests
         var result = await _service.GetAllAsync(0, 10);
 
         Assert.That(result.Events.Count, Is.EqualTo(2));
+        Assert.That(result.Events[0].Name, Is.EqualTo("A"));
+        Assert.That(result.Events[1].Name, Is.EqualTo("B"));
     }
 }
