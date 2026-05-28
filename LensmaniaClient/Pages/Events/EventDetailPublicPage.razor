@@ -1,0 +1,83 @@
+@page "/events/{Id:int}"
+@inherits EventDetailPublicPageBase
+@using LensmaniaLibrary.DTOs.Events
+@using LensmaniaClient.Components
+
+<div class="container py-4" style="max-width: 900px;">
+
+    @if (IsLoading)
+    {
+        <p class="text-center">Chargement…</p>
+    }
+    else if (ErrorMessage is not null)
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+    else if (Event is not null)
+    {
+        <div class="text-center mb-5">
+            @if (!string.IsNullOrEmpty(Event.CoverPhotoUrl))
+            {
+                <img src="@($"{ApiBaseUrl}/uploads/photos/{Event.CoverPhotoUrl}")"
+                     class="img-fluid rounded shadow"
+                     style="max-height: 320px; width: 100%; object-fit: cover;"
+                     alt="@Event.Name" />
+            }
+            else
+            {
+                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                     style="height: 220px;">
+                    <span style="font-size: 4rem;">@(Event.Theme.Icon ?? "📷")</span>
+                </div>
+            }
+
+            <h1 class="mt-4 fw-bold">@Event.Name</h1>
+
+            @if (Event.Theme is not null)
+            {
+                <p class="text-muted">@Event.Theme.Icon @Event.Theme.Name</p>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Event.Description))
+            {
+                <p class="mx-auto" style="max-width: 600px;">@Event.Description</p>
+            }
+
+            <p class="text-muted small">
+                Du @Event.StartDate.ToLocalTime().ToString("dd/MM/yyyy")
+                au @Event.EndDate.ToLocalTime().ToString("dd/MM/yyyy")
+            </p>
+
+            <AuthorizeView>
+                <Authorized>
+                    @if (IsActive)
+                    {
+                        <button class="btn btn-primary mt-2" @onclick="OpenModal">
+                            <i class="bi bi-camera me-1"></i>Participer
+                        </button>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mt-2">Cet événement est terminé.</p>
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    @if (IsActive)
+                    {
+                        <p class="mt-2">
+                            <a href="/login">Connectez-vous</a> pour participer à cet événement.
+                        </p>
+                    }
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <CreatePostModal IsOpen="ShowModal"
+                         OnClose="CloseModal"
+                         OnPostCreated="HandlePostCreated"
+                         EventId="Id" />
+
+        <h2 class="text-center mb-4">Classement</h2>
+        <Posts EventId="Id" />
+    }
+</div>
