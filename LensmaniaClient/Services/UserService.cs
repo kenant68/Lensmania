@@ -13,6 +13,18 @@ public class UserService
         _http = http;
     }
 
+	public async Task<PublicUserProfileResponse?> GetByUsernameAsync(string username)
+    {
+        var response = await _http.GetAsync($"api/user/{Uri.EscapeDataString(username)}");
+
+		if (response.StatusCode == HttpStatusCode.NotFound)
+		{
+			return null;
+		}
+
+        return await response.Content.ReadFromJsonAsync<PublicUserProfileResponse>();
+    }
+
     public async Task<PaginatedUsers> GetAllAsync(int offset = 0, int limit = 10)
     {
         var url = $"api/user?offset={offset}&limit={limit}";
@@ -31,4 +43,20 @@ public class UserService
 	{
     	return await _http.DeleteAsync($"api/user/{userId}");
 	}
+
+    public async Task DeleteMeAsync()
+	{
+    	var response = await _http.DeleteAsync($"api/user/me");
+		response.EnsureSuccessStatusCode();
+	}
+
+    public async Task<UserResponse?> UpdateMeAsync(UpdateUserRequest request)
+    {
+        var response = await _http.PutAsJsonAsync("api/user/me", request);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<UserResponse>();
+    }
 }

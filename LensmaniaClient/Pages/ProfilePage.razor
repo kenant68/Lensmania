@@ -1,44 +1,109 @@
 @page "/profile/{Username}"
-@using LensmaniaLibrary.DTOs.Posts
-@using System.Security.Claims
+@inherits ProfilePageBase
+@using LensmaniaClient.Components.Utils
 @using LensmaniaClient.Components
-@using LensmaniaClient.Services.Auth
-@inject AuthenticationStateProvider AuthStateProvider
 
-<div class="profile-page">
-
-    <header class="profile-header">
-        <h1 class="text-start mb-4">
-            @(_isOwnProfile 
-                ? "Mon profil" 
-                : $"Profil de {(_username ?? "...")}")
-        </h1>
-    </header>
-
-    <Posts @ref="_postsComponent"
-           Username="@_username"
-           DisplayCreateButton="@_isOwnProfile"
-           IsOwnProfile="@_isOwnProfile"
-           ShowSortToggle="true"
-    />
-
-</div>
-
-@code {
-    [Parameter] public required string Username { get; set; }
-
-    private Posts? _postsComponent;
-    private bool _isOwnProfile;
-    private string? _username;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        var state = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = state.User;
-
-        var usernameClaim = user.FindFirst(ClaimTypes.Name)?.Value;
+@if (_isLoading)
+{
+    <p>Chargement...</p>
+}
+else if (_hasError)
+{
+        <div class="alert alert-danger">
+			Une erreur est survenue lors du chargement du profil.
+		</div>
+}
+else if (_userNotFound)
+{
+    <div class="alert alert-warning">
+        Profil introuvable
+    </div>
+}
+else
+{
+    <div class="profile-page">
+    
+        <header class="profile-header">
+            <div class="profile-name">
+                <h1 class="text-start mb-4">
+                    @(_isOwnProfile 
+                        ? "Mon profil" 
+                        : $"Profil de {(_username ?? "...")}")
+                </h1>
+    
+                @if (_isOwnProfile)
+                {
+                    <button type="button" class="btn btn-icon"
+                            @onclick="ToggleActionsMenu">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                }
+            </div>
+    
+            @if (_showActionsMenu)
+            {
+                <div class="profile-actions-menu">
+                    <button type="button" class="btn btn-primary"
+                            @onclick="OpenEditModal">
+                        <i class="bi bi-pencil"></i>
+                        Modifier mon profil
+                    </button>
+            
+                    <button type="button" class="btn btn-danger"
+                            @onclick="OpenDeleteModal">
+                        <i class="bi bi-trash"></i>
+                        Supprimer mon compte
+                    </button>
+                </div>
+            }
+        </header>		
+    
+        <Posts @ref="_postsComponent"
+               Username="@_username"
+               DisplayCreateButton="@_isOwnProfile"
+               IsOwnProfile="@_isOwnProfile"
+               ShowSortToggle="true"
+        />
+    
+        @* Modals *@
+        <ConfirmationModal IsVisible="_showDeleteModal"
+                      Title="Supprimer mon compte"
+                      ConfirmText="Supprimer"
+                      CancelText="Annuler"
+                      OnConfirm="ConfirmDeleteMe"
+                      OnCancel="CloseDeleteModal">
+    
+            <p> <strong>@_currentUsername</strong>,
+                 vous êtes sur le point de supprimer votre compte, associé au mail <span class="text-muted">@_currentEmail</span> </p>
+            <p class="text-danger"> Cette action est irréversible. </p>
+            <p class="text-danger"> Voulez-vous continuer ? </p>
+        </ConfirmationModal>
         
-        _isOwnProfile = string.Equals(usernameClaim, Username, StringComparison.OrdinalIgnoreCase);
-        _username = _isOwnProfile ? usernameClaim : Username;
-    }
+        <EditModal IsVisible="_showEditModal"
+               Title="Modifier mon profil"
+               ConfirmText="Enregistrer"
+               OnConfirm="ConfirmEditProfile"
+               OnCancel="CloseEditModal">
+    
+            <EditForm Model="_editModel" OnValidSubmit="ConfirmEditProfile">
+                <DataAnnotationsValidator />
+				<ValidationSummary />
+        
+                <div class="mb-3">
+                    <label>Pseudo</label>
+                    <InputText class="form-control"
+                               @bind-Value="_editModel.Username" />
+					<ValidationMessage For="@(() => _editModel.Username)" />
+                </div>
+        
+                <div class="mb-3">
+                    <label>Email</label>
+                    <InputText class="form-control"
+                               @bind-Value="_editModel.Email" />
+					<ValidationMessage For="@(() => _editModel.Email)" />
+                </div>
+            </EditForm>
+    
+        </EditModal>
+    </div>
 }
