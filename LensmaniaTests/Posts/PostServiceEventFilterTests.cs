@@ -85,22 +85,25 @@ public class PostServiceEventFilterTests
             EventId = ev.Id
         };
 
-        // Create a fake file on disk so the path validation passes
-        var uploadsPath = Path.Combine(Path.GetTempPath(), "uploads", "photos");
+        var tempRoot = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        var uploadsPath = Path.Combine(tempRoot, "uploads", "photos");
         Directory.CreateDirectory(uploadsPath);
         var filePath = Path.Combine(uploadsPath, "test.jpg");
-        await File.WriteAllTextAsync(filePath, "fake");
+        try
+        {
+            await File.WriteAllTextAsync(filePath, "fake");
+            var env = new FakeWebHostEnvironment(tempRoot);
+            var service = new PostService(_db, env);
 
-        // PostService uses IWebHostEnvironment for WebRootPath — use a fake env
-        var env = new FakeWebHostEnvironment(Path.GetTempPath());
-        var service = new PostService(_db, env);
+            var result = await service.CreatePostAsync(request, user.Id);
+            var savedPost = _db.Posts.First(p => p.Id == result.Id);
 
-        var result = await service.CreatePostAsync(request, user.Id);
-        var savedPost = _db.Posts.First(p => p.Id == result.Id);
-
-        Assert.That(savedPost.EventId, Is.EqualTo(ev.Id));
-
-        File.Delete(filePath);
+            Assert.That(savedPost.EventId, Is.EqualTo(ev.Id));
+        }
+        finally
+        {
+            Directory.Delete(tempRoot, recursive: true);
+        }
     }
 
     [Test]
@@ -110,21 +113,27 @@ public class PostServiceEventFilterTests
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
 
-        var uploadsPath = Path.Combine(Path.GetTempPath(), "uploads", "photos");
+        var tempRoot = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        var uploadsPath = Path.Combine(tempRoot, "uploads", "photos");
         Directory.CreateDirectory(uploadsPath);
         var filePath = Path.Combine(uploadsPath, "test2.jpg");
-        await File.WriteAllTextAsync(filePath, "fake");
-
-        var env = new FakeWebHostEnvironment(Path.GetTempPath());
-        var service = new PostService(_db, env);
-
-        var request = new LensmaniaLibrary.DTOs.Posts.CreatePostRequest
+        try
         {
-            PhotoUrl = "test2.jpg",
-            EventId = 9999
-        };
+            await File.WriteAllTextAsync(filePath, "fake");
+            var env = new FakeWebHostEnvironment(tempRoot);
+            var service = new PostService(_db, env);
 
-        Assert.ThrowsAsync<ArgumentException>(() => service.CreatePostAsync(request, user.Id));
-        File.Delete(filePath);
+            var request = new LensmaniaLibrary.DTOs.Posts.CreatePostRequest
+            {
+                PhotoUrl = "test2.jpg",
+                EventId = 9999
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => service.CreatePostAsync(request, user.Id));
+        }
+        finally
+        {
+            Directory.Delete(tempRoot, recursive: true);
+        }
     }
 }
