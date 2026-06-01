@@ -1,11 +1,13 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LensmaniaServer.Services;
 
 public class GoogleAuthService
 {
+    // The DB column allows 50 chars (AppDbContext HasMaxLength(50)); 32 is an intentional friendlier cap.
     private const int UsernameMaxLength = 32;
     private const int UsernameMinLength = 3;
 
@@ -68,7 +70,24 @@ public class GoogleAuthService
             IsActive = true
         };
         _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            var pg = ex.InnerException as PostgresException ?? ex.GetBaseException() as PostgresException;
+            if (pg != null && pg.SqlState == "23505")
+            {
+                // A concurrent sign-in for the same Google account won the race; re-resolve the existing row.
+                _db.Entry(user).State = EntityState.Detached;
+                var existing = await _db.Users.FirstOrDefaultAsync(u => u.GoogleId == info.Subject)
+                               ?? await _db.Users.FirstOrDefaultAsync(u => u.Email == info.Email);
+                if (existing is not null)
+                    return existing;
+            }
+            throw;
+        }
         return user;
     }
 
