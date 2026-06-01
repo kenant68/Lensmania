@@ -41,9 +41,10 @@ public class AuthService {
 	{
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
         
-		if (user is null || 
-			!BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
-		{ 
+		if (user is null ||
+		    user.PasswordHash is null ||
+		    !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
+		{
 			return (LoginStatus.InvalidCredentials, null);
 		}
 
