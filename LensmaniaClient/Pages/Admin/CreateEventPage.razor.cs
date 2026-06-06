@@ -38,7 +38,7 @@ public class CreateEventPageBase : ComponentBase
     }
 
     protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest(string.Empty, string.Empty));
+        => _badges.Add(new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty });
 
     protected void RemoveBadge(int index)
     {
@@ -70,16 +70,16 @@ public class CreateEventPageBase : ComponentBase
 
         try
         {
-            var request = new CreateEventRequest(
-                _form.Name.Trim(),
-                _form.Description.Trim(),
-                _form.StartDate,
-                _form.EndDate,
-                _form.IsPremium,
-                _form.ThemeId,
-                _currentUserId,
-                _badges
-            );
+            var request = new CreateEventRequest
+            {
+                Name = _form.Name.Trim(),
+                Description = _form.Description.Trim(),
+                StartDate = _form.StartDate,
+                EndDate = _form.EndDate,
+                IsPremium = _form.IsPremium,
+                ThemeId = _form.ThemeId,
+                Badges = _badges
+            };
 
             _createdEvent = await EventSvc.CreateAsync(request);
 

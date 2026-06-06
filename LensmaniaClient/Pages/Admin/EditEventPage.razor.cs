@@ -49,7 +49,7 @@ public class EditEventPageBase : ComponentBase
                 ThemeId     = ev.Theme.Id
             };
             _badges = ev.Badges
-                .Select(b => new CreateBadgeRequest(b.Name, b.ImageUrl))
+                .Select(b => new CreateBadgeRequest { Name = b.Name, ImageUrl = b.ImageUrl })
                 .ToList();
         }
         catch
@@ -63,7 +63,7 @@ public class EditEventPageBase : ComponentBase
     }
 
     protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest(string.Empty, string.Empty));
+        => _badges.Add(new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty });
 
     protected void RemoveBadge(int index)
     {
