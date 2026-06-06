@@ -62,7 +62,8 @@ public class EventsController : ControllerBase
     {
         try
         {
-            var ev = await _eventService.CreateAsync(request);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+			var ev = await _eventService.CreateAsync(request, userId);
             return Ok(ev);
         }
         catch (ArgumentException ex)
