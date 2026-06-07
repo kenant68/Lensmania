@@ -12,7 +12,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-//Todo: for production, use IConfiguration to inject the API URL from appsettings.json
+var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
+    ?? throw new InvalidOperationException("Configuration 'Api:BaseUrl' is missing.");
+
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<ITokenStore, LocalStorageTokenStore>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
@@ -20,7 +22,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 builder.Services.AddTransient<BearerTokenHandler>();
 builder.Services.AddHttpClient("LensmaniaApi", client =>
     {
-        client.BaseAddress = new Uri("http://localhost:5078/");
+        client.BaseAddress = new Uri(apiBaseUrl);
     })
     .AddHttpMessageHandler<BearerTokenHandler>();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("LensmaniaApi"));
