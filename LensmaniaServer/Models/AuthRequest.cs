@@ -27,3 +27,8 @@ public record LoginRequest(
     [param: MaxLength(128, ErrorMessage = "Le mot de passe ne peut pas depasser 128 caracteres.")]
     string Password
 );
+
+public record GoogleSignInRequest(
+    [param: Required(ErrorMessage = "Le jeton Google est obligatoire.")]
+    string IdToken
+);

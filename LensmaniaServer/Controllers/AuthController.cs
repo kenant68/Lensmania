@@ -19,11 +19,13 @@ public class AuthController : ControllerBase {
 
     private readonly AuthService _auth;
     private readonly PasswordResetService _passwordReset;
+    private readonly GoogleAuthService _google;
 
-    public AuthController(AuthService auth, PasswordResetService passwordReset)
+    public AuthController(AuthService auth, PasswordResetService passwordReset, GoogleAuthService google)
     {
         _auth = auth;
         _passwordReset = passwordReset;
+        _google = google;
     }
 
     [HttpPost("register")]
@@ -65,6 +67,33 @@ public class AuthController : ControllerBase {
             _ => StatusCode(500, new ApiErrorResponse(
                 "unknown_login_status",
                 "État de login inconnu"))
+        };
+    }
+
+    [HttpPost("google")]
+    public async Task<IActionResult> Google(GoogleSignInRequest req)
+    {
+        var (status, response) = await _google.SignInAsync(req.IdToken);
+
+        return status switch
+        {
+            GoogleAuthStatus.Success => Ok(response),
+
+            GoogleAuthStatus.Blocked => StatusCode(403, new ApiErrorResponse(
+                AuthErrorCodes.UserIsBlocked,
+                "Votre compte a été bloqué")),
+
+            GoogleAuthStatus.EmailUnverified => Unauthorized(new ApiErrorResponse(
+                AuthErrorCodes.GoogleEmailUnverified,
+                "Votre adresse e-mail Google n'est pas vérifiée.")),
+
+            GoogleAuthStatus.InvalidToken => Unauthorized(new ApiErrorResponse(
+                AuthErrorCodes.GoogleInvalidToken,
+                "Le jeton Google est invalide ou a expiré.")),
+
+            _ => StatusCode(500, new ApiErrorResponse(
+                "unknown_google_status",
+                "État de connexion Google inconnu"))
         };
     }
 

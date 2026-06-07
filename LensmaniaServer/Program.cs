@@ -97,6 +97,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddCors(options =>
