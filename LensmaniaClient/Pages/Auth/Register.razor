@@ -1,4 +1,5 @@
 @page "/register"
+@using LensmaniaClient.Components
 @using LensmaniaClient.Models.Auth
 @using LensmaniaClient.Services.Auth
 @inject AuthApiClient AuthApiClient
@@ -49,6 +50,9 @@
             </div>
         }
     </form>
+
+    <div class="auth-separator"><span>ou</span></div>
+    <GoogleSignInButton />
 </AuthCard>
 
 @code {
