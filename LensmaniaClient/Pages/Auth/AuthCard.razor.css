@@ -139,3 +139,20 @@
     background: rgba(25, 135, 84, 0.12);
     color: #146c43;
 }
+
+::deep .auth-separator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+    color: rgba(86, 62, 161, 0.6);
+    font-size: 0.9rem;
+}
+
+::deep .auth-separator::before,
+::deep .auth-separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(86, 62, 161, 0.18);
+}
