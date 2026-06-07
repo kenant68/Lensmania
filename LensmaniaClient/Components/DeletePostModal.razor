@@ -57,6 +57,7 @@
         try
         {
             var result = await PostService.DeletePostAsync(PostId);
+            await OnPostDeleted.InvokeAsync(PostId);
             NotificationService.Info($"Le post a été supprimé avec succès !");
 
             switch (result)

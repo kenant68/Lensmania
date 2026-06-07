@@ -17,12 +17,12 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
 
-
     // Parameters
     [Parameter] public string? Username { get; set; }
     [Parameter] public bool DisplayCreateButton { get; set; } = false;
     [Parameter] public bool IsOwnProfile { get; set; } = false;
     [Parameter] public EventCallback<PostListItemResponse> OnPostCreated { get; set; }
+    [Parameter] public EventCallback<int> OnPostDeleted { get; set; }
     [Parameter] public bool ShowSortToggle { get; set; } = false;
     [Parameter] public int? EventId { get; set; }
 
@@ -257,6 +257,12 @@ public partial class Posts : ComponentBase, IAsyncDisposable
     	
         await OnPostCreated.InvokeAsync(post);
 		StateHasChanged();
+    }
+    
+    // --- Post deletion ---
+    private async Task HandlePostDeleted(int postId)
+    {
+	    await ReloadAsync();
     }
     
     // Post details
