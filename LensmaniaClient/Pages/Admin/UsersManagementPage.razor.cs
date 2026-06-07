@@ -9,6 +9,7 @@ namespace LensmaniaClient.Pages.Admin;
 public class UserManagementPageBase : ComponentBase
 {
     [Inject] private UserService UserService { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     protected PaginatedUsers? PagedUsers { get; private set; }
     protected bool IsLoading { get; private set; }
@@ -62,6 +63,7 @@ public class UserManagementPageBase : ComponentBase
     protected async Task OnToggleBlock(UserAdminResponse user)
     {
         await UserService.ToggleUserIsActiveAsync(user.Id, !user.IsActive);
+		NotificationService.Info($"Les droits de l'utilisateur ont été modifiés avec succès !");
 
         await LoadAsync();
     }
@@ -89,6 +91,7 @@ public class UserManagementPageBase : ComponentBase
             return;
 
         var response = await UserService.DeleteUserAsync(_selectedUserToDelete.Id);
+        NotificationService.Info($"L'utilisateur a été supprimé avec succès !");
 
         if (response.IsSuccessStatusCode)
         {

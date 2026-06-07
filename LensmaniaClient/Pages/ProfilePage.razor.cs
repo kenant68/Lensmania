@@ -13,6 +13,7 @@ public class ProfilePageBase : ComponentBase
     [Inject] private UserService UserService { get; set; } = default!;
     [Inject] private CustomAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
     
     [Parameter] public required string Username { get; set; }
 
@@ -110,6 +111,7 @@ public class ProfilePageBase : ComponentBase
     protected async Task ConfirmEditProfile()
     {
         var updatedUser = await UserService.UpdateMeAsync(_editModel);
+        NotificationService.Success($"Les informations de votre profil ont été modifiées ! Elles seront appliquées après reconnexion.");
 
         if (updatedUser is null)
             return;

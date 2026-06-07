@@ -13,6 +13,7 @@ public class CreateEventPageBase : ComponentBase
     [Inject] private ThemeService ThemeSvc { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     protected EventFormModel _form = new();
     protected List<CreateBadgeRequest> _badges = new();
@@ -82,8 +83,7 @@ public class CreateEventPageBase : ComponentBase
             );
 
             _createdEvent = await EventSvc.CreateAsync(request);
-
-            await Task.Delay(1500);
+            NotificationService.Success($"L'événement a été créé avec succès !");
             Nav.NavigateTo($"/admin/events/{_createdEvent.Id}");
         }
         catch (Exception ex)

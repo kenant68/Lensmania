@@ -7,6 +7,7 @@ namespace LensmaniaClient.Pages.Admin;
 public class EventsManagementPageBase : ComponentBase
 {
     [Inject] private EventService EventSvc { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     protected PaginatedEvents? PagedEvents { get; private set; }
     protected bool IsLoading { get; private set; }
@@ -76,6 +77,7 @@ public class EventsManagementPageBase : ComponentBase
         try
         {
             await EventSvc.DeleteAsync(_selectedToDelete.Id);
+			NotificationService.Info($"L'évènement a été supprimé avec succès !");
         }
         catch
         {

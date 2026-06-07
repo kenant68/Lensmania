@@ -11,6 +11,7 @@ public class EditEventPageBase : ComponentBase
     [Inject] private EventService EventSvc { get; set; } = default!;
     [Inject] private ThemeService ThemeSvc { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     [Parameter] public int Id { get; set; }
 
@@ -98,6 +99,7 @@ public class EditEventPageBase : ComponentBase
             );
 
             await EventSvc.UpdateAsync(Id, request);
+            NotificationService.Info($"L'évènement a été mis à jour avec succès !");
             Nav.NavigateTo($"/admin/events/{Id}");
         }
         catch (Exception ex)
