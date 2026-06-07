@@ -31,6 +31,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<UploadService>();
+builder.Services.AddScoped<NotificationService>();
 
 var host = builder.Build();
 await host.Services.GetRequiredService<CustomAuthenticationStateProvider>().InitializeAsync();
