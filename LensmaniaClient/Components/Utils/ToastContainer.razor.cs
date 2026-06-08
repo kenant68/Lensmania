@@ -11,9 +11,11 @@ public partial class ToastContainer : IDisposable
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private readonly List<ToastItem> _toasts = [];
+    private CancellationTokenSource? _cancellationTokenSource;
 
     protected override void OnInitialized()
     {
+        _cancellationTokenSource = new CancellationTokenSource();
         NotificationService.OnNotification += HandleNotification;
     }
 
@@ -22,13 +24,25 @@ public partial class ToastContainer : IDisposable
         var toast = new ToastItem(notification);
         _toasts.Add(toast);
         InvokeAsync(StateHasChanged);
-
-        // Auto-dismiss
-        _ = Task.Delay(notification.DurationMs).ContinueWith(_ =>
+        _ = AutoDismissToastAsync(toast, notification.DurationMs);
+    }
+    
+    private async Task AutoDismissToastAsync(ToastItem toast, int durationMs)
+    {
+        try
         {
-            Remove(toast);
-            InvokeAsync(StateHasChanged);
-        });
+            await Task.Delay(durationMs, _cancellationTokenSource?.Token ?? default);
+
+            await InvokeAsync(() =>
+            {
+                Remove(toast);
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when component is disposed
+        }
     }
 
     private void Remove(ToastItem toast) => _toasts.Remove(toast);
@@ -36,6 +50,9 @@ public partial class ToastContainer : IDisposable
     public void Dispose()
     {
         NotificationService.OnNotification -= HandleNotification;
+        
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
     }
 
     private record ToastItem(Notification Notification)
