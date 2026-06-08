@@ -91,12 +91,11 @@ public class UserManagementPageBase : ComponentBase
             return;
 
         var response = await UserService.DeleteUserAsync(_selectedUserToDelete.Id);
-        NotificationService.Info($"L'utilisateur a été supprimé avec succès !");
 
         if (response.IsSuccessStatusCode)
         {
-            message = "Utilisateur supprimé avec succès.";
-            isError = false;
+            NotificationService.Info($"L'utilisateur a été supprimé avec succès !");
+			isError = false;
             
             _selectedUserToDelete = null;
             _showDeleteModal = false;

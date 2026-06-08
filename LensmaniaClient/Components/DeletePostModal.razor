@@ -57,13 +57,13 @@
         try
         {
             var result = await PostService.DeletePostAsync(PostId);
-            await OnPostDeleted.InvokeAsync(PostId);
-            NotificationService.Info($"Le post a été supprimé avec succès !");
 
             switch (result)
             {
                 case DeletePostResult.Success:
                     await OnPostDeleted.InvokeAsync(PostId);
+                    NotificationService.Info($"Le post a été supprimé avec succès !");
+                    await OnClose.InvokeAsync();
                     break;
                 case DeletePostResult.NotFound:
                     errorMessage = "Ce post n'existe plus.";

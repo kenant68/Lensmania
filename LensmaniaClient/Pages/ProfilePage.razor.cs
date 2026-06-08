@@ -111,10 +111,11 @@ public class ProfilePageBase : ComponentBase
     protected async Task ConfirmEditProfile()
     {
         var updatedUser = await UserService.UpdateMeAsync(_editModel);
-        NotificationService.Success($"Les informations de votre profil ont été modifiées ! Elles seront appliquées après reconnexion.");
 
         if (updatedUser is null)
             return;
+        
+        NotificationService.Success($"Les informations de votre profil ont été modifiées ! Elles seront appliquées après reconnexion.");
 
         _currentUsername = updatedUser.Username;
         _currentEmail = updatedUser.Email;
