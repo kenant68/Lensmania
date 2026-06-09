@@ -1,0 +1,25 @@
+@using LensmaniaLibrary.DTOs.Users
+
+@if (Badges is { Count: > 0 })
+{
+    <section class="badge-showcase">
+        <h2 class="badge-showcase-title">Trophées</h2>
+        <div class="badge-showcase-grid">
+            @foreach (var badge in Badges)
+            {
+                <div class="badge-showcase-item" title="@($"{badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
+                    @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
+                    {
+                        <img class="badge-showcase-img" src="@badge.ImageUrl" alt="@badge.Name" onerror="this.style.display='none'" />
+                    }
+                    <span class="badge-showcase-name">@badge.Name</span>
+                    <span class="badge-showcase-event">@badge.EventName</span>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<UserBadgeResponse>? Badges { get; set; }
+}

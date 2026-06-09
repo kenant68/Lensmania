@@ -28,11 +28,13 @@ public class ProfilePageBase : ComponentBase
     protected string? _currentUsername;
     protected string? _currentEmail;
     protected UpdateUserRequest _editModel = new();
+    protected PublicUserProfileResponse? _profile;
 
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
         _userNotFound = false;
+        _profile = null;
         
         var state = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = state.User;
@@ -53,6 +55,8 @@ public class ProfilePageBase : ComponentBase
                 _userNotFound = true;
                 return;
             }
+
+            _profile = userSearched;
         }
         catch {
             _hasError = true;

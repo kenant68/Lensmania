@@ -1,0 +1,45 @@
+.badge-showcase {
+    margin: 1.5rem 0;
+}
+
+.badge-showcase-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-dark-purple, #563ea1);
+    margin-bottom: 1rem;
+}
+
+.badge-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.badge-showcase-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.4rem;
+    padding: 1rem 0.75rem;
+    background: #fff;
+    border: 1px solid rgba(86, 62, 161, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(86, 62, 161, 0.08);
+}
+
+.badge-showcase-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.badge-showcase-name {
+    font-weight: 600;
+    color: var(--color-dark-purple, #563ea1);
+}
+
+.badge-showcase-event {
+    font-size: 0.8rem;
+    color: rgba(86, 62, 161, 0.7);
+}
