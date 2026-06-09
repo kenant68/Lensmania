@@ -35,7 +35,7 @@ public class AuthServiceLoginTests
         await db.SaveChangesAsync();
         var service = new AuthService(db, BuildTokenService());
 
-        var (status, response) = await service.Login(new LoginRequest("alice@example.com", "whatever1"));
+        var (status, response) = await service.Login(new LoginRequest { Email = "alice@example.com", Password = "whatever1" });
 
         Assert.That(status, Is.EqualTo(LoginStatus.InvalidCredentials));
         Assert.That(response, Is.Null);
