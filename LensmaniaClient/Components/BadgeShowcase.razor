@@ -14,6 +14,10 @@
                     }
                     <span class="badge-showcase-name">@badge.Name</span>
                     <span class="badge-showcase-event">@badge.EventName</span>
+                    @if (!string.IsNullOrWhiteSpace(badge.WinningPhotoUrl))
+                    {
+                        <img class="badge-showcase-photo" src="@badge.WinningPhotoUrl" alt="Photo gagnante" onerror="this.style.display='none'" />
+                    }
                 </div>
             }
         </div>

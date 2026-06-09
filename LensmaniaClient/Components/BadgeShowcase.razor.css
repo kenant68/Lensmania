@@ -43,3 +43,11 @@
     font-size: 0.8rem;
     color: rgba(86, 62, 161, 0.7);
 }
+
+.badge-showcase-photo {
+    margin-top: 0.5rem;
+    width: 100%;
+    max-height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+}
