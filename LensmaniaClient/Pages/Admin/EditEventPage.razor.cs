@@ -99,7 +99,7 @@ public class EditEventPageBase : ComponentBase
             );
 
             await EventSvc.UpdateAsync(Id, request);
-            NotificationService.Info($"L'évènement a été mis à jour avec succès !");
+            NotificationService.Success($"L'évènement a été mis à jour avec succès !");
             Nav.NavigateTo($"/admin/events/{Id}");
         }
         catch (Exception ex)
