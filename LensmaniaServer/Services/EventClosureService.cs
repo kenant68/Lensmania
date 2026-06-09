@@ -20,7 +20,7 @@ public class EventClosureService
     {
         var dueEvents = await _db.Events
             .Include(e => e.Badges)
-            .Where(e => e.EndDate < now && e.ClosedAt == null)
+            .Where(e => e.EndDate <= now && e.ClosedAt == null)
             .ToListAsync();
 
         foreach (var ev in dueEvents)
