@@ -1,4 +1,5 @@
 @using LensmaniaLibrary.DTOs.Users
+@inject HttpClient Http
 
 @if (Badges is { Count: > 0 })
 {
@@ -10,13 +11,13 @@
                 <div class="badge-showcase-item" title="@($"{badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
                     @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
                     {
-                        <img class="badge-showcase-img" src="@badge.ImageUrl" alt="@badge.Name" onerror="this.style.display='none'" />
+                        <img class="badge-showcase-img" src="@($"{ApiBaseUrl}/{badge.ImageUrl}")" alt="@badge.Name" onerror="this.style.display='none'" />
                     }
                     <span class="badge-showcase-name">@badge.Name</span>
                     <span class="badge-showcase-event">@badge.EventName</span>
                     @if (!string.IsNullOrWhiteSpace(badge.WinningPhotoUrl))
                     {
-                        <img class="badge-showcase-photo" src="@badge.WinningPhotoUrl" alt="Photo gagnante" onerror="this.style.display='none'" />
+                        <img class="badge-showcase-photo" src="@($"{ApiBaseUrl}/uploads/photos/{badge.WinningPhotoUrl}")" alt="Photo gagnante" onerror="this.style.display='none'" />
                     }
                 </div>
             }
@@ -26,4 +27,6 @@
 
 @code {
     [Parameter] public IReadOnlyList<UserBadgeResponse>? Badges { get; set; }
+
+    private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
 }
