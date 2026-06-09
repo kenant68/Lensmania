@@ -1,4 +1,4 @@
-namespace LensmaniaServer.Models;
+namespace LensmaniaLibrary.Enums;
 
 public enum GoogleAuthStatus
 {

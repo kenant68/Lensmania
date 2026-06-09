@@ -1,6 +1,7 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
 using LensmaniaServer.Services;
+using LensmaniaLibrary.Enums;
 using LensmaniaTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

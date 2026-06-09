@@ -1,5 +1,6 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
+using LensmaniaLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
