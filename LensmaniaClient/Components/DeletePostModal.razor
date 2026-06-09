@@ -62,7 +62,7 @@
             {
                 case DeletePostResult.Success:
                     await OnPostDeleted.InvokeAsync(PostId);
-                    NotificationService.Info($"Le post a été supprimé avec succès !");
+                    NotificationService.Success($"Le post a été supprimé avec succès !");
                     await OnClose.InvokeAsync();
                     break;
                 case DeletePostResult.NotFound:

@@ -22,8 +22,11 @@ public partial class ToastContainer : IDisposable
     private void HandleNotification(Notification notification)
     {
         var toast = new ToastItem(notification);
-        _toasts.Add(toast);
-        InvokeAsync(StateHasChanged);
+        InvokeAsync(() =>
+        {
+            _toasts.Add(toast);
+            StateHasChanged();
+        });
         _ = AutoDismissToastAsync(toast, notification.DurationMs);
     }
     

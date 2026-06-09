@@ -63,7 +63,7 @@ public class UserManagementPageBase : ComponentBase
     protected async Task OnToggleBlock(UserAdminResponse user)
     {
         await UserService.ToggleUserIsActiveAsync(user.Id, !user.IsActive);
-		NotificationService.Info($"Les droits de l'utilisateur ont été modifiés avec succès !");
+		NotificationService.Success($"Les droits de l'utilisateur ont été modifiés avec succès !");
 
         await LoadAsync();
     }
@@ -94,7 +94,7 @@ public class UserManagementPageBase : ComponentBase
 
         if (response.IsSuccessStatusCode)
         {
-            NotificationService.Info($"L'utilisateur a été supprimé avec succès !");
+            NotificationService.Success($"L'utilisateur a été supprimé avec succès !");
 			isError = false;
             
             _selectedUserToDelete = null;
