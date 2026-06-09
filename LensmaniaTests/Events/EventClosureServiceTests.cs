@@ -42,7 +42,7 @@ public class EventClosureServiceTests
             Description = "d",
             StartDate = _now.AddDays(-10),
             EndDate = _now.AddDays(-1),
-            ThemeId = theme.Id,
+            Theme = theme,
             UserId = owner.Id
         };
         _db.Themes.Add(theme);
