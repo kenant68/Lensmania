@@ -82,11 +82,8 @@ public class EventService : IEventService
             .FirstOrDefaultAsync();
     }
     
-    public async Task<EventDetailedResponse> CreateAsync(CreateEventRequest request)
+    public async Task<EventDetailedResponse> CreateAsync(CreateEventRequest request, int userId)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
-            throw new ArgumentException("Le nom de l'événement est obligatoire.");
-
         if (request.EndDate <= request.StartDate)
             throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
 
@@ -97,9 +94,9 @@ public class EventService : IEventService
         if (!themeExists)
             throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");
 
-        var userExists = await _db.Users.AnyAsync(u => u.Id == request.UserId);
+        var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
-            throw new ArgumentException($"L'utilisateur #{request.UserId} n'existe pas.");
+            throw new ArgumentException($"L'utilisateur #{userId} n'existe pas.");
 
         if (request.Badges is null || request.Badges.Count != 1)
             throw new ArgumentException("Un événement doit avoir exactement un badge.");
@@ -112,7 +109,7 @@ public class EventService : IEventService
             EndDate     = DateTime.SpecifyKind(request.EndDate,   DateTimeKind.Utc),
             IsPremium   = request.IsPremium,
             ThemeId     = request.ThemeId,
-            UserId      = request.UserId,
+            UserId      = userId,
         };
 
         // Associated badges

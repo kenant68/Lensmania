@@ -86,11 +86,11 @@
     private void OnNameChanged(string value)
     {
         _nameError = string.IsNullOrWhiteSpace(value) ? "Le nom est obligatoire." : null;
-        OnChange.InvokeAsync(Badge with { Name = value });
+        OnChange.InvokeAsync(new CreateBadgeRequest { Name = value, ImageUrl = Badge.ImageUrl });
     }
 
     private void OnImageUrlChanged(string value)
-        => OnChange.InvokeAsync(Badge with { ImageUrl = value });
+        => OnChange.InvokeAsync(new CreateBadgeRequest { Name = Badge.Name, ImageUrl = value });
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
@@ -106,7 +106,7 @@
                 _uploadError = "L'upload a échoué. Vérifiez le format et la taille du fichier.";
                 return;
             }
-            await OnChange.InvokeAsync(Badge with { ImageUrl = url.Trim('"') });
+            await OnChange.InvokeAsync(new CreateBadgeRequest { Name = Badge.Name, ImageUrl = url.Trim('"') });
         }
         catch (Exception ex)
         {

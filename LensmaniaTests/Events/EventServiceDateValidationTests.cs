@@ -33,23 +33,29 @@ public class EventServiceDateValidationTests
     [TearDown]
     public void Teardown() => _db.Dispose();
 
-    private CreateEventRequest Request(DateTime start, DateTime end) => new(
-        "Contest", "desc", start, end,
-        false, _themeId, _userId,
-        new List<CreateBadgeRequest> { new("Champion", "c.svg") });
+    private CreateEventRequest Request(DateTime start, DateTime end) => new()
+    {
+        Name = "Contest",
+        Description = "desc",
+        StartDate = start,
+        EndDate = end,
+        IsPremium = false,
+        ThemeId = _themeId,
+        Badges = new List<CreateBadgeRequest> { new() { Name = "Champion", ImageUrl = "c.svg" } }
+    };
 
     [Test]
     public void Create_rejects_start_date_in_the_past()
     {
         var req = Request(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow.AddDays(-1));
-        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req));
+        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req, _userId));
     }
 
     [Test]
     public async Task Create_accepts_start_date_in_the_future()
     {
         var req = Request(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2));
-        var result = await _service.CreateAsync(req);
+        var result = await _service.CreateAsync(req, _userId);
         Assert.That(result.Id, Is.GreaterThan(0));
     }
 }

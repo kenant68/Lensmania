@@ -33,17 +33,22 @@ public class EventServiceBadgeValidationTests
     [TearDown]
     public void Teardown() => _db.Dispose();
 
-    private CreateEventRequest Request(List<CreateBadgeRequest> badges) => new(
-        "Contest", "desc",
-        DateTime.UtcNow.AddDays(1),
-        DateTime.UtcNow.AddDays(2),
-        false, _themeId, _userId, badges);
+    private CreateEventRequest Request(List<CreateBadgeRequest> badges) => new()
+    {
+        Name = "Contest",
+        Description = "desc",
+        StartDate = DateTime.UtcNow.AddDays(1),
+        EndDate = DateTime.UtcNow.AddDays(2),
+        IsPremium = false,
+        ThemeId = _themeId,
+        Badges = badges
+    };
 
     [Test]
     public void Create_rejects_zero_badges()
     {
         var req = Request(new List<CreateBadgeRequest>());
-        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req));
+        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req, _userId));
     }
 
     [Test]
@@ -51,17 +56,17 @@ public class EventServiceBadgeValidationTests
     {
         var req = Request(new List<CreateBadgeRequest>
         {
-            new("A", "a.svg"),
-            new("B", "b.svg")
+            new() { Name = "A", ImageUrl = "a.svg" },
+            new() { Name = "B", ImageUrl = "b.svg" }
         });
-        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req));
+        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req, _userId));
     }
 
     [Test]
     public async Task Create_accepts_exactly_one_badge()
     {
-        var req = Request(new List<CreateBadgeRequest> { new("Champion", "c.svg") });
-        var result = await _service.CreateAsync(req);
+        var req = Request(new List<CreateBadgeRequest> { new() { Name = "Champion", ImageUrl = "c.svg" } });
+        var result = await _service.CreateAsync(req, _userId);
         Assert.That(result.Badges, Has.Count.EqualTo(1));
     }
 }

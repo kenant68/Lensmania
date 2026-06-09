@@ -15,7 +15,7 @@ public class CreateEventPageBase : ComponentBase
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected EventFormModel _form = new();
-    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest(string.Empty, string.Empty) };
+    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty } };
     protected List<ThemeResponse>? _themes;
     protected bool _isSubmitting;
     protected string? _errorMessage;
@@ -61,16 +61,16 @@ public class CreateEventPageBase : ComponentBase
 
         try
         {
-            var request = new CreateEventRequest(
-                _form.Name.Trim(),
-                _form.Description.Trim(),
-                DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
-                DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
-                _form.IsPremium,
-                _form.ThemeId,
-                _currentUserId,
-                _badges
-            );
+            var request = new CreateEventRequest
+            {
+                Name = _form.Name.Trim(),
+                Description = _form.Description.Trim(),
+                StartDate = DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
+                EndDate = DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
+                IsPremium = _form.IsPremium,
+                ThemeId = _form.ThemeId,
+                Badges = _badges
+            };
 
             _createdEvent = await EventSvc.CreateAsync(request);
 
