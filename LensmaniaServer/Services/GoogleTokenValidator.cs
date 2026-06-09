@@ -8,9 +8,11 @@ public class GoogleTokenValidator : IGoogleTokenValidator
 
     public GoogleTokenValidator(IConfiguration cfg)
     {
-        _clientId = cfg["Google:ClientId"]
-            ?? throw new InvalidOperationException(
+        var clientId = cfg["Google:ClientId"];
+        if (string.IsNullOrWhiteSpace(clientId))
+            throw new InvalidOperationException(
                 "Configuration value 'Google:ClientId' is missing or empty.");
+        _clientId = clientId.Trim();
     }
 
     public async Task<GoogleUserInfo?> ValidateAsync(string idToken)
