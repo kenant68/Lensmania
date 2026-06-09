@@ -11,7 +11,7 @@
                 <div class="badge-showcase-item" title="@($"{badge.Name} — {badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
                     @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
                     {
-                        <img class="badge-showcase-img" src="@($"{ApiBaseUrl}/{badge.ImageUrl}")" alt="@badge.Name" onerror="this.style.display='none'" />
+                        <img class="badge-showcase-img" src="@($"{ApiBaseUrl}/{badge.ImageUrl.TrimStart('/')}")" alt="@badge.Name" onerror="this.style.display='none'" />
                     }
                     <span class="badge-showcase-event">@badge.EventName</span>
                 </div>
