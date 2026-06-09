@@ -23,46 +23,61 @@ public class EventClosureService
             .Where(e => e.EndDate <= now && e.ClosedAt == null)
             .ToListAsync();
 
+        var closed = 0;
         foreach (var ev in dueEvents)
         {
-            var badge = ev.Badges.FirstOrDefault();
-            if (badge is null)
+            try
             {
-                _logger.LogWarning("Event {EventId} has no badge; closing without award.", ev.Id);
-            }
-            else
-            {
-                var winner = await _db.Posts
-                    .Where(p => p.EventId == ev.Id && p.LikesCount >= 1)
-                    .OrderByDescending(p => p.LikesCount)
-                    .ThenBy(p => p.CreatedAt)
-                    .ThenBy(p => p.Id)
-                    .FirstOrDefaultAsync();
-
-                if (winner is not null)
+                var badge = ev.Badges.FirstOrDefault();
+                if (badge is null)
                 {
-                    ev.WinnerPostId = winner.Id;
+                    _logger.LogWarning("Event {EventId} has no badge; closing without award.", ev.Id);
+                }
+                else
+                {
+                    var winner = await _db.Posts
+                        .Where(p => p.EventId == ev.Id && p.LikesCount >= 1)
+                        .OrderByDescending(p => p.LikesCount)
+                        .ThenBy(p => p.CreatedAt)
+                        .ThenBy(p => p.Id)
+                        .FirstOrDefaultAsync();
 
-                    var alreadyEarned = await _db.Earn
-                        .AnyAsync(e => e.UserId == winner.UserId && e.BadgeId == badge.Id);
-                    if (!alreadyEarned)
+                    if (winner is not null)
                     {
-                        _db.Earn.Add(new Earn
+                        ev.WinnerPostId = winner.Id;
+
+                        var alreadyEarned = await _db.Earn
+                            .AnyAsync(e => e.UserId == winner.UserId && e.BadgeId == badge.Id);
+                        if (!alreadyEarned)
                         {
-                            UserId = winner.UserId,
-                            BadgeId = badge.Id,
-                            AwardedAt = now
-                        });
+                            _db.Earn.Add(new Earn
+                            {
+                                UserId = winner.UserId,
+                                BadgeId = badge.Id,
+                                AwardedAt = now
+                            });
+                        }
                     }
                 }
-            }
 
-            ev.ClosedAt = now;
+                ev.ClosedAt = now;
+                await _db.SaveChangesAsync();
+                closed++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to close event {EventId}; skipping.", ev.Id);
+
+                // Discard this event's partial changes so they don't leak into the next event's save.
+                foreach (var entry in _db.ChangeTracker.Entries()
+                             .Where(e => e.State is EntityState.Added or EntityState.Modified)
+                             .ToList())
+                {
+                    entry.State = EntityState.Detached;
+                }
+            }
         }
 
-        if (dueEvents.Count > 0)
-            await _db.SaveChangesAsync();
-
-        return dueEvents.Count;
+        return closed;
     }
 }
