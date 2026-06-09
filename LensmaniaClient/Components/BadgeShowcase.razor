@@ -4,21 +4,16 @@
 @if (Badges is { Count: > 0 })
 {
     <section class="badge-showcase">
-        <h2 class="badge-showcase-title">Trophées</h2>
+        <h2 class="badge-showcase-title">Badges</h2>
         <div class="badge-showcase-grid">
             @foreach (var badge in Badges)
             {
-                <div class="badge-showcase-item" title="@($"{badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
+                <div class="badge-showcase-item" title="@($"{badge.Name} — {badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
                     @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
                     {
                         <img class="badge-showcase-img" src="@($"{ApiBaseUrl}/{badge.ImageUrl}")" alt="@badge.Name" onerror="this.style.display='none'" />
                     }
-                    <span class="badge-showcase-name">@badge.Name</span>
                     <span class="badge-showcase-event">@badge.EventName</span>
-                    @if (!string.IsNullOrWhiteSpace(badge.WinningPhotoUrl))
-                    {
-                        <img class="badge-showcase-photo" src="@($"{ApiBaseUrl}/uploads/photos/{badge.WinningPhotoUrl}")" alt="Photo gagnante" onerror="this.style.display='none'" />
-                    }
                 </div>
             }
         </div>
