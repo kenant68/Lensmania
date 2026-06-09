@@ -64,8 +64,8 @@ public class CreateEventPageBase : ComponentBase
             var request = new CreateEventRequest(
                 _form.Name.Trim(),
                 _form.Description.Trim(),
-                _form.StartDate,
-                _form.EndDate,
+                DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
+                DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
                 _form.IsPremium,
                 _form.ThemeId,
                 _currentUserId,
