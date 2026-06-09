@@ -34,7 +34,7 @@ public class AppDbContext : DbContext {
         modelBuilder.Entity<Post>(entity =>
         {
             entity.Property(p => p.Title).HasMaxLength(150);
-            entity.Property(p => p.PhotoUrl).IsRequired();
+            entity.Property(p => p.PhotoUrl).IsRequired().HasMaxLength(400);
             entity.Property(p => p.Description).HasMaxLength(300);
 
 			entity.HasOne(p => p.User)
@@ -103,6 +103,9 @@ public class AppDbContext : DbContext {
 	        entity.Property(e => e.Name)
 		        .IsRequired()
 		        .HasMaxLength(200);
+	        
+	        entity.Property(e => e.Description)
+		        .HasMaxLength(600);
 
 	        entity.Property(e => e.StartDate).IsRequired();
 	        entity.Property(e => e.EndDate).IsRequired();
