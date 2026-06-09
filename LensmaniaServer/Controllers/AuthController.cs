@@ -19,13 +19,11 @@ public class AuthController : ControllerBase {
 
     private readonly AuthService _auth;
     private readonly PasswordResetService _passwordReset;
-    private readonly GoogleAuthService _google;
 
-    public AuthController(AuthService auth, PasswordResetService passwordReset, GoogleAuthService google)
+    public AuthController(AuthService auth, PasswordResetService passwordReset)
     {
         _auth = auth;
         _passwordReset = passwordReset;
-        _google = google;
     }
 
     [HttpPost("register")]
@@ -71,9 +69,9 @@ public class AuthController : ControllerBase {
     }
 
     [HttpPost("google")]
-    public async Task<IActionResult> Google(GoogleSignInRequest req)
+    public async Task<IActionResult> Google(GoogleSignInRequest req, [FromServices] GoogleAuthService google)
     {
-        var (status, response) = await _google.SignInAsync(req.IdToken);
+        var (status, response) = await google.SignInAsync(req.IdToken);
 
         return status switch
         {

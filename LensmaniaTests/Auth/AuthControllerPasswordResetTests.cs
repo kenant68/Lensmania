@@ -42,9 +42,8 @@ public class AuthControllerPasswordResetTests
             .Build();
         var tokens = new TokenService(configuration);
         var auth = new AuthService(_db, tokens);
-        var google = new GoogleAuthService(_db, tokens, new FakeGoogleTokenValidator());
 
-        _controller = new AuthController(auth, _passwordReset, google);
+        _controller = new AuthController(auth, _passwordReset);
     }
 
     [TearDown]
