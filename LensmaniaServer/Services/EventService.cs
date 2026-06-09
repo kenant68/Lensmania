@@ -97,7 +97,10 @@ public class EventService : IEventService
         var userExists = await _db.Users.AnyAsync(u => u.Id == request.UserId);
         if (!userExists)
             throw new ArgumentException($"L'utilisateur #{request.UserId} n'existe pas.");
-        
+
+        if (request.Badges is null || request.Badges.Count != 1)
+            throw new ArgumentException("Un événement doit avoir exactement un badge.");
+
         var ev = new Event
         {
             Name        = request.Name.Trim(),
@@ -156,6 +159,9 @@ public class EventService : IEventService
         var themeExists = await _db.Themes.AnyAsync(t => t.Id == request.ThemeId);
         if (!themeExists)
             throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");
+
+        if (request.Badges is null || request.Badges.Count != 1)
+            throw new ArgumentException("Un événement doit avoir exactement un badge.");
 
         ev.Name        = request.Name.Trim();
         ev.Description = request.Description.Trim();
