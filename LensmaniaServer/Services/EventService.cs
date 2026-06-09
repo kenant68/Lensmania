@@ -90,6 +90,9 @@ public class EventService : IEventService
         if (request.EndDate <= request.StartDate)
             throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
 
+        if (DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc) <= DateTime.UtcNow)
+            throw new ArgumentException("La date de début doit être dans le futur.");
+
         var themeExists = await _db.Themes.AnyAsync(t => t.Id == request.ThemeId);
         if (!themeExists)
             throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");

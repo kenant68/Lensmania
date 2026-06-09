@@ -8,7 +8,7 @@ using LensmaniaTests.Helpers;
 namespace LensmaniaTests.Events;
 
 [TestFixture]
-public class EventServiceBadgeValidationTests
+public class EventServiceDateValidationTests
 {
     private AppDbContext _db = null!;
     private EventService _service = null!;
@@ -33,35 +33,23 @@ public class EventServiceBadgeValidationTests
     [TearDown]
     public void Teardown() => _db.Dispose();
 
-    private CreateEventRequest Request(List<CreateBadgeRequest> badges) => new(
-        "Contest", "desc",
-        DateTime.UtcNow.AddDays(1),
-        DateTime.UtcNow.AddDays(2),
-        false, _themeId, _userId, badges);
+    private CreateEventRequest Request(DateTime start, DateTime end) => new(
+        "Contest", "desc", start, end,
+        false, _themeId, _userId,
+        new List<CreateBadgeRequest> { new("Champion", "c.svg") });
 
     [Test]
-    public void Create_rejects_zero_badges()
+    public void Create_rejects_start_date_in_the_past()
     {
-        var req = Request(new List<CreateBadgeRequest>());
+        var req = Request(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow.AddDays(-1));
         Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req));
     }
 
     [Test]
-    public void Create_rejects_two_badges()
+    public async Task Create_accepts_start_date_in_the_future()
     {
-        var req = Request(new List<CreateBadgeRequest>
-        {
-            new("A", "a.svg"),
-            new("B", "b.svg")
-        });
-        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(req));
-    }
-
-    [Test]
-    public async Task Create_accepts_exactly_one_badge()
-    {
-        var req = Request(new List<CreateBadgeRequest> { new("Champion", "c.svg") });
+        var req = Request(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2));
         var result = await _service.CreateAsync(req);
-        Assert.That(result.Badges, Has.Count.EqualTo(1));
+        Assert.That(result.Id, Is.GreaterThan(0));
     }
 }

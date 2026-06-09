@@ -94,6 +94,8 @@ public class CreateEventPageBase : ComponentBase
 
         if (_form.StartDate == default)
             _fieldErrors["StartDate"] = "Obligatoire";
+        else if (_form.StartDate <= DateTime.Now)
+            _fieldErrors["StartDate"] = "La date de début doit être dans le futur.";
 
         if (_form.EndDate == default)
             _fieldErrors["EndDate"] = "Obligatoire";
