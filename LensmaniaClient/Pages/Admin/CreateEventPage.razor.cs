@@ -15,7 +15,7 @@ public class CreateEventPageBase : ComponentBase
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected EventFormModel _form = new();
-    protected List<CreateBadgeRequest> _badges = new();
+    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest(string.Empty, string.Empty) };
     protected List<ThemeResponse>? _themes;
     protected bool _isSubmitting;
     protected string? _errorMessage;
@@ -35,15 +35,6 @@ public class CreateEventPageBase : ComponentBase
             return;
         }
         _currentUserId = uid;
-    }
-
-    protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest(string.Empty, string.Empty));
-
-    protected void RemoveBadge(int index)
-    {
-        if (index >= 0 && index < _badges.Count)
-            _badges.RemoveAt(index);
     }
 
     protected void UpdateBadge(int index, CreateBadgeRequest updated)

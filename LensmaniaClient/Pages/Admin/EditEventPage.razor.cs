@@ -15,7 +15,7 @@ public class EditEventPageBase : ComponentBase
     [Parameter] public int Id { get; set; }
 
     protected EventFormModel _form = new();
-    protected List<CreateBadgeRequest> _badges = new();
+    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest(string.Empty, string.Empty) };
     protected List<ThemeResponse>? _themes;
     protected bool _isLoading;
     protected bool _isSubmitting;
@@ -48,9 +48,12 @@ public class EditEventPageBase : ComponentBase
                 IsPremium   = ev.IsPremium,
                 ThemeId     = ev.Theme.Id
             };
-            _badges = ev.Badges
+            var loaded = ev.Badges
                 .Select(b => new CreateBadgeRequest(b.Name, b.ImageUrl))
                 .ToList();
+            _badges = loaded.Count > 0
+                ? new() { loaded[0] }
+                : new() { new CreateBadgeRequest(string.Empty, string.Empty) };
         }
         catch
         {
@@ -60,15 +63,6 @@ public class EditEventPageBase : ComponentBase
         {
             _isLoading = false;
         }
-    }
-
-    protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest(string.Empty, string.Empty));
-
-    protected void RemoveBadge(int index)
-    {
-        if (index >= 0 && index < _badges.Count)
-            _badges.RemoveAt(index);
     }
 
     protected void UpdateBadge(int index, CreateBadgeRequest updated)
