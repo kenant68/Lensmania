@@ -87,6 +87,9 @@ public class EventService : IEventService
         if (request.EndDate <= request.StartDate)
             throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
 
+        if (DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc) <= DateTime.UtcNow)
+            throw new ArgumentException("La date de début doit être dans le futur.");
+
         var themeExists = await _db.Themes.AnyAsync(t => t.Id == request.ThemeId);
         if (!themeExists)
             throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");
@@ -94,7 +97,10 @@ public class EventService : IEventService
         var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
             throw new ArgumentException($"L'utilisateur #{userId} n'existe pas.");
-        
+
+        if (request.Badges is null || request.Badges.Count != 1)
+            throw new ArgumentException("Un événement doit avoir exactement un badge.");
+
         var ev = new Event
         {
             Name        = request.Name.Trim(),
@@ -153,6 +159,9 @@ public class EventService : IEventService
         var themeExists = await _db.Themes.AnyAsync(t => t.Id == request.ThemeId);
         if (!themeExists)
             throw new ArgumentException($"Le thème #{request.ThemeId} n'existe pas.");
+
+        if (request.Badges is null || request.Badges.Count != 1)
+            throw new ArgumentException("Un événement doit avoir exactement un badge.");
 
         ev.Name        = request.Name.Trim();
         ev.Description = request.Description.Trim();

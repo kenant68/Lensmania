@@ -17,14 +17,24 @@ public class UserService : IUserService
     
     public async Task<PublicUserProfileResponse?> GetByUsernameAsync(string username)
     {
-        if (string.IsNullOrWhiteSpace(username)) 
+        if (string.IsNullOrWhiteSpace(username))
             return null;
-        
+
         return await _db.Users
             .Where(u => u.Username.ToLower() == username.ToLower())
             .Select(u => new PublicUserProfileResponse(
                 u.Id,
-                u.Username
+                u.Username,
+                u.Earns
+                    .OrderByDescending(e => e.AwardedAt)
+                    .Select(e => new UserBadgeResponse(
+                        e.BadgeId,
+                        e.Badge.Name,
+                        e.Badge.ImageUrl,
+                        e.Badge.Event.Name,
+                        e.AwardedAt,
+                        e.Badge.Event.WinnerPost != null ? e.Badge.Event.WinnerPost.PhotoUrl : null))
+                    .ToList()
             ))
             .FirstOrDefaultAsync();
     }

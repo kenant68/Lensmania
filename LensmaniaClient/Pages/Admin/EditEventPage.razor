@@ -138,24 +138,13 @@
                 </div>
 
                 <h5 class="section-title mt-4">
-                    <i class="bi bi-award me-2"></i>Badges
-                    <span class="badge bg-secondary ms-2">@_badges.Count</span>
+                    <i class="bi bi-award me-2"></i>Badge
                 </h5>
 
-                @for (int i = 0; i < _badges.Count; i++)
-                {
-                    var idx = i;
-                    <BadgeItemForm Badge="_badges[idx]"
-                                   Index="idx"
-                                   OnRemove="RemoveBadge"
-                                   OnChange="b => UpdateBadge(idx, b)" />
-                }
-
-                <button type="button"
-                        class="btn btn-outline-primary btn-sm mt-1"
-                        @onclick="AddBadge">
-                    <i class="bi bi-plus-circle me-1"></i>Ajouter un badge
-                </button>
+                <BadgeItemForm Badge="_badges[0]"
+                               Index="0"
+                               ShowRemove="false"
+                               OnChange="b => UpdateBadge(0, b)" />
 
                 <hr class="my-4" />
 

@@ -15,7 +15,7 @@ public class CreateEventPageBase : ComponentBase
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected EventFormModel _form = new();
-    protected List<CreateBadgeRequest> _badges = new();
+    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty } };
     protected List<ThemeResponse>? _themes;
     protected bool _isSubmitting;
     protected string? _errorMessage;
@@ -35,15 +35,6 @@ public class CreateEventPageBase : ComponentBase
             return;
         }
         _currentUserId = uid;
-    }
-
-    protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty });
-
-    protected void RemoveBadge(int index)
-    {
-        if (index >= 0 && index < _badges.Count)
-            _badges.RemoveAt(index);
     }
 
     protected void UpdateBadge(int index, CreateBadgeRequest updated)
@@ -74,8 +65,8 @@ public class CreateEventPageBase : ComponentBase
             {
                 Name = _form.Name.Trim(),
                 Description = _form.Description.Trim(),
-                StartDate = _form.StartDate,
-                EndDate = _form.EndDate,
+                StartDate = DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
+                EndDate = DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
                 IsPremium = _form.IsPremium,
                 ThemeId = _form.ThemeId,
                 Badges = _badges
@@ -103,6 +94,8 @@ public class CreateEventPageBase : ComponentBase
 
         if (_form.StartDate == default)
             _fieldErrors["StartDate"] = "Obligatoire";
+        else if (_form.StartDate <= DateTime.Now)
+            _fieldErrors["StartDate"] = "La date de début doit être dans le futur.";
 
         if (_form.EndDate == default)
             _fieldErrors["EndDate"] = "Obligatoire";

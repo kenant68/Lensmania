@@ -137,8 +137,14 @@ public class AppDbContext : DbContext {
 		        .HasForeignKey(e => e.CoverPhotoPostId)
 		        .IsRequired(false)
 		        .OnDelete(DeleteBehavior.SetNull);
+
+	        entity.HasOne(e => e.WinnerPost)
+		        .WithMany()
+		        .HasForeignKey(e => e.WinnerPostId)
+		        .IsRequired(false)
+		        .OnDelete(DeleteBehavior.SetNull);
         });
-        
+
         modelBuilder.Entity<Badge>(entity =>
         {
 	        entity.HasKey(b => b.Id);

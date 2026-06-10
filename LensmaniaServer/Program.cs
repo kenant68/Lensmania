@@ -42,6 +42,12 @@ builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
 builder.Services.AddScoped<PasswordResetService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
+builder.Services.AddOptions<EventClosingOptions>()
+    .BindConfiguration("EventClosing")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddScoped<EventClosureService>();
+builder.Services.AddHostedService<EventClosingBackgroundService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
