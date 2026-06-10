@@ -13,6 +13,7 @@ public class ProfilePageBase : ComponentBase
     [Inject] private UserService UserService { get; set; } = default!;
     [Inject] private CustomAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
     
     [Parameter] public required string Username { get; set; }
 
@@ -117,6 +118,8 @@ public class ProfilePageBase : ComponentBase
 
         if (updatedUser is null)
             return;
+        
+        NotificationService.Success($"Les informations de votre profil ont été modifiées ! Elles seront appliquées après reconnexion.");
 
         _currentUsername = updatedUser.Username;
         _currentEmail = updatedUser.Email;

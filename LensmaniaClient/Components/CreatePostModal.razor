@@ -1,4 +1,5 @@
 @using LensmaniaClient.Services.Posts
+@using LensmaniaClient.Services
 @using LensmaniaLibrary.DTOs.Posts
 
 @if (IsOpen)
@@ -42,6 +43,7 @@
     [Parameter] public int? EventId { get; set; }
 
     [Inject] private PostService PostService { get; set; } = default!;
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private string? title;
     private string? description;
@@ -102,6 +104,7 @@
             }
 
             await OnPostCreated.InvokeAsync(createdPost);
+            NotificationService.Success($"Le post a été créé avec succès !");
             FormReset();
         }
         catch (Exception e)

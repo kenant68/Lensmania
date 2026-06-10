@@ -8,7 +8,7 @@
     IsOpen="@isModalOpen"
     PostId="@PostId"
     OnClose="CloseModal"
-    OnPostDeleted="HandlePostDeleted"
+    OnPostDeleted="OnPostDeleted"
 />
 
 @code {
@@ -19,10 +19,4 @@
 
     void OpenModal() => isModalOpen = true;
     void CloseModal() => isModalOpen = false;
-
-    private async Task HandlePostDeleted(int postId)
-    {
-        isModalOpen = false;
-        await OnPostDeleted.InvokeAsync(postId);
-    }
 }

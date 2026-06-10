@@ -67,7 +67,9 @@ else {
                                     <Authorized>
                                         @if (IsOwnProfile)
                                         {
-                                            <DeletePostButton PostId="@post.Id"/>
+                                            <DeletePostButton 
+												PostId="@post.Id"
+												OnPostDeleted="HandlePostDeleted" />
                                         }
                                     </Authorized>
                                 </AuthorizeView>
