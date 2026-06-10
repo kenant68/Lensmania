@@ -103,6 +103,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddCors(options =>
@@ -121,7 +123,7 @@ if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     using var scope = app.Services.CreateScope();
     await using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    await db.Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();

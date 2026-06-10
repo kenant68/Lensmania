@@ -4,7 +4,9 @@ public class User {
     public int Id { get; set; }
     public string Username { get; set; } = "";
     public string Email { get; set; } = "";
-    public string PasswordHash { get; set; } = "";
+    public string? PasswordHash { get; set; }
+    public string? GoogleId { get; set; }
+    public AuthProvider AuthProvider { get; set; } = AuthProvider.Local;
     public bool IsAdmin { get; set; } = false;
     public bool IsPremium { get; set; } = false;
     public bool IsActive { get; set; } = true;

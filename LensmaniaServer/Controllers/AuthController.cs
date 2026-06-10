@@ -68,6 +68,33 @@ public class AuthController : ControllerBase {
         };
     }
 
+    [HttpPost("google")]
+    public async Task<IActionResult> Google(GoogleSignInRequest req, [FromServices] GoogleAuthService google)
+    {
+        var (status, response) = await google.SignInAsync(req.IdToken);
+
+        return status switch
+        {
+            GoogleAuthStatus.Success => Ok(response),
+
+            GoogleAuthStatus.Blocked => StatusCode(403, new ApiErrorResponse(
+                AuthErrorCodes.UserIsBlocked,
+                "Votre compte a été bloqué")),
+
+            GoogleAuthStatus.EmailUnverified => Unauthorized(new ApiErrorResponse(
+                AuthErrorCodes.GoogleEmailUnverified,
+                "Votre adresse e-mail Google n'est pas vérifiée.")),
+
+            GoogleAuthStatus.InvalidToken => Unauthorized(new ApiErrorResponse(
+                AuthErrorCodes.GoogleInvalidToken,
+                "Le jeton Google est invalide ou a expiré.")),
+
+            _ => StatusCode(500, new ApiErrorResponse(
+                "unknown_google_status",
+                "État de connexion Google inconnu"))
+        };
+    }
+
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest req)
     {

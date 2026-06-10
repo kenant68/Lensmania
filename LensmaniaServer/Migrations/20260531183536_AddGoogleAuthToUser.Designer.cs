@@ -3,6 +3,7 @@ using System;
 using LensmaniaServer.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LensmaniaServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260531183536_AddGoogleAuthToUser")]
+    partial class AddGoogleAuthToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +79,6 @@ namespace LensmaniaServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("CoverPhotoPostId")
                         .HasColumnType("integer");
 
@@ -106,9 +106,6 @@ namespace LensmaniaServer.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("WinnerPostId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CoverPhotoPostId");
@@ -116,8 +113,6 @@ namespace LensmaniaServer.Migrations
                     b.HasIndex("ThemeId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("WinnerPostId");
 
                     b.ToTable("Events", t =>
                         {
@@ -345,18 +340,11 @@ namespace LensmaniaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LensmaniaServer.Models.Post", "WinnerPost")
-                        .WithMany()
-                        .HasForeignKey("WinnerPostId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("CoverPhoto");
 
                     b.Navigation("Theme");
 
                     b.Navigation("User");
-
-                    b.Navigation("WinnerPost");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.PasswordResetToken", b =>

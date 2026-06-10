@@ -9,7 +9,9 @@ public enum AuthApiErrorType
     NetworkFailure,
     UnexpectedServerError,
     InvalidOrExpiredResetToken,
-    BlockedUser
+    BlockedUser,
+    InvalidGoogleToken,
+    GoogleEmailUnverified
 }
 
 public sealed record AuthApiError(AuthApiErrorType Type, string Message, string? Code = null);
