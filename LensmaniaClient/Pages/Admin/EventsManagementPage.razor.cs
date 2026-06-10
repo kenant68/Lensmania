@@ -77,7 +77,7 @@ public class EventsManagementPageBase : ComponentBase
         try
         {
             await EventSvc.DeleteAsync(_selectedToDelete.Id);
-			NotificationService.Info($"L'évènement a été supprimé avec succès !");
+			NotificationService.Success($"L'évènement a été supprimé avec succès !");
         }
         catch
         {
