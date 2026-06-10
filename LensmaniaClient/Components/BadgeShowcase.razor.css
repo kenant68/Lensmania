@@ -1,0 +1,39 @@
+.badge-showcase {
+    margin: 1rem 0;
+}
+
+.badge-showcase-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(86, 62, 161, 0.7);
+    margin-bottom: 0.6rem;
+}
+
+.badge-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.6rem;
+}
+
+.badge-showcase-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.5rem;
+    background: #fff;
+    border: 1px solid rgba(86, 62, 161, 0.12);
+    border-radius: 12px;
+}
+
+.badge-showcase-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.badge-showcase-event {
+    font-size: 0.75rem;
+    color: rgba(86, 62, 161, 0.7);
+}

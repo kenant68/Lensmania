@@ -76,6 +76,9 @@ namespace LensmaniaServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int?>("CoverPhotoPostId")
                         .HasColumnType("integer");
 
@@ -103,6 +106,9 @@ namespace LensmaniaServer.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("WinnerPostId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CoverPhotoPostId");
@@ -110,6 +116,8 @@ namespace LensmaniaServer.Migrations
                     b.HasIndex("ThemeId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("WinnerPostId");
 
                     b.ToTable("Events", t =>
                         {
@@ -243,11 +251,17 @@ namespace LensmaniaServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AuthProvider")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GoogleId")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
@@ -260,7 +274,6 @@ namespace LensmaniaServer.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Username")
@@ -272,6 +285,10 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("GoogleId")
+                        .IsUnique()
+                        .HasFilter("\"GoogleId\" IS NOT NULL");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -328,11 +345,18 @@ namespace LensmaniaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("LensmaniaServer.Models.Post", "WinnerPost")
+                        .WithMany()
+                        .HasForeignKey("WinnerPostId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("CoverPhoto");
 
                     b.Navigation("Theme");
 
                     b.Navigation("User");
+
+                    b.Navigation("WinnerPost");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.PasswordResetToken", b =>

@@ -481,6 +481,8 @@ $RECYCLE.BIN/
 #appsettings
 appsettings.json
 appsettings.Development.json
+# Client wwwroot appsettings.json is public (API URL + Google client id) and must be committed
+!LensmaniaClient/wwwroot/appsettings.json
 
 # Ignore uploaded photos in /uploads/photos/ (keep the structure)
 LensmaniaServer/wwwroot/uploads/photos/*

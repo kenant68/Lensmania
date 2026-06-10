@@ -42,6 +42,12 @@ builder.Services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
 builder.Services.AddScoped<PasswordResetService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
+builder.Services.AddOptions<EventClosingOptions>()
+    .BindConfiguration("EventClosing")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddScoped<EventClosureService>();
+builder.Services.AddHostedService<EventClosingBackgroundService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -97,6 +103,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddCors(options =>
@@ -115,7 +123,7 @@ if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     using var scope = app.Services.CreateScope();
     await using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    await db.Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();

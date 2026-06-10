@@ -1,6 +1,7 @@
 namespace LensmaniaLibrary.DTOs.Users;
 
-public record PublicUserProfileResponse (
+public record PublicUserProfileResponse(
     int Id,
-    string Username
+    string Username,
+    IReadOnlyList<UserBadgeResponse> Badges
 );

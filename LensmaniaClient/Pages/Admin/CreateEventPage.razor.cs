@@ -16,7 +16,7 @@ public class CreateEventPageBase : ComponentBase
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     protected EventFormModel _form = new();
-    protected List<CreateBadgeRequest> _badges = new();
+    protected List<CreateBadgeRequest> _badges = new() { new CreateBadgeRequest { Name = string.Empty, ImageUrl = string.Empty } };
     protected List<ThemeResponse>? _themes;
     protected bool _isSubmitting;
     protected string? _errorMessage;
@@ -36,15 +36,6 @@ public class CreateEventPageBase : ComponentBase
             return;
         }
         _currentUserId = uid;
-    }
-
-    protected void AddBadge()
-        => _badges.Add(new CreateBadgeRequest(string.Empty, string.Empty));
-
-    protected void RemoveBadge(int index)
-    {
-        if (index >= 0 && index < _badges.Count)
-            _badges.RemoveAt(index);
     }
 
     protected void UpdateBadge(int index, CreateBadgeRequest updated)
@@ -71,16 +62,16 @@ public class CreateEventPageBase : ComponentBase
 
         try
         {
-            var request = new CreateEventRequest(
-                _form.Name.Trim(),
-                _form.Description.Trim(),
-                _form.StartDate,
-                _form.EndDate,
-                _form.IsPremium,
-                _form.ThemeId,
-                _currentUserId,
-                _badges
-            );
+            var request = new CreateEventRequest
+            {
+                Name = _form.Name.Trim(),
+                Description = _form.Description.Trim(),
+                StartDate = DateTime.SpecifyKind(_form.StartDate, DateTimeKind.Local).ToUniversalTime(),
+                EndDate = DateTime.SpecifyKind(_form.EndDate, DateTimeKind.Local).ToUniversalTime(),
+                IsPremium = _form.IsPremium,
+                ThemeId = _form.ThemeId,
+                Badges = _badges
+            };
 
             _createdEvent = await EventSvc.CreateAsync(request);
             NotificationService.Success($"L'événement a été créé avec succès !");
@@ -103,6 +94,8 @@ public class CreateEventPageBase : ComponentBase
 
         if (_form.StartDate == default)
             _fieldErrors["StartDate"] = "Obligatoire";
+        else if (_form.StartDate <= DateTime.Now)
+            _fieldErrors["StartDate"] = "La date de début doit être dans le futur.";
 
         if (_form.EndDate == default)
             _fieldErrors["EndDate"] = "Obligatoire";
