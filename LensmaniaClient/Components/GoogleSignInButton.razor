@@ -1,0 +1,57 @@
+@using LensmaniaClient.Services.Auth
+@implements IDisposable
+@inject IJSRuntime JS
+@inject IConfiguration Configuration
+@inject AuthApiClient AuthApiClient
+@inject NavigationManager Navigation
+
+<div class="google-signin">
+    <div id="@_buttonId"></div>
+    @if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <div class="auth-alert auth-alert--error" role="alert">@_error</div>
+    }
+</div>
+
+@code {
+    private readonly string _buttonId = $"google-btn-{Guid.NewGuid():N}";
+    private DotNetObjectReference<GoogleSignInButton>? _ref;
+    private string? _error;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var clientId = Configuration["Google:ClientId"];
+        if (string.IsNullOrWhiteSpace(clientId))
+        {
+            _error = "Configuration Google manquante.";
+            StateHasChanged();
+            return;
+        }
+
+        _ref = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("lensmaniaGoogleAuth.initialize", clientId, _buttonId, _ref);
+    }
+
+    [JSInvokable]
+    public async Task OnGoogleCredential(string idToken)
+    {
+        _error = null;
+        var result = await AuthApiClient.GoogleSignInAsync(idToken);
+        if (result.IsSuccess)
+        {
+            Navigation.NavigateTo("/", forceLoad: false);
+        }
+        else
+        {
+            _error = result.Error?.Message ?? "La connexion Google a échoué.";
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose() => _ref?.Dispose();
+}

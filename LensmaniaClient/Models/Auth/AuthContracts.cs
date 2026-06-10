@@ -13,3 +13,5 @@ public record ForgotPasswordRequestDto(string Email);
 public record ResetPasswordRequestDto(string Token, string NewPassword);
 
 public record SimpleMessageResponseDto(string Message);
+
+public record GoogleSignInRequestDto(string IdToken);

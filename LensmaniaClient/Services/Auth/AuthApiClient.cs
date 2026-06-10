@@ -41,6 +41,23 @@ public sealed class AuthApiClient
         return result;
     }
 
+    public async Task<AuthApiResult<AuthResponseDto>> GoogleSignInAsync(string idToken)
+    {
+        var result = await SendAsync<GoogleSignInRequestDto, AuthResponseDto>(
+            "api/auth/google", new GoogleSignInRequestDto(idToken));
+
+        if (result.IsSuccess && result.Data is not null)
+        {
+            await _authenticationStateProvider.SetTokenAsync(result.Data.Token);
+        }
+        else if (result.Error?.Type == AuthApiErrorType.BlockedUser)
+        {
+            await _authenticationStateProvider.ClearTokenAsync(LogoutReason.Blocked);
+        }
+
+        return result;
+    }
+
     public Task<AuthApiResult<SimpleMessageResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request) =>
         SendAsync<ForgotPasswordRequestDto, SimpleMessageResponseDto>("api/auth/forgot-password", request);
 
@@ -75,7 +92,7 @@ public sealed class AuthApiClient
             {
                 HttpStatusCode.Unauthorized =>
                     AuthApiResult<TResponse>.Failure(
-                        new AuthApiError(AuthApiErrorType.InvalidCredentials, message, code)),
+                        new AuthApiError(MapUnauthorizedErrorType(code), message, code)),
                 HttpStatusCode.Forbidden =>
                     AuthApiResult<TResponse>.Failure(
                         new AuthApiError(AuthApiErrorType.BlockedUser, message, code)),
@@ -106,6 +123,13 @@ public sealed class AuthApiClient
                 new AuthApiError(AuthApiErrorType.UnexpectedServerError, "Format de reponse serveur invalide."));
         }
     }
+
+    private static AuthApiErrorType MapUnauthorizedErrorType(string? code) => code switch
+    {
+        "AUTH_GOOGLE_INVALID_TOKEN" => AuthApiErrorType.InvalidGoogleToken,
+        "AUTH_GOOGLE_EMAIL_UNVERIFIED" => AuthApiErrorType.GoogleEmailUnverified,
+        _ => AuthApiErrorType.InvalidCredentials
+    };
 
     private static AuthApiErrorType MapBadRequestErrorType(string? code) => code switch
     {
