@@ -72,16 +72,18 @@ public class UserManagementPageBase : ComponentBase
     protected void OpenDeleteModal(UserAdminResponse user)
     {
         _selectedUserToDelete = user;
-        message = null;
-        isError = false;
         _showDeleteModal = true;
+
+		message = null;
+        isError = false;
     }
 
     protected void CloseDeleteModal()
     {
         _selectedUserToDelete = null;
         _showDeleteModal = false;
-        message = null;
+        
+		message = null;
         isError = false;
     }
 
@@ -95,7 +97,6 @@ public class UserManagementPageBase : ComponentBase
         if (response.IsSuccessStatusCode)
         {
             NotificationService.Success($"L'utilisateur a été supprimé avec succès !");
-			isError = false;
             
             _selectedUserToDelete = null;
             _showDeleteModal = false;
