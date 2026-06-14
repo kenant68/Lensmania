@@ -241,7 +241,7 @@ Schema is managed with EF Core migrations under `LensmaniaServer/Migrations/`. M
 dotnet ef database update --project LensmaniaServer
 ```
 
-The up-to-date relational schema (reflecting the actual EF Core model) is documented in [`docs/database/schema.md`](docs/database/schema.md). Legacy conceptual/logical diagrams are also available under `docs/database/` (`MCD_Lensmania.jpg`, `MLD_Lensmania.jpg`).
+The up-to-date relational schema (reflecting the actual EF Core model) is documented in [`docs/database/MLD_Lensmania.md`](docs/database/MLD_Lensmania.md). Legacy conceptual/logical diagrams are also available under `docs/database/` (`MCD_Lensmania.jpg`, `MLD_Lensmania.jpg`).
 
 ## OpenAPI (Development)
 
@@ -257,7 +257,7 @@ dotnet test
 
 ## Documentation
 
-- Database schema (current): [`docs/database/schema.md`](docs/database/schema.md)
+- Database schema (current): [`docs/database/MLD_Lensmania.md`](docs/database/MLD_Lensmania.md)
 - Legacy database diagrams (MCD / MLD): `docs/database/`
 - UI mockups: `docs/mockups/`
 - Use-case diagram: `docs/use-cases/lensmania_use_case.drawio.png`

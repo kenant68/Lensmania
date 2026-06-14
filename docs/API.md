@@ -1110,7 +1110,7 @@ Endpoint de healthcheck. Pas d'authentification requise.
 Les `photoUrl` et `imageUrl` retournés par l'API sont des **chemins relatifs ou noms de fichiers** (ex: `abc123.jpg`, `uploads/badges/abc123.svg`). Le client est responsable de les préfixer avec l'adresse de base du serveur de fichiers statiques pour former l'URL complète.
 
 Exemple :
-```
+```text
 photoUrl: "abc123.jpg"
 → URL complète: https://server.example.com/uploads/photos/abc123.jpg
 
