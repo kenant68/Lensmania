@@ -3,6 +3,7 @@ using System;
 using LensmaniaServer.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LensmaniaServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260614171259_FixSync")]
+    partial class FixSync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,7 +50,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Badges", (string)null);
+                    b.ToTable("Badges");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Earn", b =>
@@ -65,7 +68,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("BadgeId");
 
-                    b.ToTable("Earn", (string)null);
+                    b.ToTable("Earn");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Event", b =>
@@ -120,7 +123,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("WinnerPostId");
 
-                    b.ToTable("Events", null, t =>
+                    b.ToTable("Events", t =>
                         {
                             t.HasCheckConstraint("CK_Events_DateRange", "\"EndDate\" >= \"StartDate\"");
                         });
@@ -163,7 +166,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("UserId", "ConsumedAt");
 
-                    b.ToTable("PasswordResetTokens", (string)null);
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Post", b =>
@@ -205,7 +208,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.PostLike", b =>
@@ -220,7 +223,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostLikes", (string)null);
+                    b.ToTable("PostLikes");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Theme", b =>
@@ -242,7 +245,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Themes", (string)null);
+                    b.ToTable("Themes");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.User", b =>
@@ -295,7 +298,7 @@ namespace LensmaniaServer.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Badge", b =>
