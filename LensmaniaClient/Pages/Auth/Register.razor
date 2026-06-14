@@ -68,7 +68,7 @@
     {
         var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (state.User.Identity?.IsAuthenticated == true)
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/posts");
     }
 
     private async Task SubmitAsync()
@@ -95,7 +95,7 @@
             isError = false;
             message = $"Compte créé. Bienvenue, {result.Data.Username}.";
             await Task.Delay(150);
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/posts");
             return;
         }
 
