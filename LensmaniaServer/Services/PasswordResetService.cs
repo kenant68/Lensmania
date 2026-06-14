@@ -2,6 +2,8 @@ using System.Security.Cryptography;
 using System.Text;
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
+using LensmaniaServer.Options;
+using LensmaniaLibrary.DTOs.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

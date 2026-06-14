@@ -1,5 +1,6 @@
 using LensmaniaServer.Database;
 using LensmaniaServer.Models;
+using LensmaniaLibrary.DTOs.Auth;
 using LensmaniaServer.Services;
 using LensmaniaLibrary.Enums;
 using LensmaniaTests.Helpers;

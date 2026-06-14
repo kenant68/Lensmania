@@ -1,6 +1,8 @@
 using LensmaniaServer.Database;
+using LensmaniaServer.Exceptions;
 using LensmaniaServer.Models;
 using LensmaniaLibrary.Enums;
+using LensmaniaLibrary.DTOs.Auth;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 

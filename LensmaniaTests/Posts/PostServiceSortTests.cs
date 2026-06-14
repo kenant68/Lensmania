@@ -80,6 +80,7 @@ public class PostServiceSortTests
 
         var page2 = await _service.GetAllAsync(null, cursor, 1, sortOrder: PostSortOrder.DateAsc);
 
+        Assert.That(cursor, Is.Not.Null);
         Assert.That(page2.Posts[0].Id, Is.GreaterThan(cursor));
     }
 
@@ -99,6 +100,7 @@ public class PostServiceSortTests
 
         var page2 = await _service.GetAllAsync(null, cursor, 1);
 
+        Assert.That(cursor, Is.Not.Null);
         Assert.That(page2.Posts[0].Id, Is.LessThan(cursor));
     }
 }

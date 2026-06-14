@@ -1,7 +1,10 @@
-using LensmaniaServer.Models;
+using LensmaniaServer.Exceptions;
 using LensmaniaServer.Services;
 using LensmaniaServer.Database;
+using LensmaniaServer.Errors;
 using LensmaniaLibrary.Enums;
+using LensmaniaLibrary.DTOs.Auth;
+using LensmaniaLibrary.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
