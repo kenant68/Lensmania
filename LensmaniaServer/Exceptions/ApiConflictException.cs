@@ -1,4 +1,4 @@
-namespace LensmaniaServer.Models;
+namespace LensmaniaServer.Exceptions;
 
 public class ApiConflictException : Exception
 {

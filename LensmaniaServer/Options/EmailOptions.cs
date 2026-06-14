@@ -1,4 +1,4 @@
-namespace LensmaniaServer.Models;
+namespace LensmaniaServer.Options;
 
 public class EmailOptions
 {
