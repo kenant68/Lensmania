@@ -1,4 +1,4 @@
-namespace LensmaniaServer.Models;
+namespace LensmaniaServer.Errors;
 
 public static class AuthErrorCodes
 {

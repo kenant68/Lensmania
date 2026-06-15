@@ -6,7 +6,7 @@ using LensmaniaTests.Helpers;
 using LensmaniaLibrary.DTOs.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace LensmaniaTests.Services;
+namespace LensmaniaTests.Users;
 
 [TestFixture]
 public class UserServiceTests

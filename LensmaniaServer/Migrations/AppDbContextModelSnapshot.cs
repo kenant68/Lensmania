@@ -47,7 +47,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Badges");
+                    b.ToTable("Badges", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Earn", b =>
@@ -65,7 +65,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("BadgeId");
 
-                    b.ToTable("Earn");
+                    b.ToTable("Earn", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Event", b =>
@@ -120,7 +120,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("WinnerPostId");
 
-                    b.ToTable("Events", t =>
+                    b.ToTable("Events", null, t =>
                         {
                             t.HasCheckConstraint("CK_Events_DateRange", "\"EndDate\" >= \"StartDate\"");
                         });
@@ -163,7 +163,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("UserId", "ConsumedAt");
 
-                    b.ToTable("PasswordResetTokens");
+                    b.ToTable("PasswordResetTokens", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Post", b =>
@@ -205,7 +205,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.PostLike", b =>
@@ -220,7 +220,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostLikes");
+                    b.ToTable("PostLikes", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Theme", b =>
@@ -242,7 +242,7 @@ namespace LensmaniaServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Themes");
+                    b.ToTable("Themes", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.User", b =>
@@ -295,7 +295,7 @@ namespace LensmaniaServer.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("LensmaniaServer.Models.Badge", b =>

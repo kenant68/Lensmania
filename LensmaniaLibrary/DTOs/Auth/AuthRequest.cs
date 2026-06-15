@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LensmaniaServer.Models;
+namespace LensmaniaLibrary.DTOs.Auth;
 
 public class RegisterRequest
 {

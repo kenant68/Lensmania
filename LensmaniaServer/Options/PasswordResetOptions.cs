@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LensmaniaServer.Models;
+namespace LensmaniaServer.Options;
 
 public class PasswordResetOptions
 {

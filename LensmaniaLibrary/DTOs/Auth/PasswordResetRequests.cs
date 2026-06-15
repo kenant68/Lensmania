@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LensmaniaServer.Models;
+namespace LensmaniaLibrary.DTOs.Auth;
 
 public record ForgotPasswordRequest(
     [param: Required(ErrorMessage = "L'adresse e-mail est obligatoire.")]
