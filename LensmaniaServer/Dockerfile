@@ -13,6 +13,11 @@ RUN dotnet publish LensmaniaServer/LensmaniaServer.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
+# curl sert uniquement au HEALTHCHECK du conteneur (image runtime sans client HTTP).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
 

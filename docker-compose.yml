@@ -26,6 +26,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      # Le client n'est lance qu'une fois l'API prete a repondre.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     volumes:
       # Les photos uploadees doivent survivre a la recreation du conteneur.
       - uploads:/app/wwwroot/uploads/photos
@@ -40,7 +47,8 @@ services:
       dockerfile: LensmaniaClient/Dockerfile
     restart: unless-stopped
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     volumes:
       # Surcharge l'URL de l'API sans rebuild ni toucher au appsettings.json
       # committe (qui reste cale sur le dev direct localhost:5078).
