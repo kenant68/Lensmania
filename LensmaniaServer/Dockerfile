@@ -21,7 +21,13 @@ RUN apt-get update \
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
 
-RUN mkdir -p /app/wwwroot/uploads/photos
+# Le dossier des uploads doit appartenir a l'utilisateur applicatif (APP_UID)
+# pour qu'il puisse y ecrire les photos une fois le process en non-root.
+RUN mkdir -p /app/wwwroot/uploads/photos \
+    && chown -R $APP_UID:$APP_UID /app/wwwroot/uploads
 
 COPY --from=build /app/publish .
+
+# On execute le process en non-root (utilisateur "app" fourni par l'image aspnet).
+USER $APP_UID
 ENTRYPOINT ["dotnet", "LensmaniaServer.dll"]
