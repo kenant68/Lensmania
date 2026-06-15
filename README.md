@@ -63,7 +63,7 @@ This repository is organized as a multi-project .NET solution:
 
 **Shared library (LensmaniaLibrary)**
 
-- Shared DTOs (Posts, Users, Events, Themes, Badges) and enums (`LoginStatus`, `GoogleAuthStatus`, `PostSortOrder`) used on both sides
+- Shared DTOs (Auth, Posts, Users, Events, Themes, Badges) and enums (`LoginStatus`, `GoogleAuthStatus`, `PostSortOrder`) used on both sides
 
 ## Project Structure
 
@@ -86,20 +86,24 @@ Lensmania/
 │   ├── Controllers/                # Auth, User, Posts, Events, Themes, Upload, Health
 │   ├── Services/                   # Auth, Google, Posts, Events, Themes, Email,
 │   │                               #   PasswordReset, FileStorage, EventClosing, Token
-│   ├── Database/                   # EF Core DbContext
+│   ├── Database/                   # EF Core DbContext + dev seeders (SeederPost, SeederTheme)
 │   ├── Models/                     # User, Post, Event, Theme, Badge, Earn, PostLike, ...
 │   ├── Migrations/                 # EF Core migrations
-│   ├── SeederPost.cs               # Development seed (posts)
-│   ├── SeederTheme.cs              # Development seed (themes)
+│   ├── Options/                    # Strongly-typed options (Email, PasswordReset)
+│   ├── Errors/                     # Domain error codes (AuthErrorCodes)
+│   ├── Exceptions/                 # Custom exceptions (ApiConflictException)
 │   ├── appsettings.json            # Local settings (DB, JWT, Email, Google, ...)
 │   ├── appsettings.example.json    # Example settings (safe template)
 │   ├── Program.cs                  # HTTP pipeline + auth + CORS + seeding + hosted service
 │   └── LensmaniaServer.csproj
 ├── LensmaniaLibrary/               # Shared library (DTOs + enums)
-│   ├── DTOs/                       # Posts, Users, Events, Themes, Badges
+│   ├── DTOs/                       # Auth, Posts, Users, Events, Themes, Badges
 │   ├── Enums/                      # LoginStatus, GoogleAuthStatus, PostSortOrder
 │   └── LensmaniaLibrary.csproj
-├── LensmaniaTests/                 # Tests
+├── LensmaniaTests/                 # xUnit tests
+│   ├── Auth/                       # Auth, login & password-reset tests
+│   ├── Posts/                      # Post service tests
+│   ├── Users/                      # User service tests
 │   └── LensmaniaTests.csproj
 └── docs/
     ├── database/                   # MCD / MLD diagrams
