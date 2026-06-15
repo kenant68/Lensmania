@@ -37,6 +37,8 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	private bool _hasError = false;
 	private string _errorMessage = string.Empty;
     private readonly HashSet<int> _pendingLikes = new();
+    private bool _isDeleteModalOpen;
+    private int _postIdToDelete;
 	
 	// Masonry / images
 	private Masonry? _masonry;
@@ -371,5 +373,17 @@ public partial class Posts : ComponentBase, IAsyncDisposable
 	    {
 		    _dotNetRef?.Dispose();
 	    }
+    }
+    
+    // DeleteModal
+    private void OpenDeleteModal(int postId)
+    {
+	    _postIdToDelete = postId;
+	    _isDeleteModalOpen = true;
+    }
+    
+    private void CloseDeleteModal()
+    {
+	    _isDeleteModalOpen = false;
     }
 }
