@@ -44,7 +44,7 @@
         var result = await AuthApiClient.GoogleSignInAsync(idToken);
         if (result.IsSuccess)
         {
-            Navigation.NavigateTo("/", forceLoad: false);
+            Navigation.NavigateTo("/posts", forceLoad: false);
         }
         else
         {
