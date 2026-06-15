@@ -1,0 +1,16 @@
+.page {
+    display: flex;
+    min-height: 100vh;
+    flex: 1;
+    min-width: 0;
+}
+
+.main-content {
+    flex: 1;
+}
+
+@media (max-width: 640px) {
+    .page {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,137 @@
+.admin-users-section {
+    /*background-color: var(--color-lighter-purple);*/
+    padding: 0 3rem;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 32px;
+    color: #1e1e1e;
+}
+
+/* -- Table -- */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.users-table thead {
+    background-color: var(--color-dark-purple);
+}
+
+.users-table thead tr {
+    border-bottom: 2px solid var(--color-dark-purple);
+}
+
+.users-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-lighter-purple);
+    letter-spacing: 0.05em;
+}
+
+.users-table td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: var(--color-dark-purple);
+    border-bottom: 1px solid var(--color-lighter-purple);
+    vertical-align: middle;
+}
+
+.users-table tbody tr:nth-child(even) {
+    background-color: var(--color-lighter-purple);
+}
+
+.users-table tbody tr:hover {
+    background-color: var(--color-light-purple);
+}
+
+.user-avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--color-light-purple);
+}
+
+.row-blocked td {
+    opacity: 0.5;
+}
+
+/* -- Buttons -- */
+.btn-add {
+    background-color: var(--color-dark-purple);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+}
+
+.btn-add:hover {
+    background-color: var(--color-dark-purple);
+}
+
+.btn-icon {
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition:
+            transform 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.btn-icon:hover {
+    transform: scale(1.15);
+    opacity: 0.85;
+}
+
+/* -- Pagination -- */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--color-dark-purple);
+}
+
+.btn-page {
+    background: none;
+    border: 1px solid var(--color-lighter-purple);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--color-dark-purple);
+}
+
+.btn-page:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.btn-page:hover:not(:disabled) {
+    background-color: var(--color-lighter-purple);
+}
+
+.loading-text {
+    text-align: center;
+    color: var(--color-light-purple);
+    margin-top: 40px;
+}

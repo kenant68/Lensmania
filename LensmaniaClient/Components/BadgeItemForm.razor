@@ -1,0 +1,120 @@
+@using LensmaniaLibrary.DTOs.Badges
+@using LensmaniaClient.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject UploadService UploadSvc
+
+<div class="badge-item card mb-2 p-3">
+    <div class="row g-2 align-items-end">
+
+        <div class="col-12 col-md-5">
+            <label class="form-label fw-semibold" for="badge-name-@Index">
+                Nom du badge <span class="text-danger">*</span>
+            </label>
+            <input id="badge-name-@Index"
+                   type="text"
+                   class="form-control @(_nameError is not null ? "is-invalid" : "")"
+                   placeholder="Ex : Photographe du mois"
+                   value="@Badge.Name"
+                   @oninput="e => OnNameChanged(e.Value?.ToString() ?? string.Empty)" />
+            @if (_nameError is not null)
+            {
+                <div class="invalid-feedback">@_nameError</div>
+            }
+        </div>
+
+        <div class="col-12 col-md-5">
+            <label class="form-label fw-semibold">Image du badge</label>
+            <div class="input-group">
+                <input type="url"
+                       class="form-control"
+                       placeholder="https://…/badge.svg"
+                       value="@Badge.ImageUrl"
+                       @oninput="e => OnImageUrlChanged(e.Value?.ToString() ?? string.Empty)" />
+                <label class="btn btn-outline-secondary" title="Choisir un fichier">
+                    @if (_isUploading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-upload"></i>
+                    }
+                    <InputFile OnChange="OnFileSelected"
+                               accept=".jpg,.jpeg,.png,.webp,.svg"
+                               style="display:none" />
+                </label>
+            </div>
+            @if (_uploadError is not null)
+            {
+                <div class="text-danger small mt-1">@_uploadError</div>
+            }
+        </div>
+
+        <div class="col-12 col-md-2 d-flex align-items-end">
+            @if (!string.IsNullOrWhiteSpace(Badge.ImageUrl))
+            {
+                <img src="@Badge.ImageUrl"
+                     alt="Aperçu badge"
+                     class="badge-preview me-2"
+                     onerror="this.style.display='none'" />
+            }
+            @if (ShowRemove)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        title="Supprimer ce badge"
+                        @onclick="() => OnRemove.InvokeAsync(Index)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CreateBadgeRequest Badge { get; set; } = default!;
+    [Parameter, EditorRequired] public int Index { get; set; }
+    [Parameter] public EventCallback<int> OnRemove { get; set; }
+    [Parameter] public EventCallback<CreateBadgeRequest> OnChange { get; set; }
+    [Parameter] public bool ShowRemove { get; set; } = true;
+
+    private bool _isUploading;
+    private string? _uploadError;
+    private string? _nameError;
+
+    private void OnNameChanged(string value)
+    {
+        _nameError = string.IsNullOrWhiteSpace(value) ? "Le nom est obligatoire." : null;
+        OnChange.InvokeAsync(new CreateBadgeRequest { Name = value, ImageUrl = Badge.ImageUrl });
+    }
+
+    private void OnImageUrlChanged(string value)
+        => OnChange.InvokeAsync(new CreateBadgeRequest { Name = Badge.Name, ImageUrl = value });
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        _uploadError = null;
+        _isUploading = true;
+        StateHasChanged();
+
+        try
+        {
+            var url = await UploadSvc.UploadBadgeAsync(e.File);
+            if (url is null)
+            {
+                _uploadError = "L'upload a échoué. Vérifiez le format et la taille du fichier.";
+                return;
+            }
+            await OnChange.InvokeAsync(new CreateBadgeRequest { Name = Badge.Name, ImageUrl = url.Trim('"') });
+        }
+        catch (Exception ex)
+        {
+            _uploadError = ex.Message;
+        }
+        finally
+        {
+            _isUploading = false;
+        }
+    }
+}

@@ -1,0 +1,105 @@
+@page "/login"
+@using LensmaniaClient.Components
+@using LensmaniaClient.Models.Auth
+@using LensmaniaClient.Services.Auth
+@inject AuthApiClient AuthApiClient
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthCard>
+    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault="true">
+        <div class="auth-fields">
+            <div class="auth-field">
+                <label class="visually-hidden" for="login-email">E-mail</label>
+                <input id="login-email" class="form-control auth-input" type="email" autocomplete="email" placeholder="Email" @bind="email" @bind:event="oninput" />
+            </div>
+            <div class="auth-field">
+                <label class="visually-hidden" for="login-password">Mot de passe</label>
+                <input id="login-password" class="form-control auth-input" type="password" autocomplete="current-password" placeholder="Mot de passe" @bind="password" @bind:event="oninput" />
+            </div>
+        </div>
+
+        <div class="auth-forgot-row">
+            <a class="auth-forgot-link" href="@AuthRoutes.ForgotPassword">Mot de passe oublié</a>
+        </div>
+
+        <button class="auth-submit" type="submit" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Connexion…</span>
+            }
+            else
+            {
+                <span>Connexion</span>
+            }
+        </button>
+
+        <p class="auth-footer-link">
+            <a href="@AuthRoutes.Register">Créer un compte</a>
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="auth-alert @(isError ? "auth-alert--error" : "auth-alert--success")" role="alert">
+                @message
+            </div>
+        }
+    </form>
+
+    <div class="auth-separator"><span>ou</span></div>
+    <GoogleSignInButton />
+</AuthCard>
+
+@code {
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private bool isLoading;
+    private string? message;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        
+        if (state.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("/posts");
+        
+        
+        var provider = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
+        
+        switch (provider.LogoutReason)
+        {
+            case LogoutReason.Blocked:
+                isError = true;
+                message = "Votre compte a été bloqué.";
+                break;
+
+            case LogoutReason.Unauthorized:
+                isError = true;
+                message = "Session expirée, veuillez vous reconnecter.";
+                break;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        isLoading = true;
+        message = null;
+        StateHasChanged();
+
+        var result = await AuthApiClient.LoginAsync(new LoginRequestDto(email.Trim(), password));
+
+        if (result.IsSuccess && result.Data is not null)
+        {
+            isError = false;
+            message = $"Bienvenue, {result.Data.Username}.";
+            await Task.Delay(150);
+            Navigation.NavigateTo("/posts");
+            return;
+        }
+
+        isError = true;
+        message = result.Error?.Message ?? "La connexion a échoué.";
+        isLoading = false;
+    }
+}

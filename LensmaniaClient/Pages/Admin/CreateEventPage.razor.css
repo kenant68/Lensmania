@@ -1,0 +1,96 @@
+.create-event-page {
+    max-width: 860px;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-dark-purple);
+}
+
+.btn-back {
+    font-size: 0.9rem;
+    color: var(--color-dark-purple);
+    text-decoration: none;
+    background-color: var(--color-lighter-purple);
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+.btn-back:hover {
+    background-color: var(--color-light-purple);
+    color: var(--color-dark-purple);
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-dark-purple);
+    border-bottom: 2px solid var(--color-lighter-purple);
+    padding-bottom: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.card {
+    border-radius: 1rem;
+    border: 1px solid var(--color-lighter-purple);
+}
+
+.badge-item {
+    background-color: var(--color-lighter-purple);
+    border: 1px solid var(--color-lighter-purple);
+    border-radius: 0.75rem;
+    transition: box-shadow 0.15s ease;
+}
+
+.badge-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.badge-preview {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 1px solid var(--color-lighter-purple);
+    background: #fff;
+}
+
+.btn-add-badge {
+    background-color: transparent;
+    border: 1px solid var(--color-dark-purple);
+    color: var(--color-dark-purple);
+    border-radius: 6px;
+}
+
+.btn-add-badge:hover {
+    background-color: var(--color-lighter-purple);
+}
+
+.btn-submit {
+    background-color: var(--color-dark-purple);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-submit:hover:not(:disabled) {
+    background-color: var(--color-lighter-purple);
+    color: var(--color-dark-purple);
+}
+
+.btn-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        padding: 1.25rem !important;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+    }
+}

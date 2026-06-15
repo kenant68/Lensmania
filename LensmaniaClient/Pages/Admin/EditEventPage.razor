@@ -1,0 +1,173 @@
+@page "/admin/events/{Id:int}/edit"
+@inherits EditEventPageBase
+@using LensmaniaLibrary.DTOs.Events
+@using LensmaniaLibrary.DTOs.Badges
+@using LensmaniaLibrary.DTOs.Themes
+@using LensmaniaClient.Services
+@using LensmaniaClient.Components
+
+<div class="create-event-page container py-4">
+
+    <div class="page-header mb-4">
+        <a href="/admin/events/@Id" class="btn btn-link btn-back ps-0">
+            <i class="bi bi-arrow-left me-1"></i>Retour à l'événement
+        </a>
+        <h1 class="page-title mt-1">Modifier l'événement</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@_errorMessage</span>
+        </div>
+    }
+
+    @if (_isLoading)
+    {
+        <p>Chargement…</p>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <h5 class="section-title">
+                    <i class="bi bi-info-circle me-2"></i>Informations générales
+                </h5>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="event-name">
+                        Nom de l'événement <span class="text-danger">*</span>
+                    </label>
+                    <input id="event-name"
+                           type="text"
+                           class="form-control @(ShowError("Name") ? "is-invalid" : "")"
+                           @bind="_form.Name" />
+                    @if (ShowError("Name"))
+                    {
+                        <div class="invalid-feedback">Le nom est obligatoire.</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="event-description">Description</label>
+                    <textarea id="event-description"
+                              class="form-control"
+                              rows="4"
+                              @bind="_form.Description"></textarea>
+                </div>
+
+                <h5 class="section-title mt-4">
+                    <i class="bi bi-calendar-event me-2"></i>Dates
+                </h5>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold" for="event-start">
+                            Date de début <span class="text-danger">*</span>
+                        </label>
+                        <input id="event-start"
+                               type="datetime-local"
+                               class="form-control @(ShowError("StartDate") ? "is-invalid" : "")"
+                               @bind="_form.StartDate" />
+                        @if (ShowError("StartDate"))
+                        {
+                            <div class="invalid-feedback">La date de début est obligatoire.</div>
+                        }
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold" for="event-end">
+                            Date de fin <span class="text-danger">*</span>
+                        </label>
+                        <input id="event-end"
+                               type="datetime-local"
+                               class="form-control @(ShowError("EndDate") ? "is-invalid" : "")"
+                               @bind="_form.EndDate" />
+                        @if (ShowError("EndDate"))
+                        {
+                            <div class="invalid-feedback">@_fieldErrors["EndDate"]</div>
+                        }
+                    </div>
+                </div>
+
+                <h5 class="section-title mt-4">
+                    <i class="bi bi-palette me-2"></i>Thème &amp; accès
+                </h5>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-8">
+                        <label class="form-label fw-semibold" for="event-theme">
+                            Thème <span class="text-danger">*</span>
+                        </label>
+                        @if (_themes is null)
+                        {
+                            <div class="text-muted fst-italic">Chargement des thèmes…</div>
+                        }
+                        else
+                        {
+                            <select id="event-theme"
+                                    class="form-select @(ShowError("ThemeId") ? "is-invalid" : "")"
+                                    @bind="_form.ThemeId">
+                                <option value="0">— Choisir un thème —</option>
+                                @foreach (var t in _themes)
+                                {
+                                    <option value="@t.Id">
+                                        @(t.Icon is not null ? t.Icon + " " : "")@t.Name
+                                    </option>
+                                }
+                            </select>
+                            @if (ShowError("ThemeId"))
+                            {
+                                <div class="invalid-feedback">Veuillez sélectionner un thème.</div>
+                            }
+                        }
+                    </div>
+                    <div class="col-12 col-md-4 d-flex align-items-end pb-1">
+                        <div class="form-check form-switch">
+                            <input id="event-premium"
+                                   class="form-check-input"
+                                   type="checkbox"
+                                   role="switch"
+                                   @bind="_form.IsPremium" />
+                            <label class="form-check-label fw-semibold" for="event-premium">
+                                <i class="bi bi-star-fill text-warning me-1"></i>Événement Premium
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="section-title mt-4">
+                    <i class="bi bi-award me-2"></i>Badge
+                </h5>
+
+                <BadgeItemForm Badge="_badges[0]"
+                               Index="0"
+                               ShowRemove="false"
+                               OnChange="b => UpdateBadge(0, b)" />
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/admin/events/@Id" class="btn btn-outline-secondary">Annuler</a>
+                    <button type="button"
+                            class="btn btn-primary px-4"
+                            disabled="@_isSubmitting"
+                            @onclick="SubmitAsync">
+                        @if (_isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span>Sauvegarde…</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check2-circle me-1"></i>
+                            <span>Enregistrer</span>
+                        }
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>

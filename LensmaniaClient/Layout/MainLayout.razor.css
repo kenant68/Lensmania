@@ -1,0 +1,22 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+}
+
+main {
+    padding-top: 10px;
+}
+
+.main-content {
+    flex: 1;
+    background-color: #f8f9fa;
+}
+
+.content {
+    max-width: 95vw;
+    margin: 20px auto 0 auto;
+}

@@ -1,0 +1,27 @@
+@using LensmaniaLibrary.DTOs.Users
+@inject HttpClient Http
+
+@if (Badges is { Count: > 0 })
+{
+    <section class="badge-showcase">
+        <h2 class="badge-showcase-title">Badges</h2>
+        <div class="badge-showcase-grid">
+            @foreach (var badge in Badges)
+            {
+                <div class="badge-showcase-item" title="@($"{badge.Name} — {badge.EventName} — {badge.AwardedAt:dd/MM/yyyy}")">
+                    @if (!string.IsNullOrWhiteSpace(badge.ImageUrl))
+                    {
+                        <img class="badge-showcase-img" src="@($"{ApiBaseUrl}/{badge.ImageUrl.TrimStart('/')}")" alt="@badge.Name" onerror="this.style.display='none'" />
+                    }
+                    <span class="badge-showcase-event">@badge.EventName</span>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<UserBadgeResponse>? Badges { get; set; }
+
+    private string ApiBaseUrl => Http.BaseAddress?.ToString().TrimEnd('/') ?? string.Empty;
+}

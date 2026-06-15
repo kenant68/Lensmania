@@ -1,0 +1,88 @@
+@page "/admin/users"
+@inherits UserManagementPageBase
+@using LensmaniaLibrary.DTOs.Users
+@using LensmaniaClient.Components.Utils
+
+<h1 class="page-title py-4">Gestion des utilisateurs</h1>
+
+<section class="admin-users-section">
+    @if (IsLoading)
+    {
+        <p class="loading-text">Chargement...</p>
+    }
+    else if (PagedUsers is not null)
+    {
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>PSEUDO</th>
+                    <th>E-MAIL</th>
+                    <th>RÔLE</th>
+                    <th>BANNIR</th>
+                    <th>SUPPRIMER</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in PagedUsers.Users)
+                {
+                    <tr class="@(!user.IsActive ? "row-blocked" : "")">
+                        <td>
+                            <div class="user-avatar-placeholder"></div>
+                        </td>
+                        <td>@user.Username</td>
+                        <td>@user.Email</td>
+                        <td>@(user.IsAdmin ? "Admin" : user.IsPremium ? "Premium" : "")</td>
+                        <td>
+                            <button class="btn-icon btn-ban @(!user.IsActive ? "blocked" : "")"
+                                    title="@(!user.IsActive ? "Débloquer" : "Bloquer")"
+									aria-label="@(!user.IsActive ? "Débloquer l'utilisateur" : "Bloquer l'utilisateur")"
+                                    @onclick="() => OnToggleBlock(user)">
+                                <i class="bi @(user.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn-icon btn-delete"
+                                    title="Supprimer"
+									aria-label="Supprimer l'utilisateur"
+                                    @onclick="() => OpenDeleteModal(user)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span class="pagination-info">
+				@{
+                    var start = PagedUsers.Total == 0 ? 0 : Math.Min(CurrentOffset + 1, PagedUsers.Total);
+                    var end = Math.Min(CurrentOffset + PageSize, PagedUsers.Total);
+                }
+                @start à @end sur @PagedUsers.Total
+            </span>
+            <button class="btn-page" disabled="@(CurrentOffset == 0)" @onclick="PreviousPage">‹</button>
+            <button class="btn-page" disabled="@(!HasNextPage)" @onclick="NextPage">›</button>
+        </div>
+        
+        <ConfirmationModal IsVisible="_showDeleteModal"
+                      Title="Supprimer l'utilisateur"
+                      ConfirmText="Supprimer"
+                      CancelText="Annuler"
+                      OnConfirm="ConfirmDeleteUser"
+                      OnCancel="CloseDeleteModal">
+
+            <p> Vous êtes sur le point de supprimer : <strong>@_selectedUserToDelete?.Username</strong> </p>
+            <p> <span class="text-muted">@_selectedUserToDelete?.Email</span> </p>
+            <p class="text-danger"> Cette action est irréversible. </p>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="alert @(isError ? "alert--error" : "alert--success")" role="alert">
+                @message
+            </div>
+        }
+        </ConfirmationModal>
+    }
+</section>

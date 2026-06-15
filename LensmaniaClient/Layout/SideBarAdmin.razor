@@ -1,0 +1,80 @@
+@using System.Security.Claims
+@using LensmaniaClient.Services.Auth
+@inject CustomAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<aside class="sidebar">
+
+    <div class="sidebar-header">
+        <a class="navbar-brand" href="/">
+            Lensmania
+        </a>
+
+        <button
+            title="Navigation menu"
+            class="navbar-toggler"
+            @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    
+    <nav class="@NavMenuCssClass nav-scrollable">
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-section">
+                    <NavLink class="nav-link-admin" href="admin/users">
+                        Utilisateurs
+                    </NavLink>
+
+                    <NavLink class="nav-link-admin" href="admin/events">
+                        Événements
+                    </NavLink>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span class="text-white-50 small text-lg-start">
+                        @GetDisplayName(context)
+                    </span>
+                    <button type="button" class="btn btn-outline-light" @onclick="LogoutAsync">
+                        Déconnexion
+                    </button>
+                </div>
+            </Authorized>
+
+            <NotAuthorized>
+                <NavLink class="btn btn-secondary" href="@AuthRoutes.Login">
+                    Connexion
+                </NavLink>
+                <NavLink class="btn btn-primary" href="@AuthRoutes.Register">
+                    Inscription
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </nav>
+    
+</aside>
+
+@code {
+    private bool collapseNavMenu = false;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private static string? GetDisplayName(AuthenticationState state)
+    {
+        var user = state.User;
+        return user.FindFirst("name")?.Value
+               ?? user.FindFirst(ClaimTypes.Name)?.Value
+               ?? user.Identity?.Name;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthStateProvider.ClearTokenAsync();
+        Navigation.NavigateTo(string.Empty, replace: true);
+    }
+}

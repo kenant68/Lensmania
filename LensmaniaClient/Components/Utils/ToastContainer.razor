@@ -1,0 +1,19 @@
+@implements IDisposable
+
+<div class="toast-container position-fixed end-0 p-3">
+    @foreach (var toast in _toasts)
+    {
+        <div class="toast show align-items-center text-bg-@toast.CssClass border-0 mb-2"
+             role="alert" aria-live="assertive">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="bi @toast.Icon"></i>
+                    <span>@toast.Message</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        @onclick="() => Remove(toast)">
+                </button>
+            </div>
+        </div>
+    }
+</div>
