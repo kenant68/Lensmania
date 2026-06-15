@@ -33,29 +33,31 @@ else
     
                 @if (_isOwnProfile)
                 {
-                    <button type="button" class="btn btn-icon"
-                            @onclick="ToggleActionsMenu">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
+                    <div class="profile-actions-wrapper">
+                        <button type="button" class="btn btn-icon"
+                                @onclick="ToggleActionsMenu">
+                            <i class="bi bi-three-dots-vertical fs-3"></i>
+                        </button>
+
+                        @if (_showActionsMenu)
+                        {
+                            <div class="profile-actions-menu">
+                                <button type="button" class="btn btn-primary"
+                                        @onclick="OpenEditModal">
+                                    <i class="bi bi-pencil"></i>
+                                    Modifier mon profil
+                                </button>
+
+                                <button type="button" class="btn btn-danger"
+                                        @onclick="OpenDeleteModal">
+                                    <i class="bi bi-trash"></i>
+                                    Supprimer mon compte
+                                </button>
+                            </div>
+                        }
+                    </div>
                 }
             </div>
-    
-            @if (_showActionsMenu)
-            {
-                <div class="profile-actions-menu">
-                    <button type="button" class="btn btn-primary"
-                            @onclick="OpenEditModal">
-                        <i class="bi bi-pencil"></i>
-                        Modifier mon profil
-                    </button>
-            
-                    <button type="button" class="btn btn-danger"
-                            @onclick="OpenDeleteModal">
-                        <i class="bi bi-trash"></i>
-                        Supprimer mon compte
-                    </button>
-                </div>
-            }
         </header>		
     
         <BadgeShowcase Badges="_profile?.Badges" />
