@@ -40,13 +40,33 @@ else {
         @foreach (var post in _posts)
         {
             <MasonryItem class="col-lg-3 col-md-4 col-sm-6 mb-4">
-				<div class="post-card">
+                <div class="post-card">
+                    
+                    <div @onclick="() => SelectPost(post)">
+                        <img src="@($"{ApiBaseUrl}/uploads/photos/{post.PhotoUrl}")"
+                             alt="@post.Title"
+                             class="card-img-top"
+                             @onload="OnImageLoaded"
+                             @onerror="OnImageFailed"/>
+                    </div>
+                    
+                    <div class="post-overlay">
+                        <button type="button"
+                                class="like-btn @(post.IsLikedByCurrentUser ? "liked" : "")"
+                                aria-label="@(post.IsLikedByCurrentUser ? "Retirer le like" : "Liker la photo")"
+                                aria-pressed="@post.IsLikedByCurrentUser"
+                                @onclick="() => ToggleLike(post)"
+                                @onclick:stopPropagation="true">
+                            <span class="heart-icon">@(post.IsLikedByCurrentUser ? "♥" : "♡")</span>
+                            <span class="like-count">@FormatLikeCount(post.LikesCount)</span>
+                        </button>
+                    </div>
 
                     @if (_selectedPostItem?.Id == post.Id)
                     {
-                        <div class="post-detail">
+                        <div class="post-detail" @onclick:stopPropagation="true">
                             <button class="btn btn-primary ms-auto w-25" @onclick="CloseDetail">✕</button>
-        
+
                             @if (_isLoadingDetail)
                             {
                                 <p>Chargement...</p>
@@ -55,49 +75,27 @@ else {
                             {
                                 <span>@_selectedPostDetailed.Title</span>
                                 <p class="small fw-light opacity-75">@_selectedPostDetailed.Description</p>
-        
+
                                 <p>
-                                    Par 
-                                    <NavLink class="nav-link fw-semibold" href=@($"/profile/{_selectedPostDetailed.Username}")>@_selectedPostDetailed.Username</NavLink>
+                                    <NavLink class="nav-link fw-semibold" href=@($"/profile/{_selectedPostDetailed.Username}")> Par @_selectedPostDetailed.Username</NavLink>
                                 </p>
-        
+
                                 <p class="small fw-light opacity-75">@_selectedPostDetailed.CreatedAt.ToShortDateString()</p>
-                                
+
                                 <AuthorizeView>
                                     <Authorized>
                                         @if (IsOwnProfile)
                                         {
-                                            <DeletePostButton 
-												PostId="@post.Id"
-												OnPostDeleted="HandlePostDeleted" />
+                                            <DeletePostButton
+                                                PostId="@post.Id"
+                                                OnPostDeleted="HandlePostDeleted"/>
                                         }
                                     </Authorized>
                                 </AuthorizeView>
                             }
                         </div>
                     }
-                    else
-                    {
-                        <div @onclick="() => SelectPost(post)">
-                            <img src="@($"{ApiBaseUrl}/uploads/photos/{post.PhotoUrl}")"
-                                alt="@post.Title"
-                                class="card-img-top"
-                                @onload="OnImageLoaded"
-                                @onerror="OnImageFailed"/>
-                        </div>
-                        <div class="post-overlay">
-                            <button type="button"
-                                    class="like-btn @(post.IsLikedByCurrentUser ? "liked" : "")"
-                                    aria-label="@(post.IsLikedByCurrentUser ? "Retirer le like" : "Liker la photo")"
-                                    aria-pressed="@post.IsLikedByCurrentUser"
-                                    @onclick="() => ToggleLike(post)"
-                                    @onclick:stopPropagation="true">
-                                <span class="heart-icon">@(post.IsLikedByCurrentUser ? "♥" : "♡")</span>
-                                <span class="like-count">@FormatLikeCount(post.LikesCount)</span>
-                            </button>
-                        </div>
-                    }
-				</div>
+                </div>
             </MasonryItem>
         }
     </Masonry>

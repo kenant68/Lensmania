@@ -4,6 +4,7 @@
     overflow: hidden;
     cursor: pointer;
     position: relative;
+    break-inside: avoid;
 }
 
 .card-img-top {
@@ -21,6 +22,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .post-overlay {
@@ -87,15 +89,19 @@
 }
 
 .post-detail {
-    padding: 1rem;
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: auto;
-    background-color: var(--color-dark-purple);
-    color: var(--color-yellow);
+    /*gap: 0.5rem;*/
+    padding: 1rem;
     text-align: center;
-    z-index: 100;
+    background: rgba(20, 10, 40, 0.92);
+    backdrop-filter: blur(6px);
+    color: var(--color-yellow);
+    z-index: 2;
+    box-sizing: border-box;
+    animation: fadeIn 0.15s ease-out;
 }
 
 .sort-toggle {
@@ -118,4 +124,15 @@
 .sort-select option {
     background-color: var(--color-dark-purple);
     color: var(--color-yellow);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
