@@ -153,6 +153,9 @@ public class EventService : IEventService
         if (string.IsNullOrWhiteSpace(request.Name))
             throw new ArgumentException("Le nom de l'événement est obligatoire.");
 
+        if (request.Description.Length > 600)
+            throw new ArgumentException("La description ne doit pas dépasser 600 caractères.");
+
         if (request.EndDate <= request.StartDate)
             throw new ArgumentException("La date de fin doit être postérieure à la date de début.");
 
