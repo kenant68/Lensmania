@@ -54,7 +54,7 @@ services:
       # committe (qui reste cale sur le dev direct localhost:5078).
       - ./LensmaniaClient/appsettings.Docker.json:/usr/share/nginx/html/appsettings.json:ro
     ports:
-      - "8080:80"     # le client (et l'API via proxy) sur http://localhost:8080
+      - "8080:8080"   # le client (et l'API via proxy) sur http://localhost:8080
 
 volumes:
   pgdata:
