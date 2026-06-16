@@ -13,9 +13,21 @@
                 </div>
 
                 <div class="modal-body">
-                    <input class="form-control mb-2" @bind="title" placeholder="Titre"/>
-                    <textarea class="form-control mb-2" @bind="description" placeholder="Description"></textarea>
-                    <InputFile class="form-control mb-2" OnChange="HandleFileSelected"/>
+                    <div class="mb-2">
+                        <label for="title" class="form-label">Titre</label>
+                        <input id="title" class="form-control" @bind="title" placeholder="Titre" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control" @bind="description" placeholder="Description" ></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="photo" class="form-label">Photo</label>
+                        <InputFile id="photo" class="form-control" OnChange="HandleFileSelected" />
+                    </div>
+                    
                     @if (!string.IsNullOrEmpty(errorMessage))
                     {
                         <p class="text-danger">@errorMessage</p>
