@@ -21,12 +21,14 @@ RUN apt-get update \
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
 
-# Le dossier des uploads doit appartenir a l'utilisateur applicatif (APP_UID)
-# pour qu'il puisse y ecrire les photos une fois le process en non-root.
-RUN mkdir -p /app/wwwroot/uploads/photos \
-    && chown -R $APP_UID:$APP_UID /app/wwwroot/uploads
-
 COPY --from=build /app/publish .
+
+# Les dossiers d'uploads doivent appartenir a l'utilisateur applicatif (APP_UID)
+# pour qu'il puisse y ecrire une fois le process en non-root. On le fait APRES le
+# COPY : sinon les sous-dossiers ramenes par le publish (ex: badges) repassent en
+# root et redeviennent non inscriptibles.
+RUN mkdir -p /app/wwwroot/uploads/photos /app/wwwroot/uploads/badges \
+    && chown -R $APP_UID:$APP_UID /app/wwwroot/uploads
 
 # On execute le process en non-root (utilisateur "app" fourni par l'image aspnet).
 USER $APP_UID
