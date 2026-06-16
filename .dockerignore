@@ -1,0 +1,15 @@
+# .dockerignore
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/node_modules/
+**/.git/
+**/.gitignore
+**/*.user
+# Ne jamais embarquer de secrets ni de config locale dans l'image
+**/appsettings.Development.json
+LensmaniaServer/appsettings.json
+# Donnees utilisateurs : restent dans un volume, pas dans l'image
+**/wwwroot/uploads/photos/*
+docs/
