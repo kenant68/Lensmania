@@ -34,8 +34,9 @@ services:
       retries: 5
       start_period: 40s
     volumes:
-      # Les photos uploadees doivent survivre a la recreation du conteneur.
+      # Les photos et badges uploades doivent survivre a la recreation du conteneur.
       - uploads:/app/wwwroot/uploads/photos
+      - badges:/app/wwwroot/uploads/badges
     # L'API n'est joignable que par le client via le reseau interne.
     # Decommenter pour taper l'API directement depuis l'hote (debug).
     # ports:
@@ -59,3 +60,4 @@ services:
 volumes:
   pgdata:
   uploads:
+  badges:
