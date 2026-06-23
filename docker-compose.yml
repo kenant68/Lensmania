@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      # On ne demarre l'API que lorsque la base accepte les connexions.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: LensmaniaServer/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # Le client n'est lance qu'une fois l'API prete a repondre.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    volumes:
+      # Les photos et badges uploades doivent survivre a la recreation du conteneur.
+      - uploads:/app/wwwroot/uploads/photos
+      - badges:/app/wwwroot/uploads/badges
+    # L'API n'est joignable que par le client via le reseau interne.
+    # Decommenter pour taper l'API directement depuis l'hote (debug).
+    # ports:
+    #   - "127.0.0.1:8081:8080"
+
+  client:
+    build:
+      context: .
+      dockerfile: LensmaniaClient/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      # Surcharge l'URL de l'API sans rebuild ni toucher au appsettings.json
+      # committe (qui reste cale sur le dev direct localhost:5078).
+      - ./LensmaniaClient/appsettings.Docker.json:/usr/share/nginx/html/appsettings.json:ro
+    ports:
+      - "8080:8080"   # le client (et l'API via proxy) sur http://localhost:8080
+
+volumes:
+  pgdata:
+  uploads:
+  badges:
